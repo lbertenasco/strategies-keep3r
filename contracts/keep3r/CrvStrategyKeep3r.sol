@@ -50,7 +50,8 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
   function calculateHarvest(address _strategy) public override returns (uint256 _amount) {
     require(requiredHarvest[_strategy] > 0, 'strategy-keep3r::calculate-harvest:strategy-not-added');
     address _gauge = ICrvStrategy(_strategy).gauge();
-    return ICrvClaimable(_gauge).claimable_tokens(_strategy);
+    address _voter = ICrvStrategy(_strategy).voter();
+    return ICrvClaimable(_gauge).claimable_tokens(_voter);
   }
   function workable(address _strategy) public override returns (bool) {
     require(requiredHarvest[_strategy] > 0, 'strategy-keep3r::workable:strategy-not-added');

@@ -43,10 +43,10 @@ describe('CrvStrategyKeep3r', function() {
     console.timeEnd('addStrategy')
     
     console.time('calculateHarvest')
-    console.log('calculateHarvest(ycrv)', (await crvStrategyKeep3r.callStatic.calculateHarvest(ycrvContract.address)).toNumber())
-    console.log('calculateHarvest(busd)', (await crvStrategyKeep3r.callStatic.calculateHarvest(busdContract.address)).toNumber())
-    console.log('calculateHarvest(sbtc)', (await crvStrategyKeep3r.callStatic.calculateHarvest(sbtcContract.address)).toNumber())
-    console.log('calculateHarvest(pool3)', (await crvStrategyKeep3r.callStatic.calculateHarvest(pool3Contract.address)).toNumber())
+    console.log('calculateHarvest(ycrv)', (await crvStrategyKeep3r.callStatic.calculateHarvest(ycrvContract.address)).toString())
+    console.log('calculateHarvest(busd)', (await crvStrategyKeep3r.callStatic.calculateHarvest(busdContract.address)).toString())
+    console.log('calculateHarvest(sbtc)', (await crvStrategyKeep3r.callStatic.calculateHarvest(sbtcContract.address)).toString())
+    console.log('calculateHarvest(pool3)', (await crvStrategyKeep3r.callStatic.calculateHarvest(pool3Contract.address)).toString())
     console.timeEnd('calculateHarvest')
 
     console.time('workable')
