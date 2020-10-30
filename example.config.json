@@ -1,0 +1,41 @@
+{
+    "accounts": {
+        "mainnet": {
+            "publicKey": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74",
+            "privateKey": ""
+        }
+    },
+    "contracts": {
+        "mainnet": {
+            "keep3r": {
+                "address": "0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44"
+            },
+            "ycrv": {
+                "address": "0x07DB4B9b3951094B9E278D336aDf46a036295DE7"
+            },
+            "busd": {
+                "address": "0x112570655b32A8c747845E0215ad139661e66E7F"
+            },
+            "sbtc": {
+                "address": "0x6D6c1AD13A5000148Aa087E7CbFb53D402c81341"
+            },
+            "pool3": {
+                "address": "0xC59601F0CC49baa266891b7fc63d2D5FE097A79D"
+            }
+        }
+    },
+    "infura": {
+        "_name": "",
+        "apiKey": ""
+    },
+    "alchemy": {
+        "mainnet": {
+            "_name": "",
+            "apiKey": ""
+        },
+        "ropsten": {
+            "_name": "",
+            "apiKey": ""
+        }
+    }
+}
