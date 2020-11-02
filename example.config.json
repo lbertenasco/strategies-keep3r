@@ -1,14 +1,16 @@
 {
     "accounts": {
         "mainnet": {
-            "publicKey": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74",
-            "privateKey": ""
+            "publicKey": "0xfeb4acf3df3cdea7399794d0869ef76a6efaff52",
+            "privateKey": "",
+            "keep3rGovernance": "0x2d407ddb06311396fe14d4b49da5f0471447d45c",            
+            "keeper": "0x9f6FdC2565CfC9ab8E184753bafc8e94C0F985a0"
         }
     },
     "contracts": {
         "mainnet": {
             "keep3r": {
-                "address": "0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44"
+                "address": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"
             },
             "ycrv": {
                 "address": "0x07DB4B9b3951094B9E278D336aDf46a036295DE7"

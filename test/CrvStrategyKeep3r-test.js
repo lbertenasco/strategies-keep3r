@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const config = require('../.config.json');
 
-const base18DecimalUnit = ethers.BigNumber.from(1).pow(10, 18);
+const e18 = ethers.BigNumber.from(10).pow(18);
 
 describe('CrvStrategyKeep3r', function() {
   let owner;
@@ -19,10 +19,16 @@ describe('CrvStrategyKeep3r', function() {
   });
 
   it.only('Should deploy on mainnet fork', async function() {
-    // await hre.network.provider.request({
-    //   method: "hardhat_impersonateAccount",
-    //   params: ["0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74"]
-    // });
+    
+    await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.publicKey] });
+    const multisig = owner.provider.getUncheckedSigner(config.accounts.mainnet.publicKey);
+
+    await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.keeper] });
+    const keeper = owner.provider.getUncheckedSigner(config.accounts.mainnet.keeper);
+
+    await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.keep3rGovernance] });
+    const keep3rGovernance = owner.provider.getUncheckedSigner(config.accounts.mainnet.keep3rGovernance);
+
 
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
     const crvStrategyKeep3r = (await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address)).connect(owner);
@@ -35,7 +41,7 @@ describe('CrvStrategyKeep3r', function() {
 
     // Add crv strategies to crv keep3r
     console.time('addStrategy')
-    const requiredHarvestAmount = base18DecimalUnit;
+    const requiredHarvestAmount = e18;
     await crvStrategyKeep3r.addStrategy(ycrvContract.address, requiredHarvestAmount);
     await crvStrategyKeep3r.addStrategy(busdContract.address, requiredHarvestAmount);
     await crvStrategyKeep3r.addStrategy(sbtcContract.address, requiredHarvestAmount);
@@ -56,14 +62,41 @@ describe('CrvStrategyKeep3r', function() {
     console.log('workable(pool3)', await crvStrategyKeep3r.callStatic.workable(pool3Contract.address))
     console.timeEnd('workable')
     
-    console.log('TODO: Register as keeper')
-    console.time('harvest')
-    console.log('harvest(ycrv)', await crvStrategyKeep3r.harvest(ycrvContract.address))
-    console.log('harvest(busd)', await crvStrategyKeep3r.harvest(busdContract.address))
-    console.log('harvest(sbtc)', await crvStrategyKeep3r.harvest(sbtcContract.address))
-    console.log('harvest(pool3)', await crvStrategyKeep3r.harvest(pool3Contract.address))
-    console.timeEnd('harvest')
+    console.time('harvest should revert on ycrv')
+    await expect(crvStrategyKeep3r.harvest(ycrvContract.address))
+    .to.be.revertedWith('keep3r::isKeeper:keeper-is-not-registered');
+    console.timeEnd('harvest should revert on ycrv')
+
+    console.time('set crvStrategyKeep3r as strategist')
+    await busdContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
+    await sbtcContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
+    await pool3Contract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
+    console.timeEnd('set crvStrategyKeep3r as strategist')
+
     
+    console.time('add crvStrategyKeep3r as a job on keep3r')
+    const keep3r = await ethers.getContractAt('IKeep3rV1', config.contracts.mainnet.keep3r.address, keep3rGovernance);
+    await keep3r.addJob(crvStrategyKeep3r.address);
+    await keep3r.addKPRCredit(crvStrategyKeep3r.address, e18.mul(10));
+    console.timeEnd('add crvStrategyKeep3r as a job on keep3r')
+
+
+    console.time('harvest busd, sbtc and pool3')
+    console.log('harvest(busd)')
+    await crvStrategyKeep3r.connect(keeper).harvest(busdContract.address)
+    console.log('harvest(sbtc)')
+    await crvStrategyKeep3r.connect(keeper).harvest(sbtcContract.address)
+    console.log('harvest(pool3)')
+    await crvStrategyKeep3r.connect(keeper).harvest(pool3Contract.address)
+    console.timeEnd('harvest busd, sbtc and pool3')
+    
+    
+    console.time('forceHarvest ycrv makes workable false')
+    await ycrvContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
+    await crvStrategyKeep3r.forceHarvest(ycrvContract.address);
+    expect(await crvStrategyKeep3r.callStatic.workable(ycrvContract.address)).to.be.false;
+    console.timeEnd('forceHarvest ycrv makes workable false')
+
   });
 
 });
