@@ -41,7 +41,7 @@ describe('CrvStrategyKeep3r', function() {
 
     // Add crv strategies to crv keep3r
     console.time('addStrategy')
-    const requiredHarvestAmount = e18;
+    const requiredHarvestAmount = e18.mul(100);
     await crvStrategyKeep3r.addStrategy(ycrvContract.address, requiredHarvestAmount);
     await crvStrategyKeep3r.addStrategy(busdContract.address, requiredHarvestAmount);
     await crvStrategyKeep3r.addStrategy(sbtcContract.address, requiredHarvestAmount);
@@ -68,6 +68,7 @@ describe('CrvStrategyKeep3r', function() {
     console.timeEnd('harvest should revert on ycrv')
 
     console.time('set crvStrategyKeep3r as strategist')
+    await ycrvContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
     await busdContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
     await sbtcContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
     await pool3Contract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
@@ -92,10 +93,15 @@ describe('CrvStrategyKeep3r', function() {
     
     
     console.time('forceHarvest ycrv makes workable false')
-    await ycrvContract.connect(multisig).setStrategist(crvStrategyKeep3r.address);
     await crvStrategyKeep3r.forceHarvest(ycrvContract.address);
     expect(await crvStrategyKeep3r.callStatic.workable(ycrvContract.address)).to.be.false;
     console.timeEnd('forceHarvest ycrv makes workable false')
+    
+    console.time('keeper harvest reverts with not-workable')
+    await expect(crvStrategyKeep3r.connect(keeper).harvest(ycrvContract.address))
+      .to.be.revertedWith('strategy-keep3r::harvest:not-workable');
+    console.timeEnd('keeper harvest reverts with not-workable')
+
 
   });
 
