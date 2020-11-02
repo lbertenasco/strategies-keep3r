@@ -13,7 +13,6 @@ describe('CrvStrategyKeep3r', function() {
   it('Should deploy new CrvStrategyKeep3r with keep3r', async function() {
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
     const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address);
-    await crvStrategyKeep3r.deployed();
     const isCrvStrategyKeep3r = await crvStrategyKeep3r.isCrvStrategyKeep3r();
     expect(isCrvStrategyKeep3r).to.be.true;
   });

@@ -9,12 +9,15 @@
     "ethereum-waffle": "^3.1.2",
     "ethers": "^5.0.19",
     "hardhat": "^2.0.1",
-    "hardhat-gas-reporter": "^1.0.0-beta.0"
+    "hardhat-gas-reporter": "^1.0.0-beta.0",
+    "prompt-confirm": "^2.0.4"
   },
   "scripts": {
+    "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/$INFURA_API_KEY --account=\"$ETH_PRIVATE_KEY,1000000000000000000000\"",
     "test": "npx hardhat test",
     "test:gas": "REPORT_GAS=true npx hardhat test",
     "test:ganache": "npx hardhat test --network ganache",
+    "test:mainnet": "npx hardhat test --network mainnet",
     "compile": "npx hardhat compile"
   }
 }

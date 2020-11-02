@@ -4,6 +4,10 @@ require('hardhat-gas-reporter');
 
 const config = require('./.config.json');
 
+const mainnetAccounts = [
+  config.accounts.mainnet.privateKey
+];
+
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -23,6 +27,18 @@ module.exports = {
       unlocked_accounts: ['0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74'],
       keepAliveTimeout: 100000,
     },
+    localMainnet: {
+      url: 'http://127.0.0.1:8545',
+      accounts: mainnetAccounts,
+      gasMultiplier: 1.1,
+      gasPrice: 70000000000, // 70 gwei
+    },
+    mainnet: {
+      url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
+      accounts: mainnetAccounts,
+      gasMultiplier: 1.1,
+      gasPrice: 70000000000, // 70 gwei
+    }
   },
   solidity: {
     compilers: [
