@@ -7,6 +7,6 @@ interface ICrvStrategyKeep3r {
   function isCrvStrategyKeep3r() external pure returns (bool);
   // Setters
   function addStrategy(address _strategy, uint256 _requiredHarvest) external;
-  function setStrategyRequiredHarvest(address _strategy, uint256 _requiredHarvest) external;
+  function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external;
   function removeStrategy(address _strategy) external;
 }

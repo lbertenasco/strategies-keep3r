@@ -26,17 +26,17 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
 
   // Setters
   function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
-    require(requiredHarvest[_strategy] == 0, 'strategy-keep3r::add-strategy:strategy-already-added');
-    requiredHarvest[_strategy] = _requiredHarvest;
+    require(requiredHarvest[_strategy] == 0, 'crv-strategy-keep3r::add-strategy:strategy-already-added');
+    _setRequiredHarvest(_strategy, _requiredHarvest);
     emit StrategyAdded(_strategy, _requiredHarvest);
   }
-  function setStrategyRequiredHarvest(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
-    require(requiredHarvest[_strategy] > 0, 'strategy-keep3r::remove-strategy:strategy-not-added');
-    requiredHarvest[_strategy] = _requiredHarvest;
+  function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
+    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::update-required-harvest:strategy-not-added');
+    _setRequiredHarvest(_strategy, _requiredHarvest);
     emit StrategyModified(_strategy, _requiredHarvest);
   }
   function removeStrategy(address _strategy) external override onlyGovernor {
-    require(requiredHarvest[_strategy] > 0, 'strategy-keep3r::remove-strategy:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::remove-strategy:strategy-not-added');
     requiredHarvest[_strategy] = 0;
     emit StrategyRemoved(_strategy);
   }
@@ -44,24 +44,28 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
     _setKeep3r(_keep3r);
     emit Keep3rSet(_keep3r);
   }
+  function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
+    require(_requiredHarvest > 0, 'crv-strategy-keep3r::set-required-harvest:should-not-be-zero');
+    requiredHarvest[_strategy] = _requiredHarvest;
+  }
 
 
   // Getters
   function calculateHarvest(address _strategy) public override returns (uint256 _amount) {
-    require(requiredHarvest[_strategy] > 0, 'strategy-keep3r::calculate-harvest:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::calculate-harvest:strategy-not-added');
     address _gauge = ICrvStrategy(_strategy).gauge();
     address _voter = ICrvStrategy(_strategy).voter();
     return ICrvClaimable(_gauge).claimable_tokens(_voter);
   }
   function workable(address _strategy) public override returns (bool) {
-    require(requiredHarvest[_strategy] > 0, 'strategy-keep3r::workable:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::workable:strategy-not-added');
     return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
   }
 
 
   // Keep3r actions
   function harvest(address _strategy) external override paysKeeper {
-    require(workable(_strategy), 'strategy-keep3r::harvest:not-workable');
+    require(workable(_strategy), 'crv-strategy-keep3r::harvest:not-workable');
     _harvest(_strategy);
     emit HarvestedByKeeper(_strategy);
   }
