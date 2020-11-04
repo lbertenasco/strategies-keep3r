@@ -47,14 +47,14 @@ function forceHarvest(address _strategy) external override onlyGovernor;
 
 Keep3r functions
 ```sol
-# Called externally (staticCall) to get available harvest in CRV by strategy
+# Called externally to get available harvest in CRV by strategy
 function calculateHarvest(address _strategy) public override returns (uint256 _amount);
 # returns true if available harvest is greater or equal than required harvest
 function workable(address _strategy) public override returns (bool);
 # pays keep3rs to call havest on crv strategies
 function harvest(address _strategy) external override paysKeeper;
 ```
-> call those functions with `staticCall` to avoid spending gas. (they can be pretty slow too)
+> call `calculateHarvest` and `workable` functions with `staticCall` to avoid spending gas. (they can be pretty slow too)
 
 
 ---
