@@ -54,7 +54,7 @@ function workable(address _strategy) public override returns (bool);
 # pays keep3rs to call havest on crv strategies
 function harvest(address _strategy) external override paysKeeper;
 ```
-> call `calculateHarvest` and `workable` functions with `staticCall` to avoid spending gas. (they can be pretty slow too)
+> call `calculateHarvest` and `workable` functions with `callStatic` to avoid spending gas. (they can be pretty slow too)
 
 
 ---
