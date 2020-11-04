@@ -1,5 +1,6 @@
 require('@nomiclabs/hardhat-waffle');
 require("@nomiclabs/hardhat-ganache");
+require("@nomiclabs/hardhat-etherscan");
 require('hardhat-gas-reporter');
 
 const config = require('./.config.json');
@@ -37,7 +38,7 @@ module.exports = {
       url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       accounts: mainnetAccounts,
       gasMultiplier: 1.1,
-      gasPrice: 70000000000, // 70 gwei
+      gasPrice: 50000000000, // 50 gwei
     }
   },
   solidity: {
@@ -58,6 +59,9 @@ module.exports = {
   },
   mocha: {
     timeout: 10*60*1000 // 10 minutes
+  },
+  etherscan: {
+    apiKey: `${config.etherscan.apiKey}`
   },
   gasReporter: {
     enabled: (process.env.REPORT_GAS) ? true : false,
