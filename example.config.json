@@ -23,10 +23,17 @@
             },
             "pool3": {
                 "address": "0xC59601F0CC49baa266891b7fc63d2D5FE097A79D"
+            },
+            "crvStrategyKeep3r": {
+                "address": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D"
             }
         }
     },
     "infura": {
+        "_name": "",
+        "apiKey": ""
+    },
+    "etherscan": {
         "_name": "",
         "apiKey": ""
     },
