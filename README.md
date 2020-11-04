@@ -62,8 +62,11 @@ function harvest(address _strategy) external override paysKeeper;
 
 ### [`MockStrategy.sol`](./contracts/mock/MockStrategy.sol)
 
+> TODO
+
 ### [`StrategyCurveYVoterProxyAbstract.sol`](./contracts/mock/StrategyCurveYVoterProxyAbstract.sol)
 
+> TODO
 
 ## Adding new StrategyKeep3rs
 
