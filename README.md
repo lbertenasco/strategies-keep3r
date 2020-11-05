@@ -7,6 +7,12 @@
 * [x] [`CRV`](./contracts/keep3r/CrvStrategyKeep3r.sol) (`ycrv, busd, sbtc, 3pool`)
 * [ ] (define next strats to keep3rfy)
 
+## Scripts
+
+### Get available rewards and workable for CRV (ycrv, busd, sbtc, 3pool) strategies.
+`npx hardhat run scripts/crv/01-crv-keep3r-calculate-harvest.js`
+
+
 ## Contracts
 
 ---
