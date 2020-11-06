@@ -31,6 +31,17 @@ function promptAndSubmit() {
           const sbtcContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.sbtc.address, deployer);
           const pool3Contract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.pool3.address, deployer);
 
+          console.time('current strategist')
+          const ycrvStrategist = await ycrvContract.strategist()
+          console.log('ycrv.strategist()', ycrvStrategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : ycrvStrategist)
+          const busdStrategist = await busdContract.strategist()
+          console.log('busd.strategist()', busdStrategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : busdStrategist)
+          const sbtcStrategist = await sbtcContract.strategist()
+          console.log('sbtc.strategist()', sbtcStrategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : sbtcStrategist)
+          const pool3Strategist = await pool3Contract.strategist()
+          console.log('pool3.strategist()', pool3Strategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : pool3Strategist)
+          console.timeEnd('current strategist')
+
           console.log('calculating harvest for: ycrv, busd, sbtc, 3pool. please wait ...')
           console.time('calculateHarvest')
           console.log('calculateHarvest(ycrv)', (await crvStrategyKeep3r.callStatic.calculateHarvest(ycrvContract.address)).div(e18).toString())
