@@ -25,6 +25,9 @@
             "pool3": {
                 "address": "0xC59601F0CC49baa266891b7fc63d2D5FE097A79D"
             },
+            "comp": {
+                "address": "0x530da5aeF3c8f9CCbc75C97C182D6ee2284B643F"
+            },
             "crvStrategyKeep3r": {
                 "address": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D"
             }
