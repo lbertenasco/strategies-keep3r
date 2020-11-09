@@ -25,37 +25,43 @@ function promptAndSubmit() {
           // Setup crv strategy keep3r
           const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3r', config.contracts.mainnet.crvStrategyKeep3r.address, deployer);
 
+          // TODO Remove after adding comp
+          // Add comp crv strategy
+          const requiredHarvestAmount = e18.mul(10000); // 10k CRV
+          await crvStrategyKeep3r.addStrategy(config.contracts.mainnet.comp.address, requiredHarvestAmount);
+
+
+          const strategies = { 'ycrv': {}, 'busd': {}, 'sbtc': {}, 'pool3': {}, 'comp': {} };
           // Setup crv strategies
-          const ycrvContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.ycrv.address, deployer);
-          const busdContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.busd.address, deployer);
-          const sbtcContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.sbtc.address, deployer);
-          const pool3Contract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.pool3.address, deployer);
+          for (const strategy in strategies) {
+            strategies[strategy].contract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet[strategy].address, deployer);
+          }
 
           console.time('current strategist')
-          const ycrvStrategist = await ycrvContract.strategist()
-          console.log('ycrv.strategist()', ycrvStrategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : ycrvStrategist)
-          const busdStrategist = await busdContract.strategist()
-          console.log('busd.strategist()', busdStrategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : busdStrategist)
-          const sbtcStrategist = await sbtcContract.strategist()
-          console.log('sbtc.strategist()', sbtcStrategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : sbtcStrategist)
-          const pool3Strategist = await pool3Contract.strategist()
-          console.log('pool3.strategist()', pool3Strategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : pool3Strategist)
+          for (const strategy in strategies) {
+            const strategist = await strategies[strategy].contract.strategist()
+            console.log(`${strategy}.strategist()`, strategist == crvStrategyKeep3r.address ? 'crvStrategyKeep3r' : strategist)
+          }
           console.timeEnd('current strategist')
 
-          console.log('calculating harvest for: ycrv, busd, sbtc, 3pool. please wait ...')
+          console.log(`calculating harvest for: ${Object.keys(strategies)}. please wait ...`)
           console.time('calculateHarvest')
-          console.log('calculateHarvest(ycrv)', (await crvStrategyKeep3r.callStatic.calculateHarvest(ycrvContract.address)).div(e18).toString())
-          console.log('calculateHarvest(busd)', (await crvStrategyKeep3r.callStatic.calculateHarvest(busdContract.address)).div(e18).toString())
-          console.log('calculateHarvest(sbtc)', (await crvStrategyKeep3r.callStatic.calculateHarvest(sbtcContract.address)).div(e18).toString())
-          console.log('calculateHarvest(pool3)', (await crvStrategyKeep3r.callStatic.calculateHarvest(pool3Contract.address)).div(e18).toString())
+          for (const strategy in strategies) {
+            console.log(
+              `calculateHarvest(${strategy})`,
+              (await crvStrategyKeep3r.callStatic.calculateHarvest(strategies[strategy].contract.address)).div(e18).toString()
+            )
+          }
           console.timeEnd('calculateHarvest')
 
           console.log('checking if workable for: ycrv, busd, sbtc, 3pool. please wait ...')
           console.time('workable')
-          console.log('workable(ycrv)', await crvStrategyKeep3r.callStatic.workable(ycrvContract.address))
-          console.log('workable(busd)', await crvStrategyKeep3r.callStatic.workable(busdContract.address))
-          console.log('workable(sbtc)', await crvStrategyKeep3r.callStatic.workable(sbtcContract.address))
-          console.log('workable(pool3)', await crvStrategyKeep3r.callStatic.workable(pool3Contract.address))
+          for (const strategy in strategies) {
+            console.log(
+              `workable(${strategy})`,
+              await crvStrategyKeep3r.callStatic.workable(strategies[strategy].contract.address)
+            )
+          }
           console.timeEnd('workable')
 
           resolve();
