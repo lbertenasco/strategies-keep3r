@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 
 import '../../interfaces/Keep3r/IStrategyKeep3r.sol';
 import '../../interfaces/Keep3r/IDforceStrategyKeep3r.sol';
-import '../../interfaces/dforce/IdRewards.sol';
+import '../../interfaces/dforce/IDRewards.sol';
 import '../../interfaces/dforce/IDforceStrategy.sol';
 
 import '../utils/Governable.sol';
@@ -54,7 +54,7 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
   function calculateHarvest(address _strategy) public view override returns (uint256 _amount) {
     require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::calculate-harvest:strategy-not-added');
     address _pool = IDforceStrategy(_strategy).pool();
-    return IdRewards(_pool).earned(_strategy);
+    return IDRewards(_pool).earned(_strategy);
   }
   function workable(address _strategy) public view override returns (bool) {
     require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::workable:strategy-not-added');
