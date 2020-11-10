@@ -25,8 +25,10 @@ function promptAndSubmit() {
           // Setup crv strategy keep3r
           const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3r', config.contracts.mainnet.crvStrategyKeep3r.address, deployer);
 
-          // Add crv strategy
+          // Add crv comp strategy
           await crvStrategyKeep3r.addStrategy(config.contracts.mainnet.comp.address, requiredHarvestAmount);
+          // Add crv gusd strategy
+          await crvStrategyKeep3r.addStrategy(config.contracts.mainnet.gusd.address, requiredHarvestAmount);
 
           resolve();
         } else {
