@@ -28,8 +28,23 @@
             "comp": {
                 "address": "0x530da5aeF3c8f9CCbc75C97C182D6ee2284B643F"
             },
+            "gusd": {
+                "address": "0xc8327D8E1094a94466e05a2CC1f10fA70a1dF119"
+            },
             "crvStrategyKeep3r": {
                 "address": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D"
+            },
+            "dforce-usdc": {
+                "address": "0xA30d1D98C502378ad61Fe71BcDc3a808CF60b897"
+            },
+            "dforce-usdt": {
+                "address": "0x787C771035bDE631391ced5C083db424A4A64bD8"
+            },
+            "dforceStrategyKeep3r": {
+                "address": "0x30084324619D9645019C3f2cb3a94611601a3078"
+            },
+            "mkr-dai": {
+                "address": "0x932fc4fd0eEe66F22f1E23fBA74D7058391c0b15"
             }
         }
     },
@@ -38,6 +53,10 @@
         "apiKey": ""
     },
     "etherscan": {
+        "_name": "",
+        "apiKey": ""
+    },
+    "coinmarketcap": {
         "_name": "",
         "apiKey": ""
     },
