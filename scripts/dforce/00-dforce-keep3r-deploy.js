@@ -5,7 +5,7 @@ const ethers = hre.ethers;
 const e18 = ethers.BigNumber.from(10).pow(18);
 
 
-const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
+const prompt = new Confirm('Do you wish to deploy dforce keep3r contract?');
 
 async function main() {
   await hre.run('compile');
@@ -26,15 +26,15 @@ function promptAndSubmit(DforceStrategyKeep3r) {
           
           console.time('dforceStrategyKeep3r addStrategy');
           const requiredHarvestAmount = e18.mul(2000); // 2k dforce rewards
-          console.log('dforceUsdcContract')
+          console.log('dforceStrategyKeep3r.addStrategy(dforce-usdc)', config.contracts.mainnet['dforce-usdc'].address, requiredHarvestAmount.toString());
           await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet['dforce-usdc'].address, requiredHarvestAmount);
-          console.log('dforceUsdtContract')
+          console.log('dforceStrategyKeep3r.addStrategy(dforce-usdt)', config.contracts.mainnet['dforce-usdt'].address, requiredHarvestAmount.toString());
           await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet['dforce-usdt'].address, requiredHarvestAmount);
           console.timeEnd('dforceStrategyKeep3r addStrategy');
 
           console.log('TODO from multisig:')
-          console.log(`dforceUsdcContract.setStrategist(${dforceStrategyKeep3r.address})`)
-          console.log(`dforceUsdtContract.setStrategist(${dforceStrategyKeep3r.address})`)
+          console.log(`dforce-usdc: ${config.contracts.mainnet['dforce-usdc'].address}.setStrategist(${dforceStrategyKeep3r.address})`)
+          console.log(`dforce-usdt: ${config.contracts.mainnet['dforce-usdt'].address}.setStrategist(${dforceStrategyKeep3r.address})`)
 
           resolve();
         } else {

@@ -25,13 +25,6 @@ function promptAndSubmit() {
           // Setup crv strategy keep3r
           const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3r', config.contracts.mainnet.crvStrategyKeep3r.address, deployer);
 
-          // TODO Remove after adding comp & gusd
-          // Add comp & gusd crv strategy
-          const requiredHarvestAmount = e18.mul(10000); // 10k CRV
-          await crvStrategyKeep3r.addStrategy(config.contracts.mainnet.comp.address, requiredHarvestAmount);
-          await crvStrategyKeep3r.addStrategy(config.contracts.mainnet.gusd.address, requiredHarvestAmount);
-
-
           const strategies = { 'ycrv': {}, 'busd': {}, 'sbtc': {}, 'pool3': {}, 'comp': {}, 'gusd': {} };
           // Setup crv strategies
           for (const strategy in strategies) {

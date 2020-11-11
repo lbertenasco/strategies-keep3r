@@ -22,27 +22,13 @@ function promptAndSubmit() {
           await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
           const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
           
-          // TODO Remove after deploying dforce keep3r
-          console.time('DforceStrategyKeep3r deployed');
-          const DforceStrategyKeep3r = await ethers.getContractFactory('DforceStrategyKeep3r');
-          const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address);
-          console.timeEnd('DforceStrategyKeep3r deployed');
-          console.log('DforceStrategyKeep3r address:', dforceStrategyKeep3r.address);
-
           // Setup crv strategy keep3r
-          // const dforceStrategyKeep3r = await ethers.getContractAt('DforceStrategyKeep3r', config.contracts.mainnet.dforceStrategyKeep3r.address, deployer);
-
-          // TODO Remove after adding dforce-strats
-          // Add dforce (usdc, usdt) strategies
-          const requiredHarvestAmount = e18.mul(10000); // 10k CRV
-          await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet['dforce-usdc'].address, requiredHarvestAmount);
-          await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet['dforce-usdt'].address, requiredHarvestAmount);
-
+          const dforceStrategyKeep3r = await ethers.getContractAt('DforceStrategyKeep3r', config.contracts.mainnet.dforceStrategyKeep3r.address, deployer);
 
           const strategies = { 'dforce-usdc': {}, 'dforce-usdt': {} };
           // Setup crv strategies
           for (const strategy in strategies) {
-            strategies[strategy].contract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet[strategy].address, deployer);
+            strategies[strategy].contract = await ethers.getContractAt('StrategyDForceUSDC', config.contracts.mainnet[strategy].address, deployer);
           }
 
           console.time('current strategist')

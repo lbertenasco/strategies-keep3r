@@ -16,8 +16,10 @@ import './Keep3rAbstract.sol';
 
 contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep3r, IDforceStrategyKeep3r {
   using SafeMath for uint256;
-  
+
   mapping(address => uint256) public requiredHarvest;
+
+  EnumerableSet.AddressSet internal availableStrategies;
 
   constructor(address _keep3r) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
   }
@@ -26,18 +28,20 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
 
   // Setters
   function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
-    require(requiredHarvest[_strategy] == 0, 'crv-strategy-keep3r::add-strategy:strategy-already-added');
+    require(requiredHarvest[_strategy] == 0, 'dforce-strategy-keep3r::add-strategy:strategy-already-added');
     _setRequiredHarvest(_strategy, _requiredHarvest);
+    availableStrategies.add(_strategy);
     emit StrategyAdded(_strategy, _requiredHarvest);
   }
   function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
-    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::update-required-harvest:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'dforce-strategy-keep3r::update-required-harvest:strategy-not-added');
     _setRequiredHarvest(_strategy, _requiredHarvest);
     emit StrategyModified(_strategy, _requiredHarvest);
   }
   function removeStrategy(address _strategy) external override onlyGovernor {
-    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::remove-strategy:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'dforce-strategy-keep3r::remove-strategy:strategy-not-added');
     requiredHarvest[_strategy] = 0;
+    availableStrategies.remove(_strategy);
     emit StrategyRemoved(_strategy);
   }
   function setKeep3r(address _keep3r) external override onlyGovernor {
@@ -45,26 +49,32 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
     emit Keep3rSet(_keep3r);
   }
   function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
-    require(_requiredHarvest > 0, 'crv-strategy-keep3r::set-required-harvest:should-not-be-zero');
+    require(_requiredHarvest > 0, 'dforce-strategy-keep3r::set-required-harvest:should-not-be-zero');
     requiredHarvest[_strategy] = _requiredHarvest;
   }
 
 
   // Getters
+  function strategies() public view override returns (address[] memory _strategies) {
+    _strategies = new address[](availableStrategies.length());
+    for (uint i; i < availableStrategies.length(); i++) {
+      _strategies[i] = availableStrategies.at(i);
+    }
+  }
   function calculateHarvest(address _strategy) public view override returns (uint256 _amount) {
-    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::calculate-harvest:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'dforce-strategy-keep3r::calculate-harvest:strategy-not-added');
     address _pool = IDforceStrategy(_strategy).pool();
     return IDRewards(_pool).earned(_strategy);
   }
   function workable(address _strategy) public view override returns (bool) {
-    require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::workable:strategy-not-added');
+    require(requiredHarvest[_strategy] > 0, 'dforce-strategy-keep3r::workable:strategy-not-added');
     return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
   }
 
 
   // Keep3r actions
   function harvest(address _strategy) external override paysKeeper {
-    require(workable(_strategy), 'crv-strategy-keep3r::harvest:not-workable');
+    require(workable(_strategy), 'dforce-strategy-keep3r::harvest:not-workable');
     _harvest(_strategy);
     emit HarvestedByKeeper(_strategy);
   }

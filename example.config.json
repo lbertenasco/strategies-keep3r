@@ -40,6 +40,9 @@
             "dforce-usdt": {
                 "address": "0x787C771035bDE631391ced5C083db424A4A64bD8"
             },
+            "dforceStrategyKeep3r": {
+                "address": "0x30084324619D9645019C3f2cb3a94611601a3078"
+            },
             "mkr-dai": {
                 "address": "0x932fc4fd0eEe66F22f1E23fBA74D7058391c0b15"
             }
@@ -50,6 +53,10 @@
         "apiKey": ""
     },
     "etherscan": {
+        "_name": "",
+        "apiKey": ""
+    },
+    "coinmarketcap": {
         "_name": "",
         "apiKey": ""
     },
