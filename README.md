@@ -28,8 +28,13 @@ Abstract contract that should be used to extend from when creating StrategyKeep3
 
 ```sol
   IKeep3rV1 public keep3r;
+  address public bond;
+  uint256 public minBond;
+  uint256 public earned;
+  uint256 public age;
   constructor(address _keep3r) public
   function _setKeep3r(address _keep3r) internal
+  function _setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) internal
   function _isKeeper() internal
   modifier onlyKeeper()
   modifier paysKeeper()
@@ -51,12 +56,15 @@ function addStrategy(address _strategy, uint256 _requiredHarvest) external overr
 function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor;
 function removeStrategy(address _strategy) external override onlyGovernor;
 function setKeep3r(address _keep3r) external override onlyGovernor;
+function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) external override onlyGovernor;
 # safeguard that allows governor(strategist) to call harvest directly, not having to go through keep3r network.
 function forceHarvest(address _strategy) external override onlyGovernor;
 ```
 
 Keep3r functions
 ```sol
+# Called externally to get available strategies to do work for
+function strategies(address _strategy) public view override returns (address[] memory _strategies);
 # Called externally to get available harvest in CRV by strategy
 function calculateHarvest(address _strategy) public override returns (uint256 _amount);
 # returns true if available harvest is greater or equal than required harvest
@@ -117,3 +125,10 @@ function harvest(address _strategy) external override paysKeeper;
 
 - also take into account that any `onlyStrategist` functions on the strategy will need an `onlyGovernor` proxy function on your keep3r
     - i.e. if the strategy contract has a `configureStrategy(...) onlyStrategist || msg.sender == strategist` you'll need to create a ` configureStrategy(...) onlyGovernor` on your `StrategyKeep3r` contract to keep having access to that method.
+
+
+## Useful tips for Keep3r Scripts :)
+
+- call `strategies()` function with `callStatic` to get all available strategies, loop through them to check for work.
+- always call `workable(address _strategy)` function with `callStatic` to avoid spending gas. (they can be pretty slow too)
+- always call `harvest(address _strategy)` function with `callStatic` before sending the real TX to make sure you wont get a revert. (they can be pretty slow too)

@@ -11,6 +11,7 @@ interface ICrvStrategyKeep3r is IStrategyKeep3r {
   function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external;
   function removeStrategy(address _strategy) external;
   // Getters
+  function strategies() external view returns (address[] memory _strategies);
   function calculateHarvest(address _strategy) external returns (uint256 _amount);
   function workable(address _strategy) external returns (bool);
 }

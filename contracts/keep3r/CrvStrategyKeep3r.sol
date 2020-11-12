@@ -19,7 +19,16 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
   
   mapping(address => uint256) public requiredHarvest;
 
-  constructor(address _keep3r) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
+  EnumerableSet.AddressSet internal availableStrategies;
+
+  constructor(
+    address _keep3r,
+    address _bond,
+    uint256 _minBond,
+    uint256 _earned,
+    uint256 _age
+  ) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age);
   }
 
   function isCrvStrategyKeep3r() external pure override returns (bool) { return true; }
@@ -28,6 +37,7 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
   function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
     require(requiredHarvest[_strategy] == 0, 'crv-strategy-keep3r::add-strategy:strategy-already-added');
     _setRequiredHarvest(_strategy, _requiredHarvest);
+    availableStrategies.add(_strategy);
     emit StrategyAdded(_strategy, _requiredHarvest);
   }
   function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
@@ -38,19 +48,31 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
   function removeStrategy(address _strategy) external override onlyGovernor {
     require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::remove-strategy:strategy-not-added');
     requiredHarvest[_strategy] = 0;
+    availableStrategies.remove(_strategy);
     emit StrategyRemoved(_strategy);
-  }
-  function setKeep3r(address _keep3r) external override onlyGovernor {
-    _setKeep3r(_keep3r);
-    emit Keep3rSet(_keep3r);
   }
   function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
     require(_requiredHarvest > 0, 'crv-strategy-keep3r::set-required-harvest:should-not-be-zero');
     requiredHarvest[_strategy] = _requiredHarvest;
   }
+  // Keep3r Setters
+  function setKeep3r(address _keep3r) external override onlyGovernor {
+    _setKeep3r(_keep3r);
+    emit Keep3rSet(_keep3r);
+  }
+  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) external override onlyGovernor {
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age);
+    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age);
+  }
 
 
   // Getters
+  function strategies() public view override returns (address[] memory _strategies) {
+    _strategies = new address[](availableStrategies.length());
+    for (uint i; i < availableStrategies.length(); i++) {
+      _strategies[i] = availableStrategies.at(i);
+    }
+  }
   function calculateHarvest(address _strategy) public override returns (uint256 _amount) {
     require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::calculate-harvest:strategy-not-added');
     address _gauge = ICrvStrategy(_strategy).gauge();

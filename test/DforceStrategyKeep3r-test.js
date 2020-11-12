@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const config = require('../.config.json');
 
 const e18 = ethers.BigNumber.from(10).pow(18);
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 describe('DforceStrategyKeep3r', function() {
   let owner;
@@ -12,7 +13,7 @@ describe('DforceStrategyKeep3r', function() {
 
   it('Should deploy new DforceStrategyKeep3r with keep3r', async function() {
     const DforceStrategyKeep3r = await ethers.getContractFactory('DforceStrategyKeep3r');
-    const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address);
+    const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0);
     const isDforceStrategyKeep3r = await dforceStrategyKeep3r.isDforceStrategyKeep3r();
     expect(isDforceStrategyKeep3r).to.be.true;
   });
@@ -30,7 +31,7 @@ describe('DforceStrategyKeep3r', function() {
 
 
     const DforceStrategyKeep3r = await ethers.getContractFactory('DforceStrategyKeep3r');
-    const dforceStrategyKeep3r = (await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address)).connect(owner);
+    const dforceStrategyKeep3r = (await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0)).connect(owner);
     
     // Setup dforce strategies
     const dforceusdcContract = await ethers.getContractAt('StrategyDForceUSDC', config.contracts.mainnet['dforce-usdc'].address, owner);
