@@ -31,8 +31,8 @@ function promptAndSubmit(VaultKeep3r) {
           const requiredEarnAmount = e18.mul(20000); // 20k earn amount
           
           const vaults = {
-            'ycrvVault': { requiredEarnAmount }, // 20k yCRV default
-            'busdVault': { requiredEarnAmount }, // 20k bu
+            'ycrvVault': { requiredEarnAmount },
+            'busdVault': { requiredEarnAmount },
             'sbtcVault': { requiredEarnAmount: e18.mul(3) },
             'pool3Vault': { requiredEarnAmount },
             'compVault': { requiredEarnAmount }
