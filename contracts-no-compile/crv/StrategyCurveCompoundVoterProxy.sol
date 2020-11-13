@@ -451,7 +451,7 @@ contract StrategyCurveCompoundVoterProxy {
 
     uint256 public earned;  // lifetime strategy earnings denominated in `want` token
 
-    event Harvested(uint wantEarned, uint lifetimeEarned);
+    event Harvest(uint wantEarned, uint lifetimeEarned);
 
     constructor(address _controller) public {
         governance = msg.sender;
@@ -583,7 +583,7 @@ contract StrategyCurveCompoundVoterProxy {
         }
         VoterProxy(proxy).lock();
         earned = earned.add(_want);
-        emit Harvested(_want, earned);
+        emit Harvest(_want, earned);
     }
 
     function balanceOfWant() public view returns (uint256) {
