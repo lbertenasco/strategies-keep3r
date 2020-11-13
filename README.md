@@ -8,6 +8,12 @@
 * [x] [`DForce`](./contracts/keep3r/DforceStrategyKeep3r.sol) (`usdt, usdc`)
 * [ ] (define next strats to keep3rfy)
 
+### Vaults
+
+* [x] [`yearn`](./contracts/keep3r/VaultKeep3r.sol) (`yCrv, busdCrv, sbtcCrv, 3poolCrv, compCrv`)
+* [ ] (add more vautls to yearn vault keep3r)
+* [ ] (define next vaults types to keep3rfy)
+
 ## Scripts
 
 ### Get available rewards and workable for CRV (ycrv, busd, sbtc, 3pool, comp) strategies.
@@ -15,6 +21,9 @@
 
 ### Get available rewards and workable for DForce (sdt, usdc) strategies.
 `npx hardhat run scripts/dforce/01-dforce-keep3r-calculate-harvest.js`
+
+### Get available earn and workable for yearn (yCrv, busdCrv, sbtcCrv, 3poolCrv, compCrv) vaults.
+`npx hardhat run scripts/vault/01-vault-keep3r-calculate-earn`
 
 
 ## Contracts
@@ -98,6 +107,36 @@ function workable(address _strategy) public view override returns (bool);
 function harvest(address _strategy) external override paysKeeper;
 ```
 
+### [`VaultKeep3r.sol`](./contracts/keep3r/VaultKeep3r.sol)
+
+```sol
+mapping(address => uint256) public requiredEarn;
+mapping(address => uint256) public lastEarnAt;
+uint256 earnCooldown;
+EnumerableSet.AddressSet internal availableVaults;
+function isVaultKeep3r() external pure override returns (bool) { return true; }
+```
+
+Governor (strategist) functions:
+```sol
+function addVault(address _vault, uint256 _requiredEarn) external override onlyGovernor;
+function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernor;
+function removeVault(address _vault) external override onlyGovernor;
+function setEarnCooldown(uint256 _earnCooldown) external override onlyGovernor;
+```
+
+Keep3r functions
+```sol
+# Called externally to get available vaults to do work for
+function vaults(address _vault) public view override returns (address[] memory _vaults);
+# Called externally to get available earn in yearn by vault
+function calculateEarn(address _vault) public view override returns (uint256 _amount);
+# returns true if available earn is greater or equal than required earn and earnCooldown has elapsed
+function workable(address _vault) public view override returns (bool);
+# pays keep3rs to call havest on crv vaults
+function earn(address _vault) external override paysKeeper;
+```
+
 ---
 > mock
 
@@ -132,3 +171,4 @@ function harvest(address _strategy) external override paysKeeper;
 - call `strategies()` function with `callStatic` to get all available strategies, loop through them to check for work.
 - always call `workable(address _strategy)` function with `callStatic` to avoid spending gas. (they can be pretty slow too)
 - always call `harvest(address _strategy)` function with `callStatic` before sending the real TX to make sure you wont get a revert. (they can be pretty slow too)
+- on `VaultKeep3r` use `vaults()` and `earn(address _vault)`
