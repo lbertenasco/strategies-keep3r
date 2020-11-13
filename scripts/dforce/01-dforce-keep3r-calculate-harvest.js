@@ -48,7 +48,7 @@ function promptAndSubmit() {
           }
           console.timeEnd('calculateHarvest')
 
-          console.log('checking if workable for: ycrv, busd, sbtc, 3pool. please wait ...')
+          console.log('checking if workable for: dforce-usdc, dforce-usdt. please wait ...')
           console.time('workable')
           for (const strategy in strategies) {
             console.log(

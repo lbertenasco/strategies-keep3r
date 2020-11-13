@@ -2,7 +2,7 @@
 
 pragma solidity >=0.6.8;
 
-import '../../interfaces/IKeep3rV1.sol';
+import '../../interfaces/keep3r/IKeep3rV1.sol';
 
 abstract
 contract Keep3r {

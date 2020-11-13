@@ -4,8 +4,8 @@ pragma solidity >=0.6.8;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 
-import '../../interfaces/Keep3r/IStrategyKeep3r.sol';
-import '../../interfaces/Keep3r/ICrvStrategyKeep3r.sol';
+import '../../interfaces/keep3r/IStrategyKeep3r.sol';
+import '../../interfaces/keep3r/ICrvStrategyKeep3r.sol';
 import '../../interfaces/crv/ICrvStrategy.sol';
 import '../../interfaces/crv/ICrvClaimable.sol';
 
@@ -89,14 +89,14 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
   function harvest(address _strategy) external override paysKeeper {
     require(workable(_strategy), 'crv-strategy-keep3r::harvest:not-workable');
     _harvest(_strategy);
-    emit HarvestedByKeeper(_strategy);
+    emit HarvestByKeeper(_strategy);
   }
 
 
   // Governor keeper bypass
   function forceHarvest(address _strategy) external override onlyGovernor {
     _harvest(_strategy);
-    emit HarvestedByGovernor(_strategy);
+    emit HarvestByGovernor(_strategy);
   }
 
   function _harvest(address _strategy) internal {

@@ -45,6 +45,24 @@
             },
             "mkr-dai": {
                 "address": "0x932fc4fd0eEe66F22f1E23fBA74D7058391c0b15"
+            },
+            "ycrvVault": {
+                "address": "0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c"
+            },
+            "busdVault": {
+                "address": "0x2994529C0652D127b7842094103715ec5299bBed"
+            },
+            "sbtcVault": {
+                "address": "0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6"
+            },
+            "pool3Vault": {
+                "address": "0x9cA85572E6A3EbF24dEDd195623F188735A5179f"
+            },
+            "compVault": {
+                "address": "0x629c759D1E83eFbF63d84eb3868B564d9521C129"
+            },
+            "vaultKeep3r": {
+                "address": ""
             }
         }
     },
