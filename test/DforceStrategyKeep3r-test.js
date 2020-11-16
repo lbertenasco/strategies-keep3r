@@ -1,8 +1,6 @@
 const { expect } = require('chai');
 const config = require('../.config.json');
-
-const e18 = ethers.BigNumber.from(10).pow(18);
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const { e18, ZERO_ADDRESS } = require('../utils/web3-utils');
 
 describe('DforceStrategyKeep3r', function() {
   let owner;

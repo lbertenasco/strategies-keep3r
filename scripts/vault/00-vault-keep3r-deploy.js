@@ -1,11 +1,8 @@
 const Confirm = require('prompt-confirm');
 const hre = require('hardhat');
-const config = require('../../.config.json');
 const ethers = hre.ethers;
-
-const e18 = ethers.BigNumber.from(10).pow(18);
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-const SIX_HOURS = 6 * 60 * 60;
+const config = require('../../.config.json');
+const { e18, ZERO_ADDRESS, SIX_HOURS } = require('../../utils/web3-utils');
 
 const prompt = new Confirm('Do you wish to deploy vault keep3r contract?');
 
