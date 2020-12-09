@@ -42,8 +42,8 @@ function promptAndSubmit() {
           };
           // Setup vaultsC
           for (const vault in vaultsC) {
-            console.log(`vaultKeep3rC.addVault(${vault})`, config.contracts.mainnet[vault].address, requiredEarnAmount.div(e18).toNumber());
-            await vaultKeep3rC.addVault(config.contracts.mainnet[vault].address, requiredEarnAmount);
+            console.log(`vaultKeep3rC.addVault(${vault})`, config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount.div(e18).toNumber());
+            await vaultKeep3rC.addVault(config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount);
           }
           console.timeEnd('vaultKeep3rC addVault');
           config.contracts.mainnet.vaultKeep3r.address = vaultKeep3rC.address;
@@ -56,7 +56,19 @@ function promptAndSubmit() {
           // Setup vaults
           for (const vault in vaults) {
             vaults[vault].contract = await ethers.getContractAt('yVault', config.contracts.mainnet[vault].address, deployer);
+            vaults[vault].token = await ethers.getContractAt('ERC20Token', await vaults[vault].contract.callStatic.token(), deployer);
           }
+
+          
+          console.time('balance of vault')
+          for (const vault in vaults) {
+            console.log(
+              `balance of vault(${vault})`,
+              (await vaults[vault].token.callStatic.balanceOf(vaults[vault].contract.address)).div(e18).toNumber()
+            )
+          }
+          console.timeEnd('balance of vault')
+
 
           console.log(`calculating earn for: ${Object.keys(vaults)}. please wait ...`)
           console.time('calculateEarn')
@@ -77,6 +89,42 @@ function promptAndSubmit() {
             )
           }
           console.timeEnd('workable')
+
+          console.time('working...')
+          for (const vault in vaults) {
+            console.log(`working(${vault})`);
+            await vaultKeep3r.connect(owner).forceEarn(vaults[vault].contract.address);
+          }
+          console.timeEnd('working...')
+
+          console.log(`calculating earn for: ${Object.keys(vaults)}. please wait ...`)
+          console.time('calculateEarn')
+          for (const vault in vaults) {
+            console.log(
+              `calculateEarn(${vault})`,
+              (await vaultKeep3r.callStatic.calculateEarn(vaults[vault].contract.address)).div(e18).toNumber()
+            )
+          }
+          console.timeEnd('calculateEarn')
+
+          console.log(`checking if workable for: ${Object.keys(vaults).join(', ').slice(0, -2)}. please wait ...`)
+          console.time('workable')
+          for (const vault in vaults) {
+            console.log(
+              `workable(${vault})`,
+              await vaultKeep3r.callStatic.workable(vaults[vault].contract.address)
+            )
+          }
+          console.timeEnd('workable')
+
+          console.time('balance of vault')
+          for (const vault in vaults) {
+            console.log(
+              `balance of vault(${vault})`,
+              (await vaults[vault].token.callStatic.balanceOf(vaults[vault].contract.address)).div(e18).toNumber()
+            )
+          }
+          console.timeEnd('balance of vault')
 
           resolve();
         } else {

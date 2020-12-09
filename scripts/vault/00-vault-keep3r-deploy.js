@@ -34,10 +34,11 @@ function promptAndSubmit(VaultKeep3r) {
             'pool3Vault': { requiredEarnAmount },
             'compVault': { requiredEarnAmount }
           };
+
           // Setup vaults
           for (const vault in vaults) {
-            console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, requiredEarnAmount.div(e18).toNumber());
-            await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, requiredEarnAmount);
+            console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount.div(e18).toNumber());
+            await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount);
           }
           console.timeEnd('vaultKeep3r addVault');
 
