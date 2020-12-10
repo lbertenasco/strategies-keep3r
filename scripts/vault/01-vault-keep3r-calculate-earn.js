@@ -25,7 +25,7 @@ function promptAndSubmit() {
           // TODO REMOE
           console.time('VaultKeep3r deployed');
           const VaultKeep3r = await ethers.getContractFactory('VaultKeep3r');
-          const vaultKeep3rC = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, SIX_HOURS);
+          const vaultKeep3rC = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true, SIX_HOURS);
           console.timeEnd('VaultKeep3r deployed');
 
           console.log('VaultKeep3r address:', vaultKeep3rC.address);
@@ -38,7 +38,9 @@ function promptAndSubmit() {
             'busdVault': { requiredEarnAmount },
             'sbtcVault': { requiredEarnAmount: e18.mul(3) },
             'pool3Vault': { requiredEarnAmount },
-            'compVault': { requiredEarnAmount }
+            'compVault': { requiredEarnAmount },
+            'usdtVault': { requiredEarnAmount },
+            'tusdVault': { requiredEarnAmount },
           };
           // Setup vaultsC
           for (const vault in vaultsC) {
@@ -52,14 +54,16 @@ function promptAndSubmit() {
           // Setup crv vault keep3r
           const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
 
-          const vaults = { 'ycrvVault': {}, 'busdVault': {}, 'sbtcVault': {}, 'pool3Vault': {}, 'compVault': {} };
+          const vaults = {
+            'ycrvVault': {}, 'busdVault': {}, 'sbtcVault': {}, 'pool3Vault': {}, 'compVault': {}, 'usdtVault': { }, 'tusdVault': { }
+          };
           // Setup vaults
           for (const vault in vaults) {
             vaults[vault].contract = await ethers.getContractAt('yVault', config.contracts.mainnet[vault].address, deployer);
             vaults[vault].token = await ethers.getContractAt('ERC20Token', await vaults[vault].contract.callStatic.token(), deployer);
           }
 
-          
+
           console.time('balance of vault')
           for (const vault in vaults) {
             console.log(
@@ -92,8 +96,10 @@ function promptAndSubmit() {
 
           console.time('working...')
           for (const vault in vaults) {
-            console.log(`working(${vault})`);
-            await vaultKeep3r.connect(owner).forceEarn(vaults[vault].contract.address);
+            if (await vaultKeep3r.callStatic.workable(vaults[vault].contract.address)) {
+              console.log(`working(${vault})`);
+              await vaultKeep3r.connect(owner).forceEarn(vaults[vault].contract.address);
+            }
           }
           console.timeEnd('working...')
 
