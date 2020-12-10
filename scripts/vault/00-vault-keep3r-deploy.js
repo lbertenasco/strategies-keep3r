@@ -19,28 +19,12 @@ function promptAndSubmit(VaultKeep3r) {
       prompt.ask(async (answer) => {
         if (answer) {
           console.time('VaultKeep3r deployed');
-          const vaultKeep3r = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, SIX_HOURS);
+          const vaultKeep3r = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true, SIX_HOURS);
           console.timeEnd('VaultKeep3r deployed');
 
           console.log('VaultKeep3r address:', vaultKeep3r.address);
           
-          console.time('vaultKeep3r addVault');
-          const requiredEarnAmount = e18.mul(20000); // 20k earn amount
-          
-          const vaults = {
-            'ycrvVault': { requiredEarnAmount },
-            'busdVault': { requiredEarnAmount },
-            'sbtcVault': { requiredEarnAmount: e18.mul(3) },
-            'pool3Vault': { requiredEarnAmount },
-            'compVault': { requiredEarnAmount }
-          };
-
-          // Setup vaults
-          for (const vault in vaults) {
-            console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount.div(e18).toNumber());
-            await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount);
-          }
-          console.timeEnd('vaultKeep3r addVault');
+          console.log('TODO: change .config.json & example.config.json vaultKeep3r address to:', vaultKeep3r.address);
 
           resolve();
         } else {

@@ -26,9 +26,10 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
     address _bond,
     uint256 _minBond,
     uint256 _earned,
-    uint256 _age
+    uint256 _age,
+    bool _onlyEOA
   ) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
-    _setKeep3rRequirements(_bond, _minBond, _earned, _age);
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
   }
 
   function isCrvStrategyKeep3r() external pure override returns (bool) { return true; }
@@ -60,9 +61,9 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
     _setKeep3r(_keep3r);
     emit Keep3rSet(_keep3r);
   }
-  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) external override onlyGovernor {
-    _setKeep3rRequirements(_bond, _minBond, _earned, _age);
-    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age);
+  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) external override onlyGovernor {
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
+    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age, _onlyEOA);
   }
 
 

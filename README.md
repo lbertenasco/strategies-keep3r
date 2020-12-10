@@ -43,7 +43,7 @@ Abstract contract that should be used to extend from when creating StrategyKeep3
   uint256 public age;
   constructor(address _keep3r) public
   function _setKeep3r(address _keep3r) internal
-  function _setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) internal
+  function _setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) internal
   function _isKeeper() internal
   modifier onlyKeeper()
   modifier paysKeeper()
@@ -65,7 +65,7 @@ function addStrategy(address _strategy, uint256 _requiredHarvest) external overr
 function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor;
 function removeStrategy(address _strategy) external override onlyGovernor;
 function setKeep3r(address _keep3r) external override onlyGovernor;
-function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) external override onlyGovernor;
+function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) external override onlyGovernor;
 # safeguard that allows governor(strategist) to call harvest directly, not having to go through keep3r network.
 function forceHarvest(address _strategy) external override onlyGovernor;
 ```

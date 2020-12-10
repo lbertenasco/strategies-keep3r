@@ -27,9 +27,10 @@ contract VaultKeep3r is Governable, CollectableDust, Keep3r, IVaultKeep3r {
     uint256 _minBond,
     uint256 _earned,
     uint256 _age,
+    bool _onlyEOA,
     uint256 _earnCooldown
   ) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
-    _setKeep3rRequirements(_bond, _minBond, _earned, _age);
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
     _setEarnCooldown(_earnCooldown);
   }
 
@@ -69,9 +70,9 @@ contract VaultKeep3r is Governable, CollectableDust, Keep3r, IVaultKeep3r {
     _setKeep3r(_keep3r);
     emit Keep3rSet(_keep3r);
   }
-  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age) external override onlyGovernor {
-    _setKeep3rRequirements(_bond, _minBond, _earned, _age);
-    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age);
+  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) external override onlyGovernor {
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
+    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age, _onlyEOA);
   }
 
 

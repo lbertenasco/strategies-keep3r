@@ -11,7 +11,7 @@ describe('VaultKeep3r', function() {
 
   it('Should deploy new VaultKeep3r with keep3r', async function() {
     const VaultKeep3r = await ethers.getContractFactory('VaultKeep3r');
-    const vaultKeep3r = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, SIX_HOURS);
+    const vaultKeep3r = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true, SIX_HOURS);
     const isVaultKeep3r = await vaultKeep3r.isVaultKeep3r();
     expect(isVaultKeep3r).to.be.true;
   });
@@ -29,7 +29,7 @@ describe('VaultKeep3r', function() {
 
 
     const VaultKeep3r = await ethers.getContractFactory('VaultKeep3r');
-    const vaultKeep3r = (await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, SIX_HOURS)).connect(owner);
+    const vaultKeep3r = (await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true, SIX_HOURS)).connect(owner);
     
     const requiredEarnAmount = e18.mul(20000); // 20k default earn amount
     const vaults = {

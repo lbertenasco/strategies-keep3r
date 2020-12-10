@@ -11,7 +11,7 @@ describe('CrvStrategyKeep3r', function() {
 
   it('Should deploy new CrvStrategyKeep3r with keep3r', async function() {
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
-    const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0 ,0);
+    const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0 ,0, true);
     const isCrvStrategyKeep3r = await crvStrategyKeep3r.isCrvStrategyKeep3r();
     expect(isCrvStrategyKeep3r).to.be.true;
   });
@@ -29,7 +29,7 @@ describe('CrvStrategyKeep3r', function() {
 
 
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
-    const crvStrategyKeep3r = (await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0)).connect(owner);
+    const crvStrategyKeep3r = (await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true)).connect(owner);
     
     // Setup crv strategies
     const ycrvContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.ycrv.address, owner);
