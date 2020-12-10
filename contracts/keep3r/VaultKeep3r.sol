@@ -97,7 +97,7 @@ contract VaultKeep3r is Governable, CollectableDust, Keep3r, IVaultKeep3r {
 
 
   // Keep3r actions
-  function earn(address _vault) external override paysKeeper {
+  function earn(address _vault) external override onlyKeeper paysKeeper {
     require(workable(_vault), 'vault-keep3r::earn:not-workable');
     _earn(_vault);
     emit EarnByKeeper(_vault);

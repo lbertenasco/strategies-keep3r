@@ -87,7 +87,7 @@ contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep
 
 
   // Keep3r actions
-  function harvest(address _strategy) external override paysKeeper {
+  function harvest(address _strategy) external override onlyKeeper paysKeeper {
     require(workable(_strategy), 'crv-strategy-keep3r::harvest:not-workable');
     _harvest(_strategy);
     emit HarvestByKeeper(_strategy);

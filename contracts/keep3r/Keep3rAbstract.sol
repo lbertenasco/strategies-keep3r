@@ -39,25 +39,21 @@ contract Keep3r {
 
   // Checks if caller is a valid keeper, handles default payment after execution
   modifier paysKeeper() {
-    _isKeeper();
     _;
     keep3r.worked(msg.sender);
   }
   // Checks if caller is a valid keeper, handles payment amount after execution
   modifier paysKeeperAmount(uint256 _amount) {
-    _isKeeper();
     _;
     keep3r.workReceipt(msg.sender, _amount);
   }
   // Checks if caller is a valid keeper, handles payment amount in _credit after execution
   modifier paysKeeperCredit(address _credit, uint256 _amount) {
-    _isKeeper();
     _;
     keep3r.receipt(_credit, msg.sender, _amount);
   }
   // Checks if caller is a valid keeper, handles payment amount in ETH after execution
   modifier paysKeeperEth(uint256 _amount) {
-    _isKeeper();
     _;
     keep3r.receiptETH( msg.sender, _amount);
   }

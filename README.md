@@ -47,6 +47,9 @@ Abstract contract that should be used to extend from when creating StrategyKeep3
   function _isKeeper() internal
   modifier onlyKeeper()
   modifier paysKeeper()
+  modifier paysKeeperAmount(uint256 _amount)
+  modifier paysKeeperCredit(address _credit, uint256 _amount)
+  modifier paysKeeperEth(uint256 _amount)
 ```
 
 ### [`CrvStrategyKeep3r.sol`](./contracts/keep3r/CrvStrategyKeep3r.sol)
@@ -79,7 +82,7 @@ function calculateHarvest(address _strategy) public override returns (uint256 _a
 # returns true if available harvest is greater or equal than required harvest
 function workable(address _strategy) public override returns (bool);
 # pays keep3rs to call havest on crv strategies
-function harvest(address _strategy) external override paysKeeper;
+function harvest(address _strategy) external override onlyKeeper paysKeeper;
 ```
 > call `calculateHarvest` and `workable` functions with `callStatic` to avoid spending gas. (they can be pretty slow too)
 
@@ -104,7 +107,7 @@ function calculateHarvest(address _strategy) public view override returns (uint2
 # returns true if available harvest is greater or equal than required harvest
 function workable(address _strategy) public view override returns (bool);
 # pays keep3rs to call havest on crv strategies
-function harvest(address _strategy) external override paysKeeper;
+function harvest(address _strategy) external override onlyKeeper paysKeeper;
 ```
 
 ### [`VaultKeep3r.sol`](./contracts/keep3r/VaultKeep3r.sol)
@@ -134,7 +137,7 @@ function calculateEarn(address _vault) public view override returns (uint256 _am
 # returns true if available earn is greater or equal than required earn and earnCooldown has elapsed
 function workable(address _vault) public view override returns (bool);
 # pays keep3rs to call havest on crv vaults
-function earn(address _vault) external override paysKeeper;
+function earn(address _vault) external override onlyKeeper paysKeeper;
 ```
 
 ---

@@ -87,7 +87,7 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
 
 
   // Keep3r actions
-  function harvest(address _strategy) external override paysKeeper {
+  function harvest(address _strategy) external override onlyKeeper paysKeeper {
     require(workable(_strategy), 'dforce-strategy-keep3r::harvest:not-workable');
     _harvest(_strategy);
     emit HarvestByKeeper(_strategy);
