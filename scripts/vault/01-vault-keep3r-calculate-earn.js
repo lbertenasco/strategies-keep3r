@@ -21,16 +21,13 @@ function promptAndSubmit() {
           await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
           const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
           
+          // Setup vault keep3r
+          const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
 
-          // TODO REMOE
-          console.time('VaultKeep3r deployed');
-          const VaultKeep3r = await ethers.getContractFactory('VaultKeep3r');
-          const vaultKeep3rC = await VaultKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true, SIX_HOURS);
-          console.timeEnd('VaultKeep3r deployed');
+          // TODO REMOVE
+          console.log('VaultKeep3r address:', vaultKeep3r.address);
 
-          console.log('VaultKeep3r address:', vaultKeep3rC.address);
-
-          console.time('vaultKeep3rC addVault');
+          console.time('vaultKeep3r addVault');
           const requiredEarnAmount = e18.mul(20000); // 20k earn amount
 
           const vaultsC = {
@@ -44,15 +41,11 @@ function promptAndSubmit() {
           };
           // Setup vaultsC
           for (const vault in vaultsC) {
-            console.log(`vaultKeep3rC.addVault(${vault})`, config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount.div(e18).toNumber());
-            await vaultKeep3rC.addVault(config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount);
+            console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount.div(e18).toNumber());
+            await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount);
           }
-          console.timeEnd('vaultKeep3rC addVault');
-          config.contracts.mainnet.vaultKeep3r.address = vaultKeep3rC.address;
-          // TODO END REMOE
-
-          // Setup crv vault keep3r
-          const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
+          console.timeEnd('vaultKeep3r addVault');
+          // TODO END REMOVE
 
           const vaults = {
             'ycrvVault': {}, 'busdVault': {}, 'sbtcVault': {}, 'pool3Vault': {}, 'compVault': {}, 'usdtVault': { }, 'tusdVault': { }
