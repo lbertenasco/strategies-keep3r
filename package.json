@@ -20,6 +20,7 @@
     "test:gas": "REPORT_GAS=true npx hardhat test",
     "test:ganache": "npx hardhat test --network ganache",
     "test:mainnet": "npx hardhat test --network mainnet",
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   }
 }

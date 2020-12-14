@@ -91,7 +91,7 @@ function promptAndSubmit() {
           for (const vault in vaults) {
             if (await vaultKeep3r.callStatic.workable(vaults[vault].contract.address)) {
               console.log(`working(${vault})`);
-              await vaultKeep3r.connect(owner).forceEarn(vaults[vault].contract.address);
+              await vaultKeep3r.forceEarn(vaults[vault].contract.address);
             }
           }
           console.timeEnd('working...')

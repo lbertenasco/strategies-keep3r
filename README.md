@@ -111,6 +111,8 @@ function harvest(address _strategy) external override onlyKeeper paysKeeper;
 ```
 
 ### [`VaultKeep3r.sol`](./contracts/keep3r/VaultKeep3r.sol)
+> [verified on etherscan](https://etherscan.io/address/0x054A87DdFdE3ccb5DDB03739375329BcC1b03203#code)
+
 
 ```sol
 mapping(address => uint256) public requiredEarn;
