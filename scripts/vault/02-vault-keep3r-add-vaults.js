@@ -5,7 +5,7 @@ const config = require('../../.config.json');
 const { e18 } = require('../../utils/web3-utils');
 
 
-const prompt = new Confirm('Do you wish to add dforce strategies as keep3r strategies?');
+const prompt = new Confirm('Do you wish to add vaults to vault keep3r?');
 
 async function main() {
   await hre.run('compile');
@@ -25,6 +25,7 @@ function promptAndSubmit() {
 
           // Setup dforce strategy keep3r
           const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);      
+          // const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address);      
 
           console.time('vaultKeep3r addVault');
           const requiredEarnAmount = e18.mul(20000); // 20k earn amount

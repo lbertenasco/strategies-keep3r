@@ -24,29 +24,6 @@ function promptAndSubmit() {
           // Setup vault keep3r
           const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
 
-          // TODO REMOVE
-          console.log('VaultKeep3r address:', vaultKeep3r.address);
-
-          console.time('vaultKeep3r addVault');
-          const requiredEarnAmount = e18.mul(20000); // 20k earn amount
-
-          const vaultsC = {
-            'ycrvVault': { requiredEarnAmount },
-            'busdVault': { requiredEarnAmount },
-            'sbtcVault': { requiredEarnAmount: e18.mul(3) },
-            'pool3Vault': { requiredEarnAmount },
-            'compVault': { requiredEarnAmount },
-            'usdtVault': { requiredEarnAmount },
-            'tusdVault': { requiredEarnAmount },
-          };
-          // Setup vaultsC
-          for (const vault in vaultsC) {
-            console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount.div(e18).toNumber());
-            await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, vaultsC[vault].requiredEarnAmount);
-          }
-          console.timeEnd('vaultKeep3r addVault');
-          // TODO END REMOVE
-
           const vaults = {
             'ycrvVault': {}, 'busdVault': {}, 'sbtcVault': {}, 'pool3Vault': {}, 'compVault': {}, 'usdtVault': { }, 'tusdVault': { }
           };
