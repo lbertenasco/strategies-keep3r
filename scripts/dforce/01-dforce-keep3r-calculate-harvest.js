@@ -1,8 +1,8 @@
 const Confirm = require('prompt-confirm');
 const hre = require('hardhat');
-const config = require('../../.config.json');
 const ethers = hre.ethers;
-const e18 = ethers.BigNumber.from(10).pow(18);
+const config = require('../../.config.json');
+const { e18 } = require('../../utils/web3-utils');
 
 
 const prompt = new Confirm('Do you wish to calculate dforce keep3r strategies harvest?');
@@ -48,7 +48,7 @@ function promptAndSubmit() {
           }
           console.timeEnd('calculateHarvest')
 
-          console.log('checking if workable for: ycrv, busd, sbtc, 3pool. please wait ...')
+          console.log('checking if workable for: dforce-usdc, dforce-usdt. please wait ...')
           console.time('workable')
           for (const strategy in strategies) {
             console.log(

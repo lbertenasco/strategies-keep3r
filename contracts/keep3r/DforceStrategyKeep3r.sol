@@ -4,8 +4,8 @@ pragma solidity >=0.6.8;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 
-import '../../interfaces/Keep3r/IStrategyKeep3r.sol';
-import '../../interfaces/Keep3r/IDforceStrategyKeep3r.sol';
+import '../../interfaces/keep3r/IStrategyKeep3r.sol';
+import '../../interfaces/keep3r/IDforceStrategyKeep3r.sol';
 import '../../interfaces/dforce/IDRewards.sol';
 import '../../interfaces/dforce/IDforceStrategy.sol';
 
@@ -21,7 +21,15 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
 
   EnumerableSet.AddressSet internal availableStrategies;
 
-  constructor(address _keep3r) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
+  constructor(
+    address _keep3r,
+    address _bond,
+    uint256 _minBond,
+    uint256 _earned,
+    uint256 _age,
+    bool _onlyEOA
+  ) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
   }
 
   function isDforceStrategyKeep3r() external pure override returns (bool) { return true; }
@@ -44,13 +52,19 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
     availableStrategies.remove(_strategy);
     emit StrategyRemoved(_strategy);
   }
+  function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
+    require(_requiredHarvest > 0, 'dforce-strategy-keep3r::set-required-harvest:should-not-be-zero');
+    requiredHarvest[_strategy] = _requiredHarvest;
+  }
+  
+  // Keep3r Setters
   function setKeep3r(address _keep3r) external override onlyGovernor {
     _setKeep3r(_keep3r);
     emit Keep3rSet(_keep3r);
   }
-  function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
-    require(_requiredHarvest > 0, 'dforce-strategy-keep3r::set-required-harvest:should-not-be-zero');
-    requiredHarvest[_strategy] = _requiredHarvest;
+  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) external override onlyGovernor {
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
+    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age, _onlyEOA);
   }
 
 
@@ -73,17 +87,17 @@ contract DforceStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyK
 
 
   // Keep3r actions
-  function harvest(address _strategy) external override paysKeeper {
+  function harvest(address _strategy) external override onlyKeeper paysKeeper {
     require(workable(_strategy), 'dforce-strategy-keep3r::harvest:not-workable');
     _harvest(_strategy);
-    emit HarvestedByKeeper(_strategy);
+    emit HarvestByKeeper(_strategy);
   }
 
 
   // Governor keeper bypass
   function forceHarvest(address _strategy) external override onlyGovernor {
     _harvest(_strategy);
-    emit HarvestedByGovernor(_strategy);
+    emit HarvestByGovernor(_strategy);
   }
 
   function _harvest(address _strategy) internal {

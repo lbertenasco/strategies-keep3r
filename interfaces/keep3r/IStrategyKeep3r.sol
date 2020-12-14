@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.8;
-interface IStrategyKeep3r {
-  event Keep3rSet(address keep3r);
+import "./IKeep3r.sol";
+interface IStrategyKeep3r is IKeep3r {
   // Actions by Keeper
-  event HarvestedByKeeper(address _strategy);
+  event HarvestByKeeper(address _strategy);
   // Actions forced by governance
-  event HarvestedByGovernor(address _strategy);
-  // Setters
-  function setKeep3r(address _keep3r) external;
+  event HarvestByGovernor(address _strategy);
   // Keep3r actions
   function harvest(address _strategy) external;
   // Governance Keeper bypass

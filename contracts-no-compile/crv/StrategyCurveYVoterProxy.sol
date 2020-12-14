@@ -15,20 +15,21 @@ import "../../interfaces/curve/Curve.sol";
 import "../../interfaces/yearn/IToken.sol";
 import "../../interfaces/yearn/IVoterProxy.sol";
 
-contract StrategyCurveBTCVoterProxy {
+contract StrategyCurveYVoterProxy {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;
 
-    address public constant want = address(0x075b1bb99792c9E1041bA13afEf80C91a1e70fB3);
+    address public constant want = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
     address public constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
     address public constant uni = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-    address public constant weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> wbtc route
+    address public constant weth = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // used for crv <> weth <> dai route
 
-    address public constant wbtc = address(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599);
-    address public constant curve = address(0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714);
+    address public constant dai = address(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    address public constant ydai = address(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
+    address public constant curve = address(0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51);
 
-    address public constant gauge = address(0x705350c4BcD35c9441419DdD5d2f097d7a55410F);
+    address public constant gauge = address(0xFA712EE4788C042e2B7BB55E6cb8ec569C4530c1);
     address public constant voter = address(0xF147b8125d2ef93FB6965Db97D6746952a133934);
 
     uint256 public keepCRV = 1000;
@@ -48,7 +49,7 @@ contract StrategyCurveBTCVoterProxy {
 
     uint256 public earned; // lifetime strategy earnings denominated in `want` token
 
-    event Harvested(uint256 wantEarned, uint256 lifetimeEarned);
+    event Harvest(uint256 wantEarned, uint256 lifetimeEarned);
 
     constructor(address _controller) public {
         governance = msg.sender;
@@ -57,7 +58,7 @@ contract StrategyCurveBTCVoterProxy {
     }
 
     function getName() external pure returns (string memory) {
-        return "StrategyCurveBTCVoterProxy";
+        return "StrategyCurveYVoterProxy";
     }
 
     function setStrategist(address _strategist) external {
@@ -98,7 +99,8 @@ contract StrategyCurveBTCVoterProxy {
         require(msg.sender == controller, "!controller");
         require(want != address(_asset), "want");
         require(crv != address(_asset), "crv");
-        require(wbtc != address(_asset), "wbtc");
+        require(ydai != address(_asset), "ydai");
+        require(dai != address(_asset), "dai");
         balance = _asset.balanceOf(address(this));
         _asset.safeTransfer(controller, balance);
     }
@@ -134,9 +136,7 @@ contract StrategyCurveBTCVoterProxy {
     }
 
     function _withdrawAll() internal {
-        uint256 _before = balanceOf();
         IVoterProxy(proxy).withdrawAll(gauge, want);
-        require(_before == balanceOf(), "!slippage");
     }
 
     function harvest() public {
@@ -154,15 +154,21 @@ contract StrategyCurveBTCVoterProxy {
             address[] memory path = new address[](3);
             path[0] = crv;
             path[1] = weth;
-            path[2] = wbtc;
+            path[2] = dai;
 
             Uni(uni).swapExactTokensForTokens(_crv, uint256(0), path, address(this), now.add(1800));
         }
-        uint256 _wbtc = IERC20(wbtc).balanceOf(address(this));
-        if (_wbtc > 0) {
-            IERC20(wbtc).safeApprove(curve, 0);
-            IERC20(wbtc).safeApprove(curve, _wbtc);
-            ICurveFi(curve).add_liquidity([0, _wbtc, 0], 0);
+        uint256 _dai = IERC20(dai).balanceOf(address(this));
+        if (_dai > 0) {
+            IERC20(dai).safeApprove(ydai, 0);
+            IERC20(dai).safeApprove(ydai, _dai);
+            yERC20(ydai).deposit(_dai);
+        }
+        uint256 _ydai = IERC20(ydai).balanceOf(address(this));
+        if (_ydai > 0) {
+            IERC20(ydai).safeApprove(curve, 0);
+            IERC20(ydai).safeApprove(curve, _ydai);
+            ICurveFi(curve).add_liquidity([_ydai, 0, 0, 0], 0);
         }
         uint256 _want = IERC20(want).balanceOf(address(this));
         if (_want > 0) {
@@ -172,7 +178,7 @@ contract StrategyCurveBTCVoterProxy {
         }
         IVoterProxy(proxy).lock();
         earned = earned.add(_want);
-        emit Harvested(_want, earned);
+        emit Harvest(_want, earned);
     }
 
     function _withdrawSome(uint256 _amount) internal returns (uint256) {

@@ -8,6 +8,12 @@
 * [x] [`DForce`](./contracts/keep3r/DforceStrategyKeep3r.sol) (`usdt, usdc`)
 * [ ] (define next strats to keep3rfy)
 
+### Vaults
+
+* [x] [`yearn`](./contracts/keep3r/VaultKeep3r.sol) (`yCrv, busdCrv, sbtcCrv, 3poolCrv, compCrv`)
+* [ ] (add more vautls to yearn vault keep3r)
+* [ ] (define next vaults types to keep3rfy)
+
 ## Scripts
 
 ### Get available rewards and workable for CRV (ycrv, busd, sbtc, 3pool, comp) strategies.
@@ -15,6 +21,9 @@
 
 ### Get available rewards and workable for DForce (sdt, usdc) strategies.
 `npx hardhat run scripts/dforce/01-dforce-keep3r-calculate-harvest.js`
+
+### Get available earn and workable for yearn (yCrv, busdCrv, sbtcCrv, 3poolCrv, compCrv) vaults.
+`npx hardhat run scripts/vault/01-vault-keep3r-calculate-earn`
 
 
 ## Contracts
@@ -28,11 +37,19 @@ Abstract contract that should be used to extend from when creating StrategyKeep3
 
 ```sol
   IKeep3rV1 public keep3r;
+  address public bond;
+  uint256 public minBond;
+  uint256 public earned;
+  uint256 public age;
   constructor(address _keep3r) public
   function _setKeep3r(address _keep3r) internal
+  function _setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) internal
   function _isKeeper() internal
   modifier onlyKeeper()
   modifier paysKeeper()
+  modifier paysKeeperAmount(uint256 _amount)
+  modifier paysKeeperCredit(address _credit, uint256 _amount)
+  modifier paysKeeperEth(uint256 _amount)
 ```
 
 ### [`CrvStrategyKeep3r.sol`](./contracts/keep3r/CrvStrategyKeep3r.sol)
@@ -51,18 +68,21 @@ function addStrategy(address _strategy, uint256 _requiredHarvest) external overr
 function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor;
 function removeStrategy(address _strategy) external override onlyGovernor;
 function setKeep3r(address _keep3r) external override onlyGovernor;
+function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) external override onlyGovernor;
 # safeguard that allows governor(strategist) to call harvest directly, not having to go through keep3r network.
 function forceHarvest(address _strategy) external override onlyGovernor;
 ```
 
 Keep3r functions
 ```sol
+# Called externally to get available strategies to do work for
+function strategies(address _strategy) public view override returns (address[] memory _strategies);
 # Called externally to get available harvest in CRV by strategy
 function calculateHarvest(address _strategy) public override returns (uint256 _amount);
 # returns true if available harvest is greater or equal than required harvest
 function workable(address _strategy) public override returns (bool);
 # pays keep3rs to call havest on crv strategies
-function harvest(address _strategy) external override paysKeeper;
+function harvest(address _strategy) external override onlyKeeper paysKeeper;
 ```
 > call `calculateHarvest` and `workable` functions with `callStatic` to avoid spending gas. (they can be pretty slow too)
 
@@ -87,7 +107,39 @@ function calculateHarvest(address _strategy) public view override returns (uint2
 # returns true if available harvest is greater or equal than required harvest
 function workable(address _strategy) public view override returns (bool);
 # pays keep3rs to call havest on crv strategies
-function harvest(address _strategy) external override paysKeeper;
+function harvest(address _strategy) external override onlyKeeper paysKeeper;
+```
+
+### [`VaultKeep3r.sol`](./contracts/keep3r/VaultKeep3r.sol)
+> [verified on etherscan](https://etherscan.io/address/0x054A87DdFdE3ccb5DDB03739375329BcC1b03203#code)
+
+
+```sol
+mapping(address => uint256) public requiredEarn;
+mapping(address => uint256) public lastEarnAt;
+uint256 earnCooldown;
+EnumerableSet.AddressSet internal availableVaults;
+function isVaultKeep3r() external pure override returns (bool) { return true; }
+```
+
+Governor (strategist) functions:
+```sol
+function addVault(address _vault, uint256 _requiredEarn) external override onlyGovernor;
+function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernor;
+function removeVault(address _vault) external override onlyGovernor;
+function setEarnCooldown(uint256 _earnCooldown) external override onlyGovernor;
+```
+
+Keep3r functions
+```sol
+# Called externally to get available vaults to do work for
+function vaults(address _vault) public view override returns (address[] memory _vaults);
+# Called externally to get available earn in yearn by vault
+function calculateEarn(address _vault) public view override returns (uint256 _amount);
+# returns true if available earn is greater or equal than required earn and earnCooldown has elapsed
+function workable(address _vault) public view override returns (bool);
+# pays keep3rs to call havest on crv vaults
+function earn(address _vault) external override onlyKeeper paysKeeper;
 ```
 
 ---
@@ -117,3 +169,11 @@ function harvest(address _strategy) external override paysKeeper;
 
 - also take into account that any `onlyStrategist` functions on the strategy will need an `onlyGovernor` proxy function on your keep3r
     - i.e. if the strategy contract has a `configureStrategy(...) onlyStrategist || msg.sender == strategist` you'll need to create a ` configureStrategy(...) onlyGovernor` on your `StrategyKeep3r` contract to keep having access to that method.
+
+
+## Useful tips for Keep3r Scripts :)
+
+- call `strategies()` function with `callStatic` to get all available strategies, loop through them to check for work.
+- always call `workable(address _strategy)` function with `callStatic` to avoid spending gas. (they can be pretty slow too)
+- always call `harvest(address _strategy)` function with `callStatic` before sending the real TX to make sure you wont get a revert. (they can be pretty slow too)
+- on `VaultKeep3r` use `vaults()` and `earn(address _vault)`
