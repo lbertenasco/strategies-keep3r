@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const config = require('../.config.json');
-
-const e18 = ethers.BigNumber.from(10).pow(18);
+const { e18, ZERO_ADDRESS } = require('../utils/web3-utils');
 
 describe('CrvStrategyKeep3r', function() {
   let owner;
@@ -12,7 +11,7 @@ describe('CrvStrategyKeep3r', function() {
 
   it('Should deploy new CrvStrategyKeep3r with keep3r', async function() {
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
-    const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address);
+    const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0 ,0, true);
     const isCrvStrategyKeep3r = await crvStrategyKeep3r.isCrvStrategyKeep3r();
     expect(isCrvStrategyKeep3r).to.be.true;
   });
@@ -30,7 +29,7 @@ describe('CrvStrategyKeep3r', function() {
 
 
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
-    const crvStrategyKeep3r = (await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address)).connect(owner);
+    const crvStrategyKeep3r = (await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true)).connect(owner);
     
     // Setup crv strategies
     const ycrvContract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet.ycrv.address, owner);
@@ -46,6 +45,11 @@ describe('CrvStrategyKeep3r', function() {
     await crvStrategyKeep3r.addStrategy(sbtcContract.address, requiredHarvestAmount);
     await crvStrategyKeep3r.addStrategy(pool3Contract.address, requiredHarvestAmount);
     console.timeEnd('addStrategy')
+
+    console.time('strategies')
+    const strategies = await crvStrategyKeep3r.strategies();
+    expect(strategies).to.be.deep.eq([ycrvContract.address,busdContract.address,sbtcContract.address,pool3Contract.address]);
+    console.timeEnd('strategies')
 
     console.time('updateRequiredHarvestAmount')
     await crvStrategyKeep3r.updateRequiredHarvestAmount(ycrvContract.address, requiredHarvestAmount.mul(2));

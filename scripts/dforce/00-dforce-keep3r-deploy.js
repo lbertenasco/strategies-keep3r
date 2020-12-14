@@ -1,8 +1,8 @@
 const Confirm = require('prompt-confirm');
 const hre = require('hardhat');
-const config = require('../../.config.json');
 const ethers = hre.ethers;
-const e18 = ethers.BigNumber.from(10).pow(18);
+const config = require('../../.config.json');
+const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
 
 const prompt = new Confirm('Do you wish to deploy dforce keep3r contract?');
@@ -20,21 +20,11 @@ function promptAndSubmit(DforceStrategyKeep3r) {
       prompt.ask(async (answer) => {
         if (answer) {
           console.time('DforceStrategyKeep3r deployed');
-          const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address);
+          const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true);
           console.timeEnd('DforceStrategyKeep3r deployed');
           console.log('DforceStrategyKeep3r address:', dforceStrategyKeep3r.address);
           
-          console.time('dforceStrategyKeep3r addStrategy');
-          const requiredHarvestAmount = e18.mul(2000); // 2k dforce rewards
-          console.log('dforceStrategyKeep3r.addStrategy(dforce-usdc)', config.contracts.mainnet['dforce-usdc'].address, requiredHarvestAmount.toString());
-          await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet['dforce-usdc'].address, requiredHarvestAmount);
-          console.log('dforceStrategyKeep3r.addStrategy(dforce-usdt)', config.contracts.mainnet['dforce-usdt'].address, requiredHarvestAmount.toString());
-          await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet['dforce-usdt'].address, requiredHarvestAmount);
-          console.timeEnd('dforceStrategyKeep3r addStrategy');
-
-          console.log('TODO from multisig:')
-          console.log(`dforce-usdc: ${config.contracts.mainnet['dforce-usdc'].address}.setStrategist(${dforceStrategyKeep3r.address})`)
-          console.log(`dforce-usdt: ${config.contracts.mainnet['dforce-usdt'].address}.setStrategist(${dforceStrategyKeep3r.address})`)
+          console.log('TODO: change .config.json & example.config.json dforceStrategyKeep3r address to:', dforceStrategyKeep3r.address);
 
           resolve();
         } else {
