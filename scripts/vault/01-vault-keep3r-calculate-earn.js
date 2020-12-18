@@ -25,7 +25,15 @@ function promptAndSubmit() {
           const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
 
           const vaults = {
-            'ycrvVault': {}, 'busdVault': {}, 'sbtcVault': {}, 'pool3Vault': {}, 'compVault': {}, 'usdtVault': { }, 'tusdVault': { }
+            'ycrvVault': {},
+            'busdVault': {},
+            'sbtcVault': {},
+            'pool3Vault': {},
+            'compVault': {},
+            'usdtVault': {},
+            'tusdVault': {},
+            'musdVault': {},
+            'gusdVault': {},
           };
           // Setup vaults
           for (const vault in vaults) {
