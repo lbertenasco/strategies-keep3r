@@ -24,20 +24,22 @@ function promptAndSubmit() {
           const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
 
           // Setup dforce strategy keep3r
-          const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);      
+          const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
           // const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address);      
 
           console.time('vaultKeep3r addVault');
           const requiredEarnAmount = e18.mul(20000); // 20k earn amount
 
           const vaults = {
-            'ycrvVault': { requiredEarnAmount },
-            'busdVault': { requiredEarnAmount },
-            'sbtcVault': { requiredEarnAmount: e18.mul(3) },
-            'pool3Vault': { requiredEarnAmount },
-            'compVault': { requiredEarnAmount },
-            'usdtVault': { requiredEarnAmount },
-            'tusdVault': { requiredEarnAmount },
+            // 'ycrvVault': { requiredEarnAmount },
+            // 'busdVault': { requiredEarnAmount },
+            // 'sbtcVault': { requiredEarnAmount: e18.mul(3) },
+            // 'pool3Vault': { requiredEarnAmount },
+            // 'compVault': { requiredEarnAmount },
+            // 'usdtVault': { requiredEarnAmount },
+            // 'tusdVault': { requiredEarnAmount },
+            // 'musdVault': { requiredEarnAmount },
+            // 'gusdVault': { requiredEarnAmount },
           };
 
           // Setup vaults
