@@ -18,10 +18,14 @@ function promptAndSubmit() {
       prompt.ask(async (answer) => {
         if (answer) {
           const [owner] = await ethers.getSigners();
-
           // Setup deployer
-          await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
-          const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
+          let deployer;
+          if (owner.address == config.accounts.mainnet.deployer) {
+            deployer = owner;
+          } else {
+            await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
+            deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
+          }
 
           // Setup dforce strategy keep3r
           const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
@@ -40,6 +44,7 @@ function promptAndSubmit() {
             // 'tusdVault': { requiredEarnAmount },
             // 'musdVault': { requiredEarnAmount },
             // 'gusdVault': { requiredEarnAmount },
+            'yvUSDC': { requiredEarnAmount },
           };
 
           // Setup vaults

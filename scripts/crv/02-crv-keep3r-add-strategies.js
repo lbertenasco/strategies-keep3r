@@ -18,20 +18,27 @@ function promptAndSubmit() {
       prompt.ask(async (answer) => {
         if (answer) {
           const [owner] = await ethers.getSigners();
-
           // Setup deployer
-          await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
-          const deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
+          let deployer;
+          if (owner.address == config.accounts.mainnet.deployer) {
+            deployer = owner;
+          } else {
+            await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
+            deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
+          }
 
           // Setup crv strategy keep3r
           const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3r', config.contracts.mainnet.crvStrategyKeep3r.address, deployer);      
 
-          const strategies = { 'ycrv': {}, 'busd': {}, 'sbtc': {}, 'pool3': {}, 'comp': {}, 'gusd': {} };
-          const requiredHarvestAmount = e18.mul(10000); // 10k CRV
+          const strategies = {
+            // 'ycrv': {}, 'busd': {}, 'sbtc': {}, 'pool3': {}, 'comp': {}, 'gusd': {},
+            // 'gusdVoter': {}, 'musd': {},
+          };
+          const requiredHarvestAmount = e18.mul(5000); // 5k CRV
 
           console.time('crvStrategyKeep3r addStrategies');
           for (const strategy in strategies) {
-            console.log(`addings: ${strategy}`)
+            console.log(`adding: ${strategy}`)
             await crvStrategyKeep3r.addStrategy(config.contracts.mainnet[strategy].address, requiredHarvestAmount);
           }
           console.timeEnd('crvStrategyKeep3r addStrategy');

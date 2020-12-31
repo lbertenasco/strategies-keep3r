@@ -31,7 +31,7 @@ function promptAndSubmit() {
 
           console.time('dforceStrategyKeep3r addStrategies');
           for (const strategy in strategies) {
-            console.log(`addings: ${strategy}`)
+            console.log(`adding: ${strategy}`)
             await dforceStrategyKeep3r.addStrategy(config.contracts.mainnet[strategy].address, requiredHarvestAmount);
           }
           console.timeEnd('dforceStrategyKeep3r addStrategy');
