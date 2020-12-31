@@ -25,7 +25,26 @@ function promptAndSubmit() {
           // Setup crv strategy keep3r
           const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3r', config.contracts.mainnet.crvStrategyKeep3r.address, deployer);
 
-          const strategies = { 'ycrv': {}, 'busd': {}, 'sbtc': {}, 'pool3': {}, 'comp': {}, 'gusd': {} };
+          // Adds new strategies
+          const newStrategies = { };
+          const requiredHarvestAmount = e18.mul(10000); // 10k CRV
+
+          console.time('crvStrategyKeep3r addStrategies');
+          for (const strategy in newStrategies) {
+            console.log(`adding: ${strategy}`)
+            await crvStrategyKeep3r.addStrategy(config.contracts.mainnet[strategy].address, requiredHarvestAmount);
+          }
+
+          const strategies = {
+            'ycrv': {},
+            'busd': {},
+            'sbtc': {},
+            'pool3': {},
+            'comp': {},
+            'gusd': {},
+            'gusdVoter': {},
+            'musd': {},
+          };
           // Setup crv strategies
           for (const strategy in strategies) {
             strategies[strategy].contract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet[strategy].address, deployer);
@@ -38,6 +57,13 @@ function promptAndSubmit() {
           }
           console.timeEnd('current strategist')
 
+          console.time('current requiredHarvest')
+          for (const strategy in strategies) {
+            const requiredHarvest = await crvStrategyKeep3r.callStatic.requiredHarvest(config.contracts.mainnet[strategy].address)
+            console.log(`${strategy} requiredHarvest:`, requiredHarvest.div(e18).toString())
+          }
+          console.timeEnd('current requiredHarvest')
+
           console.log(`calculating harvest for: ${Object.keys(strategies)}. please wait ...`)
           console.time('calculateHarvest')
           for (const strategy in strategies) {
@@ -48,7 +74,7 @@ function promptAndSubmit() {
           }
           console.timeEnd('calculateHarvest')
 
-          console.log('checking if workable for: ycrv, busd, sbtc, 3pool. please wait ...')
+          console.log(`checking if workable for: ${Object.keys(strategies)}. please wait ...`)
           console.time('workable')
           for (const strategy in strategies) {
             console.log(

@@ -32,13 +32,13 @@ module.exports = {
       url: 'http://127.0.0.1:8545',
       accounts: mainnetAccounts,
       gasMultiplier: 1.1,
-      gasPrice: 30000000000, // 30 gwei
+      gasPrice: 45000000000, // 45 gwei
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       accounts: mainnetAccounts,
       gasMultiplier: 1.1,
-      gasPrice: 30000000000, // 30 gwei
+      gasPrice: 45000000000, // 45 gwei
     }
   },
   solidity: {
