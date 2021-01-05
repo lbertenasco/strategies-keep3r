@@ -77,10 +77,9 @@ function promptAndSubmit() {
           console.log(`checking if workable for: ${Object.keys(strategies)}. please wait ...`)
           console.time('workable')
           for (const strategy in strategies) {
-            console.log(
-              `workable(${strategy})`,
-              await crvStrategyKeep3r.callStatic.workable(strategies[strategy].contract.address)
-            )
+            const workable = await crvStrategyKeep3r.callStatic.workable(strategies[strategy].contract.address);
+            console.log(`workable(${strategy})`, workable)
+            if (workable) console.log(`forceHarvest with: ${strategies[strategy].contract.address} on: https://etherscan.io/address/${strategies[strategy].contract.address}#writeContract`)
           }
           console.timeEnd('workable')
 
