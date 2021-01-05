@@ -31,7 +31,7 @@
 ---
 > keep3r
 
-### [`Keep3rAbstract.sol`](./contracts/keep3r/Keep3rAbstract.sol)
+### [`Keep3rAbstract.sol`](https://github.com/lbertenasco/contract-utils/blob/main/contracts/keep3r/Keep3rAbstract.sol)
 
 Abstract contract that should be used to extend from when creating StrategyKeep3rs (see [`CrvStrategyKeep3r.sol`](./contracts/keep3r/CrvStrategyKeep3r.sol))
 

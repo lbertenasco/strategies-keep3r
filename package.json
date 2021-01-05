@@ -1,18 +1,19 @@
 {
   "name": "strategies-keep3r",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.0",
-    "@nomiclabs/hardhat-etherscan": "^2.0.0",
-    "@nomiclabs/hardhat-ganache": "^2.0.0",
-    "@nomiclabs/hardhat-waffle": "^2.0.0",
-    "@openzeppelin/contracts": "3.2.0",
-    "axios": "^0.21.0",
-    "chai": "^4.2.0",
-    "ethereum-waffle": "^3.1.2",
-    "ethers": "^5.0.19",
-    "hardhat": "^2.0.1",
-    "hardhat-gas-reporter": "^1.0.0-beta.0",
-    "prompt-confirm": "^2.0.4"
+    "@lbertenasco/contract-utils": "0.2.3",
+    "@nomiclabs/hardhat-ethers": "2.0.1",
+    "@nomiclabs/hardhat-etherscan": "2.1.0",
+    "@nomiclabs/hardhat-ganache": "2.0.0",
+    "@nomiclabs/hardhat-waffle": "2.0.1",
+    "@openzeppelin/contracts": "3.3.0",
+    "axios": "0.21.1",
+    "chai": "4.2.0",
+    "ethereum-waffle": "3.2.1",
+    "ethers": "5.0.24",
+    "hardhat": "2.0.7",
+    "hardhat-gas-reporter": "1.0.4",
+    "prompt-confirm": "2.0.4"
   },
   "scripts": {
     "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/$INFURA_API_KEY --account=\"$ETH_PRIVATE_KEY,1000000000000000000000\"",

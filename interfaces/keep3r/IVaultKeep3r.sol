@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.8;
-import "./IKeep3r.sol";
+import '@lbertenasco/contract-utils/interfaces/keep3r/IKeep3r.sol';
 interface IVaultKeep3r is IKeep3r {
   event VaultAdded(address _vault, uint256 _requiredEarn);
   event VaultModified(address _vault, uint256 _requiredEarn);
