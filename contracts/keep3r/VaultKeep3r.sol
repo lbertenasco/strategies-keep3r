@@ -3,6 +3,7 @@
 pragma solidity >=0.6.8;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol';
 
 import '../../interfaces/keep3r/IVaultKeep3r.sol';
 import '../../interfaces/yearn/IEarnableVault.sol';
@@ -10,7 +11,6 @@ import '../../interfaces/yearn/IEarnableVault.sol';
 import '../utils/Governable.sol';
 import '../utils/CollectableDust.sol';
 
-import './Keep3rAbstract.sol';
 
 contract VaultKeep3r is Governable, CollectableDust, Keep3r, IVaultKeep3r {
   using SafeMath for uint256;
