@@ -79,7 +79,7 @@ function promptAndSubmit() {
           for (const strategy in strategies) {
             const workable = await crvStrategyKeep3r.callStatic.workable(strategies[strategy].contract.address);
             console.log(`workable(${strategy})`, workable)
-            if (workable) console.log(`forceHarvest with: ${strategies[strategy].contract.address} on: https://etherscan.io/address/${strategies[strategy].contract.address}#writeContract`)
+            if (workable) console.log(`forceHarvest with: ${strategies[strategy].contract.address} on: https://etherscan.io/address/${config.contracts.mainnet.crvStrategyKeep3r.address}#writeContract`)
           }
           console.timeEnd('workable')
 
