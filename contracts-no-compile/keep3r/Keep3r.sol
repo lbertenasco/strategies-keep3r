@@ -885,7 +885,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param voter to add the votes to
      * @param amount of votes to add
      */
-    function addVotes(address voter, uint amount) external {
+    function addVotes(address voter, uint amount) external { // onlyGovernance
         require(msg.sender == governance, "addVotes: !gov");
         _activate(voter, address(this));
         votes[voter] = votes[voter].add(amount);
@@ -898,7 +898,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param voter to subtract the votes
      * @param amount of votes to remove
      */
-    function removeVotes(address voter, uint amount) external {
+    function removeVotes(address voter, uint amount) external { // onlyGovernance
         require(msg.sender == governance, "addVotes: !gov");
         votes[voter] = votes[voter].sub(amount);
         totalBonded = totalBonded.sub(amount);
@@ -910,7 +910,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param job the job being credited
      * @param amount the amount of credit being added to the job
      */
-    function addKPRCredit(address job, uint amount) external {
+    function addKPRCredit(address job, uint amount) external { // onlyGovernance
         require(msg.sender == governance, "addKPRCredit: !gov");
         require(jobs[job], "addKPRCredit: !job");
         credits[job][address(this)] = credits[job][address(this)].add(amount);
@@ -922,7 +922,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Approve a liquidity pair for being accepted in future
      * @param liquidity the liquidity no longer accepted
      */
-    function approveLiquidity(address liquidity) external {
+    function approveLiquidity(address liquidity) external { // onlyGovernance
         require(msg.sender == governance, "approveLiquidity: !gov");
         require(!liquidityAccepted[liquidity], "approveLiquidity: !pair");
         liquidityAccepted[liquidity] = true;
@@ -933,7 +933,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Revoke a liquidity pair from being accepted in future
      * @param liquidity the liquidity no longer accepted
      */
-    function revokeLiquidity(address liquidity) external {
+    function revokeLiquidity(address liquidity) external { // onlyGovernance
         require(msg.sender == governance, "revokeLiquidity: !gov");
         liquidityAccepted[liquidity] = false;
     }
@@ -1030,7 +1030,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to mint new tokens to treasury
      * @param amount the amount of tokens to mint to treasury
      */
-    function mint(uint amount) external {
+    function mint(uint amount) external { // onlyGovernance
         require(msg.sender == governance, "mint: !gov");
         _mint(governance, amount);
     }
@@ -1136,7 +1136,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to add new job systems
      * @param job address of the contract for which work should be performed
      */
-    function addJob(address job) external {
+    function addJob(address job) external { // onlyGovernance
         require(msg.sender == governance, "addJob: !gov");
         require(!jobs[job], "addJob: job known");
         jobs[job] = true;
@@ -1156,7 +1156,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to remove a job from the systems
      * @param job address of the contract for which work should be performed
      */
-    function removeJob(address job) external {
+    function removeJob(address job) external { // onlyGovernance
         require(msg.sender == governance, "removeJob: !gov");
         jobs[job] = false;
         emit JobRemoved(job, block.number, msg.sender);
@@ -1166,7 +1166,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to change the Keep3rHelper for max spend
      * @param _kprh new helper address to set
      */
-    function setKeep3rHelper(IKeep3rV1Helper _kprh) external {
+    function setKeep3rHelper(IKeep3rV1Helper _kprh) external { // onlyGovernance
         require(msg.sender == governance, "setKeep3rHelper: !gov");
         KPRH = _kprh;
     }
@@ -1175,7 +1175,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to change governance (for future upgradability)
      * @param _governance new governance address to set
      */
-    function setGovernance(address _governance) external {
+    function setGovernance(address _governance) external { // onlyGovernance
         require(msg.sender == governance, "setGovernance: !gov");
         pendingGovernance = _governance;
     }
@@ -1312,7 +1312,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice allows governance to create a dispute for a given keeper
      * @param keeper the address in dispute
      */
-    function dispute(address keeper) external {
+    function dispute(address keeper) external { // onlyGovernance
         require(msg.sender == governance, "dispute: !gov");
         disputes[keeper] = true;
         emit KeeperDispute(keeper, block.number);
@@ -1324,7 +1324,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param keeper the address being slashed
      * @param amount the amount being slashed
      */
-    function slash(address bonded, address keeper, uint amount) public nonReentrant {
+    function slash(address bonded, address keeper, uint amount) public nonReentrant { // onlyGovernance
         require(msg.sender == governance, "slash: !gov");
         if (bonded == address(this)) {
             _transferTokens(address(this), governance, amount);
@@ -1340,7 +1340,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice blacklists a keeper from participating in the network
      * @param keeper the address being slashed
      */
-    function revoke(address keeper) external {
+    function revoke(address keeper) external { // onlyGovernance
         require(msg.sender == governance, "slash: !gov");
         keepers[keeper] = false;
         blacklist[keeper] = true;
@@ -1351,7 +1351,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice allows governance to resolve a dispute on a keeper
      * @param keeper the address cleared
      */
-    function resolve(address keeper) external {
+    function resolve(address keeper) external { // onlyGovernance
         require(msg.sender == governance, "resolve: !gov");
         disputes[keeper] = false;
         emit KeeperResolved(keeper, block.number);
