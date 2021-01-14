@@ -49,7 +49,7 @@ function promptAndSubmit() {
           for (const strategy in strategies) {
             strategies[strategy].contract = await ethers.getContractAt('StrategyCurveYVoterProxy', config.contracts.mainnet[strategy].address, deployer);
           }
-
+          
           console.time('current strategist')
           for (const strategy in strategies) {
             const strategist = await strategies[strategy].contract.strategist()

@@ -44,7 +44,9 @@ function promptAndSubmit() {
             // 'tusdVault': { requiredEarnAmount },
             // 'musdVault': { requiredEarnAmount },
             // 'gusdVault': { requiredEarnAmount },
-            'yvUSDC': { requiredEarnAmount },
+            // 'yvUSDC': { requiredEarnAmount },
+            // 'musdVault2': { requiredEarnAmount },
+            // 'eursVault': { requiredEarnAmount },
           };
 
           // Setup vaults

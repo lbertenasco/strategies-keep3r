@@ -82,6 +82,12 @@
             "yvUSDC": {
                 "address": "0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e"
             },
+            "musdVault2": {
+                "address": "0xE0db48B4F71752C4bEf16De1DBD042B82976b8C7"
+            },
+            "eursVault": {
+                "address": "0x98B058b2CBacF5E99bC7012DF757ea7CFEbd35BC"
+            },
             "vaultKeep3r": {
                 "address": "0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
             }

@@ -34,19 +34,48 @@ function promptAndSubmit() {
             'tusdVault': {},
             'musdVault': {},
             'gusdVault': {},
+            'yvUSDC': {},
+            'musdVault2': {},
+            'eursVault': {},
+            // 'newVaultToAdd': { requiredEarnAmount: e18.mul(20000) },
           };
+
           // Setup vaults
           for (const vault in vaults) {
             vaults[vault].contract = await ethers.getContractAt('yVault', config.contracts.mainnet[vault].address, deployer);
             vaults[vault].token = await ethers.getContractAt('ERC20Token', await vaults[vault].contract.callStatic.token(), deployer);
+            vaults[vault].decimals = ethers.BigNumber.from(10).pow(await vaults[vault].token.decimals());
           }
 
+          // Setup vaults
+          console.time('vaultKeep3r addVault');
+          for (const vault in vaults) {
+            if (vaults[vault].requiredEarnAmount) {
+              console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount.div(vaults[vault].decimals).toNumber());
+              await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount);
+            }
+          }
+          console.timeEnd('vaultKeep3r addVault');
+
+
+          console.time('required earn of vault')
+          for (const vault in vaults) {
+            try {
+              console.log(
+                `required earn of vault(${vault})`,
+                (await vaultKeep3r.callStatic.requiredEarn(vaults[vault].contract.address)).div(vaults[vault].decimals).toNumber()
+                )
+            } catch (error) {
+              
+            }
+          }
+          console.timeEnd('required earn of vault')
 
           console.time('balance of vault')
           for (const vault in vaults) {
             console.log(
               `balance of vault(${vault})`,
-              (await vaults[vault].token.callStatic.balanceOf(vaults[vault].contract.address)).div(e18).toNumber()
+              (await vaults[vault].token.callStatic.balanceOf(vaults[vault].contract.address)).div(vaults[vault].decimals).toNumber()
             )
           }
           console.timeEnd('balance of vault')
@@ -57,7 +86,7 @@ function promptAndSubmit() {
           for (const vault in vaults) {
             console.log(
               `calculateEarn(${vault})`,
-              (await vaultKeep3r.callStatic.calculateEarn(vaults[vault].contract.address)).div(e18).toNumber()
+              (await vaultKeep3r.callStatic.calculateEarn(vaults[vault].contract.address)).div(vaults[vault].decimals).toNumber()
             )
           }
           console.timeEnd('calculateEarn')
@@ -86,7 +115,7 @@ function promptAndSubmit() {
           for (const vault in vaults) {
             console.log(
               `calculateEarn(${vault})`,
-              (await vaultKeep3r.callStatic.calculateEarn(vaults[vault].contract.address)).div(e18).toNumber()
+              (await vaultKeep3r.callStatic.calculateEarn(vaults[vault].contract.address)).div(vaults[vault].decimals).toNumber()
             )
           }
           console.timeEnd('calculateEarn')
@@ -105,7 +134,7 @@ function promptAndSubmit() {
           for (const vault in vaults) {
             console.log(
               `balance of vault(${vault})`,
-              (await vaults[vault].token.callStatic.balanceOf(vaults[vault].contract.address)).div(e18).toNumber()
+              (await vaults[vault].token.callStatic.balanceOf(vaults[vault].contract.address)).div(vaults[vault].decimals).toNumber()
             )
           }
           console.timeEnd('balance of vault')
