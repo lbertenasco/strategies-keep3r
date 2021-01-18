@@ -12,38 +12,39 @@ import '../../interfaces/keep3r/IKeep3rEscrow.sol';
 contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
     using SafeMath for uint256;
 
-    IKeep3rV1 Keep3rV1;
     address governance;
-    address lpTokens;
+    IKeep3rV1 Keep3rV1;
+    IERC20 lpToken;
 
-    constructor(address _keep3r, address _governance, address _lpTokens) public UtilsReady() { 
-        Keep3rV1 = IKeep3rV1(_keep3r);
+    constructor(address _governance, address _keep3r, address _lpToken) public UtilsReady() { 
         governance = _governance;
-        lpTokens = _lpTokens;
-        _addProtocolToken(_lpTokens);
+        Keep3rV1 = IKeep3rV1(_keep3r);
+        lpToken = IERC20(_lpToken);
+        _addProtocolToken(_lpToken);
     }
 
     function isKeep3rEscrow() external pure override returns (bool) { return true; }
 
 
     function returnLPsToGovernance() external onlyGovernor {
-        IERC20(lpTokens).transfer(governance, IERC20(lpTokens).balanceOf(address(this)));
+        IERC20(lpToken).transfer(governance, IERC20(lpToken).balanceOf(address(this)));
     }
 
-    function addLiquidityToJob(address liquidity, address job, uint amount) external onlyGovernor {
-        Keep3rV1.addLiquidityToJob(liquidity, job, amount);
+    function addLiquidityToJob(address _liquidity, address _job, uint _amount) external onlyGovernor {
+        lpToken.approve(Keep3rV1, _amount);
+        Keep3rV1.addLiquidityToJob(_liquidity, _job, _amount);
     }
 
-    function applyCreditToJob(address provider, address liquidity, address job) external onlyGovernor {
-        Keep3rV1.applyCreditToJob(provider, liquidity, job);
+    function applyCreditToJob(address provider, address _liquidity, address _job) external onlyGovernor {
+        Keep3rV1.applyCreditToJob(provider, _liquidity, _job);
     }
 
-    function unbondLiquidityFromJob(address liquidity, address job, uint amount) external onlyGovernor {
-        Keep3rV1.unbondLiquidityFromJob(liquidity, job, amount);
+    function unbondLiquidityFromJob(address _liquidity, address _job, uint _amount) external onlyGovernor {
+        Keep3rV1.unbondLiquidityFromJob(_liquidity, _job, _amount);
     }
 
-    function removeLiquidityFromJob(address liquidity, address job) external onlyGovernor {
-        Keep3rV1.removeLiquidityFromJob(liquidity, job);
+    function removeLiquidityFromJob(address _liquidity, address _job) external onlyGovernor {
+        Keep3rV1.removeLiquidityFromJob(_liquidity, _job);
     }
 
 }
