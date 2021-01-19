@@ -26,24 +26,24 @@ contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
     function isKeep3rEscrow() external pure override returns (bool) { return true; }
 
 
-    function returnLPsToGovernance() external onlyGovernor {
+    function returnLPsToGovernance() external override onlyGovernor {
         IERC20(lpToken).transfer(governance, IERC20(lpToken).balanceOf(address(this)));
     }
 
-    function addLiquidityToJob(address _liquidity, address _job, uint _amount) external onlyGovernor {
-        lpToken.approve(Keep3rV1, _amount);
+    function addLiquidityToJob(address _liquidity, address _job, uint _amount) external override onlyGovernor {
+        lpToken.approve(address(Keep3rV1), _amount);
         Keep3rV1.addLiquidityToJob(_liquidity, _job, _amount);
     }
 
-    function applyCreditToJob(address provider, address _liquidity, address _job) external onlyGovernor {
+    function applyCreditToJob(address provider, address _liquidity, address _job) external override onlyGovernor {
         Keep3rV1.applyCreditToJob(provider, _liquidity, _job);
     }
 
-    function unbondLiquidityFromJob(address _liquidity, address _job, uint _amount) external onlyGovernor {
+    function unbondLiquidityFromJob(address _liquidity, address _job, uint _amount) external override onlyGovernor {
         Keep3rV1.unbondLiquidityFromJob(_liquidity, _job, _amount);
     }
 
-    function removeLiquidityFromJob(address _liquidity, address _job) external onlyGovernor {
+    function removeLiquidityFromJob(address _liquidity, address _job) external override onlyGovernor {
         Keep3rV1.removeLiquidityFromJob(_liquidity, _job);
     }
 

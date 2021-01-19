@@ -1,7 +1,7 @@
 {
   "name": "strategies-keep3r",
   "devDependencies": {
-    "@lbertenasco/contract-utils": "0.2.6",
+    "@lbertenasco/contract-utils": "0.2.8",
     "@nomiclabs/hardhat-ethers": "2.0.1",
     "@nomiclabs/hardhat-etherscan": "2.1.0",
     "@nomiclabs/hardhat-ganache": "2.0.0",

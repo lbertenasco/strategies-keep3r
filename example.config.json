@@ -10,6 +10,17 @@
     },
     "contracts": {
         "mainnet": {
+            "escrow": {
+                "address": "",
+                "keep3r": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44",
+                "whale": "0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd",
+                "lpToken": "0xaf988aff99d3d0cb870812c325c588d8d8cb7de8",
+                "governance": "0xfeb4acf3df3cdea7399794d0869ef76a6efaff52",
+                "jobs": {
+                    "crvStrategyKeep3r": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D",
+                    "vaultKeep3r": "0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
+                }
+            },
             "keep3r": {
                 "address": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"
             },
