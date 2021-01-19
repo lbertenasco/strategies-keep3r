@@ -32,15 +32,15 @@ function promptAndSubmit() {
           const Keep3rEscrow = await ethers.getContractFactory('Keep3rEscrow');
           const keep3rEscrow = await Keep3rEscrow.deploy(escrowContracts.governance, escrowContracts.keep3r, escrowContracts.lpToken);
 
-          // Setup crv strategy keep3r
-          // const keep3rEscrow = await ethers.getContractAt('Keep3rEscrow', config.contracts.mainnet.keep3rEscrow.address, deployer);
+          // Setup deployed keep3rEscrow
+          // const keep3rEscrow = await ethers.getContractAt('Keep3rEscrow', escrowContracts.escrow1, deployer);
 
           const jobs = {
             'crvStrategyKeep3r': { address: escrowContracts.jobs['crvStrategyKeep3r'], contractName: 'CrvStrategyKeep3r' },
             'vaultKeep3r': { address: escrowContracts.jobs['vaultKeep3r'], contractName: 'VaultKeep3r'},
           };
 
-          // Setup crv jobs
+          // Setup jobs
           for (const job in jobs) {
             jobs[job].contract = await ethers.getContractAt(jobs[job].contractName, jobs[job].address, deployer);
           }
