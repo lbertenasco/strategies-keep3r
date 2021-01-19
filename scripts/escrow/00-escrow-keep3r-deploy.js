@@ -21,7 +21,7 @@ function promptAndSubmit(Keep3rEscrow) {
         if (answer) {
           console.time('Keep3rEscrow deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
-          const keep3rEscrow = await Keep3rEscrow.deploy(escrowContracts.governance, escrowContracts.keep3r, escrowContracts.lptoken);
+          const keep3rEscrow = await Keep3rEscrow.deploy(escrowContracts.governance, escrowContracts.keep3r, escrowContracts.lpToken);
           console.timeEnd('Keep3rEscrow deployed');
           console.log('Keep3rEscrow address:', keep3rEscrow.address);
           console.log('TODO: change .config.json & example.config.json keep3rEscrow address to:', keep3rEscrow.address);

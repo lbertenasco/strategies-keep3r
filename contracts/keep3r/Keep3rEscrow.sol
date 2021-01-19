@@ -16,7 +16,7 @@ contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
     IKeep3rV1 Keep3rV1;
     IERC20 lpToken;
 
-    constructor(address _governance, address _keep3r, address _lpToken) public UtilsReady() { 
+    constructor(address _governance, address _keep3r, address _lpToken) public UtilsReady() {
         governance = _governance;
         Keep3rV1 = IKeep3rV1(_keep3r);
         lpToken = IERC20(_lpToken);
