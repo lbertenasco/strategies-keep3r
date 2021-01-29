@@ -1,7 +1,7 @@
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.6.8;
+pragma solidity 0.6.12;
 
 import '@openzeppelin/contracts/utils/Address.sol';
 import '@openzeppelin/contracts/utils/EnumerableSet.sol';

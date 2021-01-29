@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol';
 import '@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol';
 
-import '../../interfaces/keep3r/IMetaKeep3r.sol';
+import '../../interfaces/meta-keep3r/IMetaKeep3rJob.sol';
 
 /*
 ### YearnMetaKeep3r:
@@ -27,8 +27,8 @@ contracts to be used via delegatecall:
     - uses keep3r's addLiquidityToJob, applyCreditToJob, unbondLiquidityFromJob and removeLiquidityFromJob.
     - workable should be a mix of cooldowns and current creds
 */
-
-contract MetaKeep3r is UtilsReady, Keep3r, IMetaKeep3r {
+abstract
+contract MetaKeep3rJob is UtilsReady, Keep3r, IMetaKeep3rJob {
   using SafeMath for uint256;
   
 

@@ -66,7 +66,7 @@ function promptAndSubmit() {
                 (await vaultKeep3r.callStatic.requiredEarn(vaults[vault].contract.address)).div(vaults[vault].decimals).toNumber()
                 )
             } catch (error) {
-              
+              console.log(error)
             }
           }
           console.timeEnd('required earn of vault')
@@ -101,14 +101,12 @@ function promptAndSubmit() {
           }
           console.timeEnd('workable')
 
-          console.time('working...')
+          console.time('forceEarn...')
           for (const vault in vaults) {
-            if (await vaultKeep3r.callStatic.workable(vaults[vault].contract.address)) {
-              console.log(`working(${vault})`);
-              await vaultKeep3r.forceEarn(vaults[vault].contract.address);
-            }
+            console.log(`forceEarn(${vault})`);
+            await vaultKeep3r.forceEarn(vaults[vault].contract.address, {gasLimit: 3000000});
           }
-          console.timeEnd('working...')
+          console.timeEnd('forceEarn...')
 
           console.log(`calculating earn for: ${Object.keys(vaults)}. please wait ...`)
           console.time('calculateEarn')

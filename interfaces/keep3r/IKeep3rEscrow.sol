@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.8;
+pragma solidity 0.6.12;
+import '@lbertenasco/contract-utils/interfaces/utils/IUtilsReady.sol';
 
-interface IKeep3rEscrow {
+interface IKeep3rEscrow is IUtilsReady {
   function isKeep3rEscrow() external pure returns (bool);
 
   function returnLPsToGovernance() external /*onlyGovernor*/;
