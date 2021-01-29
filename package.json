@@ -9,7 +9,7 @@
     "@openzeppelin/contracts": "3.3.0",
     "axios": "0.21.1",
     "chai": "4.2.0",
-    "ethereum-waffle": "3.2.2",
+    "ethereum-waffle": "3.2.1",
     "ethers": "5.0.26",
     "hardhat": "2.0.8",
     "hardhat-gas-reporter": "1.0.4",
