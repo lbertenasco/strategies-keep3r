@@ -3,14 +3,16 @@
 pragma solidity 0.6.12;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
-import '@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol';
-
-import '../sugar-mommy/Keep3rJob.sol';
+import '@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol';
 
 import '../../interfaces/keep3r/IVaultKeep3r.sol';
 import '../../interfaces/yearn/IEarnableVault.sol';
 
-contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
+import '../utils/Governable.sol';
+import '../utils/CollectableDust.sol';
+
+
+contract VaultKeep3r is Governable, CollectableDust, Keep3r, IVaultKeep3r {
   using SafeMath for uint256;
   
   mapping(address => uint256) public requiredEarn;
@@ -19,7 +21,16 @@ contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
 
   EnumerableSet.AddressSet internal availableVaults;
 
-  constructor(address _keep3rSugarMommy, uint256 _earnCooldown) public UtilsReady() Keep3rJob(_keep3rSugarMommy) { 
+  constructor(
+    address _keep3r,
+    address _bond,
+    uint256 _minBond,
+    uint256 _earned,
+    uint256 _age,
+    bool _onlyEOA,
+    uint256 _earnCooldown
+  ) public Governable(msg.sender) CollectableDust() Keep3r(_keep3r) { 
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
     _setEarnCooldown(_earnCooldown);
   }
 
@@ -54,6 +65,15 @@ contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
     require(_earnCooldown > 0, 'vault-keep3r::set-earn-cooldown:should-not-be-zero');
     earnCooldown = _earnCooldown;
   }
+  // Keep3r Setters
+  function setKeep3r(address _keep3r) external override onlyGovernor {
+    _setKeep3r(_keep3r);
+    emit Keep3rSet(_keep3r);
+  }
+  function setKeep3rRequirements(address _bond, uint256 _minBond, uint256 _earned, uint256 _age, bool _onlyEOA) external override onlyGovernor {
+    _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
+    emit Keep3rRequirementsSet(_bond, _minBond, _earned, _age, _onlyEOA);
+  }
 
 
   // Getters
@@ -63,11 +83,11 @@ contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
       _vaults[i] = availableVaults.at(i);
     }
   }
-  function calculateEarn(address _vault) public override view returns (uint256 _amount) {
+  function calculateEarn(address _vault) public override returns (uint256 _amount) {
     require(requiredEarn[_vault] > 0, 'vault-keep3r::calculate-earn:vault-not-added');
     return IEarnableVault(_vault).available();
   }
-  function workable(address _vault) public override view returns (bool) {
+  function workable(address _vault) public override returns (bool) {
     require(requiredEarn[_vault] > 0, 'vault-keep3r::workable:vault-not-added');
     return (
       calculateEarn(_vault) >= requiredEarn[_vault] &&
@@ -75,20 +95,17 @@ contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
     );
   }
 
+
   // Keep3r actions
-  function work(address _vault) external override {
+  function earn(address _vault) external override onlyKeeper paysKeeper {
     require(workable(_vault), 'vault-keep3r::earn:not-workable');
-
-    _startJob(msg.sender);
     _earn(_vault);
-    _endJob(msg.sender);
-
     emit EarnByKeeper(_vault);
   }
 
 
   // Governor keeper bypass
-  function forceWork(address _vault) external override onlyGovernor {
+  function forceEarn(address _vault) external override onlyGovernor {
     _earn(_vault);
     emit EarnByGovernor(_vault);
   }
@@ -98,4 +115,22 @@ contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
     lastEarnAt[_vault] = block.timestamp;
   }
 
+
+  // Governable
+  function setPendingGovernor(address _pendingGovernor) external override onlyGovernor {
+    _setPendingGovernor(_pendingGovernor);
+  }
+
+  function acceptGovernor() external override onlyPendingGovernor {
+    _acceptGovernor();
+  }
+
+  // Collectable Dust
+  function sendDust(
+    address _to,
+    address _token,
+    uint256 _amount
+  ) external override onlyGovernor {
+    _sendDust(_to, _token, _amount);
+  }
 }

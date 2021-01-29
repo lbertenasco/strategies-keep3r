@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.8;
+pragma solidity 0.6.12;
 import "./IStrategyKeep3r.sol";
 interface IDforceStrategyKeep3r is IStrategyKeep3r {
   event StrategyAdded(address _strategy, uint256 _requiredHarvest);

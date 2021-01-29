@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.6.8;
+pragma solidity 0.6.12;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
@@ -9,12 +9,12 @@ import '@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol';
 
 import '../../interfaces/keep3r/IKeep3rEscrow.sol';
 
-contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
+contract Keep3rEscrow is UtilsReady,  IKeep3rEscrow {
     using SafeMath for uint256;
 
-    address governance;
-    IKeep3rV1 Keep3rV1;
-    IERC20 lpToken;
+    address public governance;
+    IKeep3rV1 public Keep3rV1;
+    IERC20 public lpToken;
 
     constructor(address _governance, address _keep3r, address _lpToken) public UtilsReady() {
         governance = _governance;
