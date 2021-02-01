@@ -224,6 +224,7 @@ interface IKeep3rV1 {
 
 interface IUniswapV2SlidingOracle {
     function current(address tokenIn, uint amountIn, address tokenOut) external view returns (uint);
+    function updatePair(address pair) external returns (bool);
 }
 
 contract Keep3rV1Helper {
