@@ -3,7 +3,7 @@
 */
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.12;
+pragma solidity 0.6.12;
 
 library Keep3rV1Library {
     function getReserve(address pair, address reserve) external view returns (uint) {
