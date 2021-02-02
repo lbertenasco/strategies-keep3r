@@ -7,10 +7,10 @@ import '@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol';
 
 import '../sugar-mommy/Keep3rJob.sol';
 
-import '../../interfaces/keep3r/IVaultKeep3r.sol';
+import '../../interfaces/keep3r/IVaultKeep3rJob.sol';
 import '../../interfaces/yearn/IEarnableVault.sol';
 
-contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
+contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
   using SafeMath for uint256;
   
   mapping(address => uint256) public requiredEarn;
@@ -23,7 +23,7 @@ contract VaultKeep3r is UtilsReady, Keep3rJob, IVaultKeep3r {
     _setEarnCooldown(_earnCooldown);
   }
 
-  function isVaultKeep3r() external pure override returns (bool) { return true; }
+  function isVaultKeep3rJob() external pure override returns (bool) { return true; }
 
   // Setters
   function addVault(address _vault, uint256 _requiredEarn) external override onlyGovernor {
