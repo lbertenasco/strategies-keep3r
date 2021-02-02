@@ -85,9 +85,10 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
         availableStrategies.remove(_strategy);
         emit StrategyRemoved(_strategy);
     }
+
     function removeHarvestStrategy(address _strategy) external override onlyGovernor {
         require(requiredHarvest[_strategy] > 0, "generic-keep3r-v2::remove-harvest-strategy:strategy-not-added");
-        requiredHarvest[_strategy] = 0;
+        delete requiredHarvest[_strategy];
 
         if (requiredTend[_strategy] == 0) {
             availableStrategies.remove(_strategy);
@@ -98,7 +99,7 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
 
     function removeTendStrategy(address _strategy) external override onlyGovernor {
         require(requiredTend[_strategy] > 0, "generic-keep3r-v2::remove-tend-strategy:strategy-not-added");
-        requiredTend[_strategy] = 0;
+        delete requiredTend[_strategy];
 
         if (requiredHarvest[_strategy] == 0) {
             availableStrategies.remove(_strategy);
