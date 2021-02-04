@@ -23,8 +23,11 @@ interface IKeep3rV2StrategyJob {
 
     // Keep3r actions
     function harvest(address _strategy) external;
-
     function tend(address _strategy) external;
+    
+    // Governor keeper bypass
+    function forceHarvest(address _strategy) external;
+    function forceTend(address _strategy) external;
 
     // Name of the Keep3r
     function name() external pure returns (string memory);

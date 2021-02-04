@@ -9,29 +9,34 @@ const prompt = new Confirm('Do you wish to deploy keep3r escrow contract?');
 
 async function main() {
   await hre.run('compile');
-  const Keep3rEscrowJob = await ethers.getContractFactory('Keep3rEscrowJob');
+  const SugarMommy = await ethers.getContractFactory('SugarMommy');
 
-  await promptAndSubmit(Keep3rEscrowJob);
+  await promptAndSubmit(SugarMommy);
 }
 
-function promptAndSubmit(Keep3rEscrowJob) {
+function promptAndSubmit(SugarMommy) {
   return new Promise((resolve) => {
     try {
       prompt.ask(async (answer) => {
         if (answer) {
-          console.time('Keep3rEscrowJob deployed');
+          console.time('SugarMommy deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
-
-          const keep3rEscrowJob = await Keep3rEscrowJob.deploy(
+          // Setup SugarMommy
+          const keep3rSugarMommy = await Keep3rSugarMommy.deploy(
             escrowContracts.keep3r,
-            escrowContracts.sugarMommy,
-            escrowContracts.lpToken,
-            escrowContracts.escrow1,
-            escrowContracts.escrow2
+            ZERO_ADDRESS, // // KP3R bond
+            e18.mul(50), // 50 KP3Rs bond requirement
+            0,
+            0,
+            true
           );
-          console.timeEnd('Keep3rEscrowJob deployed');
-          console.log('Keep3rEscrowJob address:', keep3rEscrowJob.address);
-          console.log('TODO: change .config.json & example.config.json keep3rEscrowJob address to:', keep3rEscrowJob.address);
+          escrowContracts.sugarMommy = keep3rSugarMommy.address;
+          console.timeEnd('SugarMommy deployed');
+          console.log('SugarMommy address:', sugarMommy.address);
+          console.log('TODO: change .config.json & example.config.json sugarMommy address to:', sugarMommy.address);
+          // Setup SugarMommy as a keep3r job
+          console.log('keep3r governance needs to do:')
+          console.log(`${escrowContracts.keep3r}.addJob(${keep3rSugarMommy.address})`);
           resolve();
         } else {
           console.error('Aborted!');
