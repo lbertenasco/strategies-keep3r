@@ -9,26 +9,6 @@ import '@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol';
 
 import '../../interfaces/sugar-mommy/IKeep3rSugarMommy.sol';
 
-/*
-### YearnKeep3rSugarMommy: (aka Keep3rJobPaymaster)
-
-Will be the only yearn job.
-- pro: we only have to maintain the credits of 1 big job, instead of multiple tiny ones. fast and easily add sub-jobs.
-- con: we might get drained if not carefull on what we add. also if the credits end, everything stops auto'ing.
-
-contracts that will ask sugar-mommy to pay for them:
-- vault: earn, forceEarn(not really neccesary but whatever), workable (v1+v2)
-- strategy: harvest, forceHarvest, workable (v1+v2)
-- strategy: tend, forceTend, workable (v2)
-- auto-refill: refill, forceRefill, workable (v1+v2)
-    - init with YearnKeep3rSugarMommy as job address
-    - has 2 escrow contracts holding KP3R/ETH-LP tokens (created via factory on runtime)
-        - this is to be able to never be out of creds
-    - can only return LPs to ychad
-    - uses keep3r's addLiquidityToJob, applyCreditToJob, unbondLiquidityFromJob and removeLiquidityFromJob.
-    - workable should be a mix of cooldowns and current creds
-*/
-
 contract Keep3rSugarMommy is UtilsReady, IKeep3rSugarMommy {
   using SafeMath for uint256;
   using EnumerableSet for EnumerableSet.AddressSet;

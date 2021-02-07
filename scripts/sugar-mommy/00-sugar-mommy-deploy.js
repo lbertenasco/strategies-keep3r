@@ -9,19 +9,19 @@ const prompt = new Confirm('Do you wish to deploy keep3r escrow contract?');
 
 async function main() {
   await hre.run('compile');
-  const SugarMommy = await ethers.getContractFactory('SugarMommy');
+  const Keep3rSugarMommy = await ethers.getContractFactory('Keep3rSugarMommy');
 
-  await promptAndSubmit(SugarMommy);
+  await promptAndSubmit(Keep3rSugarMommy);
 }
 
-function promptAndSubmit(SugarMommy) {
+function promptAndSubmit(Keep3rSugarMommy) {
   return new Promise((resolve) => {
     try {
       prompt.ask(async (answer) => {
         if (answer) {
-          console.time('SugarMommy deployed');
+          console.time('Keep3rSugarMommy deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
-          // Setup SugarMommy
+          // Setup Keep3rSugarMommy
           const keep3rSugarMommy = await Keep3rSugarMommy.deploy(
             escrowContracts.keep3r,
             ZERO_ADDRESS, // // KP3R bond
@@ -30,11 +30,11 @@ function promptAndSubmit(SugarMommy) {
             0,
             true
           );
-          escrowContracts.sugarMommy = keep3rSugarMommy.address;
-          console.timeEnd('SugarMommy deployed');
-          console.log('SugarMommy address:', sugarMommy.address);
-          console.log('TODO: change .config.json & example.config.json sugarMommy address to:', sugarMommy.address);
-          // Setup SugarMommy as a keep3r job
+          escrowContracts.keep3rSugarMommy = keep3rSugarMommy.address;
+          console.timeEnd('Keep3rSugarMommy deployed');
+          console.log('Keep3rSugarMommy address:', keep3rSugarMommy.address);
+          console.log('TODO: change .config.json & example.config.json keep3rSugarMommy address to:', keep3rSugarMommy.address);
+          // Setup Keep3rSugarMommy as a keep3r job
           console.log('keep3r governance needs to do:')
           console.log(`${escrowContracts.keep3r}.addJob(${keep3rSugarMommy.address})`);
           resolve();
