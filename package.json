@@ -35,7 +35,7 @@
     "fork:script": "FORK=true npx hardhat run",
     "fork:test": "FORK=true npx hardhat test",
     "lint": "npx hardhat check",
-    "lint:fix": "prettier --write 'contracts/**/*.sol'",
+    "lint:fix": "prettier --write './**'",
     "release": "standard-version",
     "test": "npx hardhat test",
     "test:gas": "REPORT_GAS=1 npx hardhat test",

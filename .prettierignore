@@ -1,0 +1,9 @@
+# General
+.**
+
+# Hardhat
+artifacts
+cache
+
+# JS
+node_modules

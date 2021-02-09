@@ -11,14 +11,16 @@ module.exports = {
   defaultNetwork: 'hardhat',
   networks: {
     hardhat: {
-      enabled: (process.env.FORK) ? true : false,
-      accounts: [{
-        privateKey: config.accounts.mainnet.privateKey,
-        balance: utils.parseEther('1000').toString()
-      }],
-      forking: { 
-        url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`
-      }
+      enabled: process.env.FORK ? true : false,
+      accounts: [
+        {
+          privateKey: config.accounts.mainnet.privateKey,
+          balance: utils.parseEther('1000').toString(),
+        },
+      ],
+      forking: {
+        url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
+      },
     },
     localMainnet: {
       url: 'http://127.0.0.1:8545',
@@ -29,8 +31,8 @@ module.exports = {
       url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       accounts: [config.accounts.mainnet.privateKey],
       gasMultiplier: 1.1,
-      gasPrice: 'auto'
-    }
+      gasPrice: 'auto',
+    },
   },
   solidity: {
     compilers: [
@@ -39,28 +41,28 @@ module.exports = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200
-          }
-        }
+            runs: 200,
+          },
+        },
       },
       {
         version: '0.5.17',
-      }
-    ]
+      },
+    ],
   },
   mocha: {
-    timeout: 10 * 60 * 1000 // 10 minutes
+    timeout: 10 * 60 * 1000, // 10 minutes
   },
   gasReporter: {
-    enabled: (process.env.REPORT_GAS) ? true : false,
+    enabled: process.env.REPORT_GAS ? true : false,
     currency: 'USD',
     gasPrice: 200,
-    coinmarketcap: `${config.coinmarketcap.apiKey}`
+    coinmarketcap: `${config.coinmarketcap.apiKey}`,
   },
   preprocess: {
     eachLine: removeConsoleLog((hre) => hre.network.name !== 'hardhat'),
   },
   etherscan: {
-    apiKey: `${config.etherscan.apiKey}`
-  }
+    apiKey: `${config.etherscan.apiKey}`,
+  },
 };

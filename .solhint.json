@@ -1,11 +1,11 @@
 {
-    "extends": "solhint:recommended",
-    "plugins": ["prettier"],
-    "rules": {
-        "prettier/prettier": "error",
-        "quotes": ["error", "double"],
-        "compiler-version": "off",
-        "not-rely-on-time": "off",
-        "indent": 2
-    }
+  "extends": "solhint:recommended",
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "quotes": ["error", "double"],
+    "compiler-version": "off",
+    "not-rely-on-time": "off",
+    "indent": 2
+  }
 }
