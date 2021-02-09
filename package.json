@@ -15,18 +15,6 @@
     "type": "git",
     "url": "git+https://github.com/lbertenasco/strategies-keep3r.git"
   },
-  "authors": [
-    {
-      "name": "Luciano Bertenasco",
-      "email": "mail",
-      "url": "https://github.com/lbertenasco"
-    },
-    {
-      "name": "b0dhidharma",
-      "email": "b0dhidharma@protonmail.com",
-      "url": "https://github.com/b0dhidharma"
-    }
-  ],
   "scripts": {
     "commit": "git-cz",
     "compile": "npx hardhat compile",
@@ -35,7 +23,7 @@
     "fork:script": "FORK=true npx hardhat run",
     "fork:test": "FORK=true npx hardhat test",
     "lint": "npx hardhat check",
-    "lint:fix": "prettier --write './**'",
+    "lint:fix": "sort-package-json && prettier --write './**'",
     "release": "standard-version",
     "test": "npx hardhat test",
     "test:gas": "REPORT_GAS=1 npx hardhat test",
@@ -45,6 +33,9 @@
     "hooks": {
       "pre-commit": "npm run lint:fix && git add -A"
     }
+  },
+  "dependencies": {
+    "prompt-confirm": "2.0.4"
   },
   "devDependencies": {
     "@lbertenasco/contract-utils": "0.2.9",
@@ -71,11 +62,21 @@
     "solhint": "3.3.2",
     "solhint-plugin-prettier": "0.0.5",
     "solidity-coverage": "0.7.14",
+    "sort-package-json": "^1.48.1",
     "standard-version": "9.1.0",
     "ts-node": "9.1.1",
     "typescript": "4.1.4"
   },
-  "dependencies": {
-    "prompt-confirm": "2.0.4"
-  }
+  "authors": [
+    {
+      "name": "Luciano Bertenasco",
+      "email": "mail",
+      "url": "https://github.com/lbertenasco"
+    },
+    {
+      "name": "b0dhidharma",
+      "email": "b0dhidharma@protonmail.com",
+      "url": "https://github.com/b0dhidharma"
+    }
+  ]
 }
