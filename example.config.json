@@ -14,14 +14,14 @@
                 "escrow1": "0x9fA395901A92490D1496c94a8578e1f4eF9fB1d1",
                 "escrow2": "0x8f2245D1051f3777E314ba6FdEe1152774CE868C",
                 "sugarMommy": "0xef9512E5F33e2d1c66f77Ad61b3434A2fc97d321",
-                "escrowJob": "0x83A34a6469dbFd7654aE6D842d20977E89CcD73D",
                 "keep3r": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44",
                 "whale": "0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd",
                 "lpToken": "0xaf988aff99d3d0cb870812c325c588d8d8cb7de8",
                 "governance": "0xfeb4acf3df3cdea7399794d0869ef76a6efaff52",
                 "jobs": {
-                    "crvStrategyKeep3r": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D",
-                    "vaultKeep3r": "0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
+                    "escrowJob": "0x83A34a6469dbFd7654aE6D842d20977E89CcD73D",
+                    "crvStrategyKeep3rJob": "0xBa0b43AB3966Db791b4Db1811C3096568aD8a99c",
+                    "vaultKeep3rJob": ""
                 }
             },
             "keep3r": {

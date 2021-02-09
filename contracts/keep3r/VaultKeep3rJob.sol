@@ -26,12 +26,22 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
   function isVaultKeep3rJob() external pure override returns (bool) { return true; }
 
   // Setters
+  function addVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external override onlyGovernor {
+    require(_vaults.length == _requiredEarns.length, 'vault-keep3r::add-vaults:vaults-required-earns-different-length');
+    for (uint i; i < _vaults.length; i++) {
+      _addVault(_vaults[i], _requiredEarns[i]);
+    }
+  }
   function addVault(address _vault, uint256 _requiredEarn) external override onlyGovernor {
+    _addVault(_vault, _requiredEarn);
+  }
+  function _addVault(address _vault, uint256 _requiredEarn) internal {
     require(requiredEarn[_vault] == 0, 'vault-keep3r::add-vault:vault-already-added');
     _setRequiredEarn(_vault, _requiredEarn);
     availableVaults.add(_vault);
     emit VaultAdded(_vault, _requiredEarn);
   }
+
   function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernor {
     require(requiredEarn[_vault] > 0, 'vault-keep3r::update-required-earn:vault-not-added');
     _setRequiredEarn(_vault, _requiredEarn);
