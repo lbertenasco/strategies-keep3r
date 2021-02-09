@@ -1,31 +1,89 @@
-const { expect } = require('chai');
-const config = require('../.config.json');
-const { e18, ZERO_ADDRESS } = require('../utils/web3-utils');
+import { expect } from 'chai';
+import { ethers, network } from 'hardhat';
+import { e18, ZERO_ADDRESS } from '../utils/web3-utils';
+import config from '../.config.json';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
+import { Contract, ContractFactory } from 'ethers';
 
-describe('CrvStrategyKeep3r', function() {
-  let owner;
-  let alice;
+// Example file for Yearn Test
+
+describe('CrvStrategyKeep3r Unit Test', function() {
+  let crvStrategyKeep3rContract: ContractFactory;
+  let crvStrategyKeep3r: Contract;
+
   before('Setup accounts and contracts', async () => {
-    [owner, alice] = await ethers.getSigners();
+    crvStrategyKeep3rContract = await ethers.getContractFactory('CrvStrategyKeep3r');
   });
 
-  it('Should deploy new CrvStrategyKeep3r with keep3r', async function() {
+  beforeEach(async () => {
+    // crvStrategyKeep3r = await crvStrategyKeep3rContract.deploy(
+    //   config.contracts.mainnet.keep3r.address, 
+    //   ZERO_ADDRESS, 
+    //   0, 
+    //   0,
+    //   0, 
+    //   true
+    // );
+  });
+
+  describe('isCrvStrategyKeep3r', () => {
+    it('returns true');
+  });
+
+  describe('addStrategy', () => {
+    context('when strategy is already added', () => {
+      it('reverts with message');
+    });
+    context('when strategy was not added', () => {
+      it('adds strategy and emits event');
+    });
+  });
+});
+
+describe('CrvStrategyKeep3r Mainnet Test', () => {
+
+  let owner: SignerWithAddress;
+
+  before('Setup accounts and contracts', async () => {
+    [owner] = await ethers.getSigners();
+  });
+
+  beforeEach(async () => {
+    await network.provider.request({
+      method: 'hardhat_reset',
+      params: [{
+        forking: {
+          jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
+          blockNumber: 11724476
+        }
+      }]
+    });
+  });
+
+  it('should deploy new CrvStrategyKeep3r with keep3r', async function() {
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
-    const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0 ,0, true);
+    const crvStrategyKeep3r = await CrvStrategyKeep3r.deploy(
+      config.contracts.mainnet.keep3r.address, 
+      ZERO_ADDRESS, 
+      0, 
+      0,
+      0, 
+      true
+    );
     const isCrvStrategyKeep3r = await crvStrategyKeep3r.isCrvStrategyKeep3r();
     expect(isCrvStrategyKeep3r).to.be.true;
   });
 
-  it.only('Should deploy on mainnet fork', async function() {
+  it('Should deploy on mainnet fork', async function() {
     
-    await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.publicKey] });
-    const multisig = owner.provider.getUncheckedSigner(config.accounts.mainnet.publicKey);
+    await network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.publicKey] });
+    const multisig = ethers.provider.getUncheckedSigner(config.accounts.mainnet.publicKey);
 
-    await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.keeper] });
-    const keeper = owner.provider.getUncheckedSigner(config.accounts.mainnet.keeper);
+    await network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.keeper] });
+    const keeper = ethers.provider.getUncheckedSigner(config.accounts.mainnet.keeper);
 
-    await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.keep3rGovernance] });
-    const keep3rGovernance = owner.provider.getUncheckedSigner(config.accounts.mainnet.keep3rGovernance);
+    await network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.keep3rGovernance] });
+    const keep3rGovernance = ethers.provider.getUncheckedSigner(config.accounts.mainnet.keep3rGovernance);
 
 
     const CrvStrategyKeep3r = await ethers.getContractFactory('CrvStrategyKeep3r');
@@ -128,8 +186,5 @@ describe('CrvStrategyKeep3r', function() {
     await expect(crvStrategyKeep3r.connect(keeper).harvest(ycrvContract.address))
       .to.be.revertedWith('crv-strategy-keep3r::harvest:not-workable');
     console.timeEnd('keeper harvest reverts with not-workable')
-
-
   });
-
 });

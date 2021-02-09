@@ -16,7 +16,7 @@ describe('VaultKeep3r', function() {
     expect(isVaultKeep3r).to.be.true;
   });
 
-  it.only('Should deploy on mainnet fork', async function() {
+  it('Should deploy on mainnet fork', async function() {
     
     await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.publicKey] });
     const multisig = owner.provider.getUncheckedSigner(config.accounts.mainnet.publicKey);
