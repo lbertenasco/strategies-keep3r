@@ -4,7 +4,7 @@
   "rules": {
     "prettier/prettier": "error",
     "quotes": ["error", "double"],
-    "compiler-version": "off",
+    "compiler-version": ["off"],
     "not-rely-on-time": "off",
     "indent": 2
   }

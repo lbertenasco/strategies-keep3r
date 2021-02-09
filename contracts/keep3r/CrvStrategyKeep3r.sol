@@ -3,15 +3,15 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
+
+import "@lbertenasco/contract-utils/contracts/utils/Governable.sol";
+import "@lbertenasco/contract-utils/contracts/utils/CollectableDust.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
 import "../../interfaces/keep3r/IStrategyKeep3r.sol";
 import "../../interfaces/keep3r/ICrvStrategyKeep3r.sol";
 import "../../interfaces/crv/ICrvStrategy.sol";
 import "../../interfaces/crv/ICrvClaimable.sol";
-
-import "../utils/Governable.sol";
-import "../utils/CollectableDust.sol";
 
 contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep3r, ICrvStrategyKeep3r {
     using SafeMath for uint256;
