@@ -18,6 +18,7 @@ interface ICrvStrategyKeep3rJob {
   function forceWork(address _strategy) external;
 
   // Setters
+  function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external;
   function addStrategy(address _strategy, uint256 _requiredHarvest) external;
   function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external;
   function removeStrategy(address _strategy) external;

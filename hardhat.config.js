@@ -32,13 +32,13 @@ module.exports = {
       url: 'http://127.0.0.1:8545',
       accounts: mainnetAccounts,
       gasMultiplier: 1.1,
-      gasPrice: 100000000000, // 100 gwei
+      gasPrice: 120000000000, // 120 gwei
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       accounts: mainnetAccounts,
       gasMultiplier: 1.1,
-      gasPrice: 100000000000, // 100 gwei
+      gasPrice: 120000000000, // 120 gwei
     }
   },
   solidity: {
@@ -66,7 +66,7 @@ module.exports = {
   gasReporter: {
     enabled: (process.env.REPORT_GAS) ? true : false,
     currency: 'USD',
-    gasPrice: 200,
+    gasPrice: 120,
     coinmarketcap: `${config.coinmarketcap.apiKey}`,
   },
 };

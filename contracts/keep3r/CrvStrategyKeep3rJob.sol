@@ -27,12 +27,22 @@ contract CrvStrategyKeep3rJob is UtilsReady, Keep3rJob, ICrvStrategyKeep3rJob {
   function isCrvStrategyKeep3rJob() external pure override returns (bool) { return true; }
 
   // Setters
+  function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external override onlyGovernor {
+    require(_strategies.length == _requiredHarvests.length, 'crv-strategy-keep3r::add-strategies:strategies-required-harvests-different-length');
+    for (uint i; i < _strategies.length; i++) {
+      _addStrategy(_strategies[i], _requiredHarvests[i]);
+    }
+  }
   function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
+    _addStrategy(_strategy, _requiredHarvest);
+  }
+  function _addStrategy(address _strategy, uint256 _requiredHarvest) internal {
     require(requiredHarvest[_strategy] == 0, 'crv-strategy-keep3r::add-strategy:strategy-already-added');
     _setRequiredHarvest(_strategy, _requiredHarvest);
     availableStrategies.add(_strategy);
     emit StrategyAdded(_strategy, _requiredHarvest);
   }
+
   function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
     require(requiredHarvest[_strategy] > 0, 'crv-strategy-keep3r::update-required-harvest:strategy-not-added');
     _setRequiredHarvest(_strategy, _requiredHarvest);
