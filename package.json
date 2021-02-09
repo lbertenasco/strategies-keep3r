@@ -29,11 +29,6 @@
     "test:gas": "REPORT_GAS=1 npx hardhat test",
     "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint:fix && git add -A"
-    }
-  },
   "dependencies": {
     "prompt-confirm": "2.0.4"
   },

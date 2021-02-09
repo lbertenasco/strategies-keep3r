@@ -1,5 +1,8 @@
 # General
-.**
+.prettierignore
+.gitignore
+.gitattributes
+.versionrc
 
 # Hardhat
 artifacts
@@ -7,3 +10,5 @@ cache
 
 # JS
 node_modules
+package-lock.json
+
