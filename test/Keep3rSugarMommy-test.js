@@ -24,6 +24,9 @@ describe('Keep3rSugarMommy', function () {
       method: 'hardhat_impersonateAccount',
       params: [config.accounts.mainnet.keep3rGovernance],
     });
+    const keep3rGovernance = owner.provider.getUncheckedSigner(
+      config.accounts.mainnet.keep3rGovernance
+    );
     // Setup deployer
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
@@ -40,9 +43,7 @@ describe('Keep3rSugarMommy', function () {
     const keeper = owner.provider.getUncheckedSigner(
       config.accounts.mainnet.keeper
     );
-    const keep3rGovernance = owner.provider.getUncheckedSigner(
-      config.accounts.mainnet.keep3rGovernance
-    );
+
     const keep3r = await ethers.getContractAt(
       'IKeep3rV1',
       escrowContracts.keep3r,
