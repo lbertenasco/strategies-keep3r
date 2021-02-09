@@ -34,8 +34,6 @@
     "fork": "FORK=true npx hardhat node",
     "fork:script": "FORK=true npx hardhat run",
     "fork:test": "FORK=true npx hardhat test",
-    "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/$INFURA_API_KEY --account=\"$ETH_PRIVATE_KEY,1000000000000000000000\"",
-    "ganache:test": "npx hardhat test --network ganache",
     "lint": "npx hardhat check",
     "lint:fix": "prettier --write 'contracts/**/*.sol'",
     "release": "standard-version",
@@ -58,7 +56,7 @@
     "@types/chai": "4.2.14",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.25",
-    "axios": "^0.21.1",
+    "axios": "0.21.1",
     "chai": "4.3.0",
     "commitizen": "4.2.3",
     "cz-conventional-changelog": "3.3.0",
@@ -76,5 +74,8 @@
     "standard-version": "9.1.0",
     "ts-node": "9.1.1",
     "typescript": "4.1.4"
+  },
+  "dependencies": {
+    "prompt-confirm": "2.0.4"
   }
 }
