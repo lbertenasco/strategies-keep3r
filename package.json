@@ -1,5 +1,53 @@
 {
   "name": "strategies-keep3r",
+  "version": "0.0.0",
+  "description": "Strategies Keep3r",
+  "keywords": [
+    "ethereum",
+    "yearn",
+    "keep3r",
+    "smart",
+    "contracts",
+    "solidity",
+    "hardhat"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbertenasco/strategies-keep3r.git"
+  },
+  "authors": [
+    {
+      "name": "Luciano Bertenasco",
+      "email": "mail",
+      "url": "https://github.com/lbertenasco"
+    },
+    {
+      "name": "b0dhidharma",
+      "email": "b0dhidharma@protonmail.com",
+      "url": "https://github.com/b0dhidharma"
+    }
+  ],
+  "scripts": {
+    "commit": "git-cz",
+    "compile": "npx hardhat compile",
+    "coverage": "npx hardhat coverage",
+    "fork": "FORK=true npx hardhat node",
+    "fork:script": "FORK=true npx hardhat run",
+    "fork:test": "FORK=true npx hardhat test",
+    "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/$INFURA_API_KEY --account=\"$ETH_PRIVATE_KEY,1000000000000000000000\"",
+    "ganache:test": "npx hardhat test --network ganache",
+    "lint": "npx hardhat check",
+    "lint:fix": "prettier --write 'contracts/**/*.sol'",
+    "release": "standard-version",
+    "test": "npx hardhat test",
+    "test:gas": "REPORT_GAS=1 npx hardhat test",
+    "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint:fix && git add -A"
+    }
+  },
   "devDependencies": {
     "@lbertenasco/contract-utils": "0.2.9",
     "@nomiclabs/hardhat-ethers": "2.0.1",
@@ -10,15 +58,16 @@
     "@types/chai": "4.2.14",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.25",
+    "axios": "^0.21.1",
     "chai": "4.3.0",
     "commitizen": "4.2.3",
     "cz-conventional-changelog": "3.3.0",
     "ethereum-waffle": "3.2.2",
-    "ethers": "5.0.29",
+    "ethers": "5.0.30",
     "hardhat": "2.0.8",
     "hardhat-gas-reporter": "1.0.4",
     "hardhat-preprocessor": "0.1.1",
-    "husky": "4.3.8",
+    "husky": "5.0.9",
     "prettier": "2.2.1",
     "prettier-plugin-solidity": "1.0.0-beta.4",
     "solhint": "3.3.2",
@@ -26,15 +75,6 @@
     "solidity-coverage": "0.7.14",
     "standard-version": "9.1.0",
     "ts-node": "9.1.1",
-    "typescript": "4.1.3"
-  },
-  "scripts": {
-    "ganache:mainnet": "ganache-cli --fork https://mainnet.infura.io/v3/$INFURA_API_KEY --account=\"$ETH_PRIVATE_KEY,1000000000000000000000\"",
-    "test": "npx hardhat test",
-    "test:gas": "REPORT_GAS=true npx hardhat test",
-    "test:ganache": "npx hardhat test --network ganache",
-    "test:mainnet": "npx hardhat test --network mainnet",
-    "compile": "npx hardhat compile",
-    "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
+    "typescript": "4.1.4"
   }
 }
