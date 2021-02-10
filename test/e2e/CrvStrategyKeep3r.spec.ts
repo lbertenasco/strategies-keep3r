@@ -26,6 +26,8 @@ describe('CrvStrategyKeep3r', () => {
     });
   });
 
+  it.only('passes', async () => {});
+
   it('should deploy new CrvStrategyKeep3r with keep3r', async function () {
     const CrvStrategyKeep3r = await ethers.getContractFactory(
       'CrvStrategyKeep3r'
