@@ -1,8 +1,6 @@
-name: Unit tests
+name: E2E tests
 
-on:
-  repository_dispatch:
-    types: [trigger-unit-tests]
+on: [pull_request]
 
 jobs:
   files:
@@ -12,7 +10,7 @@ jobs:
       - name: Check out github repository
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.client_payload.sha }}
+          fetch-depth: 1
 
       - name: Cache node modules
         uses: actions/cache@v2
@@ -36,12 +34,3 @@ jobs:
 
       - name: Run unit tests
         run: npm run test:unit
-
-      - name: Trigger e2e tests
-        if: ${{ github.event_name == 'pull_request' && success() }}
-        uses: peter-evans/repository-dispatch@v1
-        with:
-          token: ${{ secrets.REPO_GHA_PAT }}
-          repository: ${{ github.repository }}
-          event-type: trigger-e2e-tests
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
