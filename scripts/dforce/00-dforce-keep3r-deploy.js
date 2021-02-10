@@ -4,12 +4,13 @@ const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
-
 const prompt = new Confirm('Do you wish to deploy dforce keep3r contract?');
 
 async function main() {
   await hre.run('compile');
-  const DforceStrategyKeep3r = await ethers.getContractFactory('DforceStrategyKeep3r');
+  const DforceStrategyKeep3r = await ethers.getContractFactory(
+    'DforceStrategyKeep3r'
+  );
 
   await promptAndSubmit(DforceStrategyKeep3r);
 }
@@ -20,11 +21,24 @@ function promptAndSubmit(DforceStrategyKeep3r) {
       prompt.ask(async (answer) => {
         if (answer) {
           console.time('DforceStrategyKeep3r deployed');
-          const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(config.contracts.mainnet.keep3r.address, ZERO_ADDRESS, 0, 0, 0, true);
+          const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(
+            config.contracts.mainnet.keep3r.address,
+            ZERO_ADDRESS,
+            0,
+            0,
+            0,
+            true
+          );
           console.timeEnd('DforceStrategyKeep3r deployed');
-          console.log('DforceStrategyKeep3r address:', dforceStrategyKeep3r.address);
-          
-          console.log('TODO: change .config.json & example.config.json dforceStrategyKeep3r address to:', dforceStrategyKeep3r.address);
+          console.log(
+            'DforceStrategyKeep3r address:',
+            dforceStrategyKeep3r.address
+          );
+
+          console.log(
+            'TODO: change .config.json & example.config.json dforceStrategyKeep3r address to:',
+            dforceStrategyKeep3r.address
+          );
 
           resolve();
         } else {
@@ -38,12 +52,11 @@ function promptAndSubmit(DforceStrategyKeep3r) {
   });
 }
 
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

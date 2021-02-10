@@ -1,13 +1,13 @@
 /**
  *Submitted for verification at Etherscan.io on 2020-10-28
-*/
+ */
 
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
 library Keep3rV1Library {
-    function getReserve(address pair, address reserve) external view returns (uint) {
-        (uint _r0, uint _r1,) = IUniswapV2Pair(pair).getReserves();
+    function getReserve(address pair, address reserve) external view returns (uint256) {
+        (uint256 _r0, uint256 _r1, ) = IUniswapV2Pair(pair).getReserves();
         if (IUniswapV2Pair(pair).token0() == reserve) {
             return _r0;
         } else if (IUniswapV2Pair(pair).token1() == reserve) {
@@ -19,51 +19,88 @@ library Keep3rV1Library {
 }
 
 interface IUniswapV2Pair {
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
     function name() external pure returns (string memory);
-    function symbol() external pure returns (string memory);
-    function decimals() external pure returns (uint8);
-    function totalSupply() external view returns (uint);
-    function balanceOf(address owner) external view returns (uint);
-    function allowance(address owner, address spender) external view returns (uint);
 
-    function approve(address spender, uint value) external returns (bool);
-    function transfer(address to, uint value) external returns (bool);
-    function transferFrom(address from, address to, uint value) external returns (bool);
+    function symbol() external pure returns (string memory);
+
+    function decimals() external pure returns (uint8);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address owner) external view returns (uint256);
+
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    function approve(address spender, uint256 value) external returns (bool);
+
+    function transfer(address to, uint256 value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external returns (bool);
 
     function DOMAIN_SEPARATOR() external view returns (bytes32);
+
     function PERMIT_TYPEHASH() external pure returns (bytes32);
-    function nonces(address owner) external view returns (uint);
 
-    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+    function nonces(address owner) external view returns (uint256);
 
-    event Mint(address indexed sender, uint amount0, uint amount1);
-    event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
-    event Swap(
-        address indexed sender,
-        uint amount0In,
-        uint amount1In,
-        uint amount0Out,
-        uint amount1Out,
-        address indexed to
-    );
+    function permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    event Mint(address indexed sender, uint256 amount0, uint256 amount1);
+    event Burn(address indexed sender, uint256 amount0, uint256 amount1, address indexed to);
+    event Swap(address indexed sender, uint256 amount0In, uint256 amount1In, uint256 amount0Out, uint256 amount1Out, address indexed to);
     event Sync(uint112 reserve0, uint112 reserve1);
 
-    function MINIMUM_LIQUIDITY() external pure returns (uint);
-    function factory() external view returns (address);
-    function token0() external view returns (address);
-    function token1() external view returns (address);
-    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
-    function price0CumulativeLast() external view returns (uint);
-    function price1CumulativeLast() external view returns (uint);
-    function kLast() external view returns (uint);
+    function MINIMUM_LIQUIDITY() external pure returns (uint256);
 
-    function mint(address to) external returns (uint liquidity);
-    function burn(address to) external returns (uint amount0, uint amount1);
-    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+    function factory() external view returns (address);
+
+    function token0() external view returns (address);
+
+    function token1() external view returns (address);
+
+    function getReserves()
+        external
+        view
+        returns (
+            uint112 reserve0,
+            uint112 reserve1,
+            uint32 blockTimestampLast
+        );
+
+    function price0CumulativeLast() external view returns (uint256);
+
+    function price1CumulativeLast() external view returns (uint256);
+
+    function kLast() external view returns (uint256);
+
+    function mint(address to) external returns (uint256 liquidity);
+
+    function burn(address to) external returns (uint256 amount0, uint256 amount1);
+
+    function swap(
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address to,
+        bytes calldata data
+    ) external;
+
     function skim(address to) external;
+
     function sync() external;
 
     function initialize(address, address) external;
@@ -74,11 +111,11 @@ interface IGovernance {
 }
 
 interface IKeep3rV1Helper {
-    function getQuoteLimit(uint gasUsed) external view returns (uint);
+    function getQuoteLimit(uint256 gasUsed) external view returns (uint256);
 }
 
 contract Keep3rV1 is ReentrancyGuard {
-    using SafeMath for uint;
+    using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     /// @notice Keep3r Helper to set max prices for the ecosystem
@@ -94,19 +131,19 @@ contract Keep3rV1 is ReentrancyGuard {
     uint8 public constant decimals = 18;
 
     /// @notice Total number of tokens in circulation
-    uint public totalSupply = 0; // Initial 0
+    uint256 public totalSupply = 0; // Initial 0
 
     /// @notice A record of each accounts delegate
-    mapping (address => address) public delegates;
+    mapping(address => address) public delegates;
 
     /// @notice A record of votes checkpoints for each account, by index
-    mapping (address => mapping (uint32 => Checkpoint)) public checkpoints;
+    mapping(address => mapping(uint32 => Checkpoint)) public checkpoints;
 
     /// @notice The number of checkpoints for each account
-    mapping (address => uint32) public numCheckpoints;
+    mapping(address => uint32) public numCheckpoints;
 
-    mapping (address => mapping (address => uint)) internal allowances;
-    mapping (address => uint) internal balances;
+    mapping(address => mapping(address => uint256)) internal allowances;
+    mapping(address => uint256) internal balances;
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH = keccak256("EIP712Domain(string name,uint chainId,address verifyingContract)");
@@ -118,20 +155,19 @@ contract Keep3rV1 is ReentrancyGuard {
     /// @notice The EIP-712 typehash for the permit struct used by the contract
     bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address owner,address spender,uint value,uint nonce,uint deadline)");
 
-
     /// @notice A record of states for signing / validating signatures
-    mapping (address => uint) public nonces;
+    mapping(address => uint256) public nonces;
 
     /// @notice An event thats emitted when an account changes its delegate
     event DelegateChanged(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
 
     /// @notice An event thats emitted when a delegate account's vote balance changes
-    event DelegateVotesChanged(address indexed delegate, uint previousBalance, uint newBalance);
+    event DelegateVotesChanged(address indexed delegate, uint256 previousBalance, uint256 newBalance);
 
     /// @notice A checkpoint for marking number of votes from a given block
     struct Checkpoint {
         uint32 fromBlock;
-        uint votes;
+        uint256 votes;
     }
 
     /**
@@ -151,7 +187,14 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param r Half of the ECDSA signature pair
      * @param s Half of the ECDSA signature pair
      */
-    function delegateBySig(address delegatee, uint nonce, uint expiry, uint8 v, bytes32 r, bytes32 s) public {
+    function delegateBySig(
+        address delegatee,
+        uint256 nonce,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
         bytes32 structHash = keccak256(abi.encode(DELEGATION_TYPEHASH, delegatee, nonce, expiry));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAINSEPARATOR, structHash));
         address signatory = ecrecover(digest, v, r, s);
@@ -166,7 +209,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param account The address to get votes balance
      * @return The number of current votes for `account`
      */
-    function getCurrentVotes(address account) external view returns (uint) {
+    function getCurrentVotes(address account) external view returns (uint256) {
         uint32 nCheckpoints = numCheckpoints[account];
         return nCheckpoints > 0 ? checkpoints[account][nCheckpoints - 1].votes : 0;
     }
@@ -178,7 +221,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param blockNumber The block number to get the vote balance at
      * @return The number of votes the account had as of the given block
      */
-    function getPriorVotes(address account, uint blockNumber) public view returns (uint) {
+    function getPriorVotes(address account, uint256 blockNumber) public view returns (uint256) {
         require(blockNumber < block.number, "getPriorVotes:");
 
         uint32 nCheckpoints = numCheckpoints[account];
@@ -214,7 +257,7 @@ contract Keep3rV1 is ReentrancyGuard {
 
     function _delegate(address delegator, address delegatee) internal {
         address currentDelegate = delegates[delegator];
-        uint delegatorBalance = votes[delegator].add(bonds[delegator][address(this)]);
+        uint256 delegatorBalance = votes[delegator].add(bonds[delegator][address(this)]);
         delegates[delegator] = delegatee;
 
         emit DelegateChanged(delegator, currentDelegate, delegatee);
@@ -222,147 +265,156 @@ contract Keep3rV1 is ReentrancyGuard {
         _moveDelegates(currentDelegate, delegatee, delegatorBalance);
     }
 
-    function _moveDelegates(address srcRep, address dstRep, uint amount) internal {
+    function _moveDelegates(
+        address srcRep,
+        address dstRep,
+        uint256 amount
+    ) internal {
         if (srcRep != dstRep && amount > 0) {
             if (srcRep != address(0)) {
                 uint32 srcRepNum = numCheckpoints[srcRep];
-                uint srcRepOld = srcRepNum > 0 ? checkpoints[srcRep][srcRepNum - 1].votes : 0;
-                uint srcRepNew = srcRepOld.sub(amount, "_moveVotes: underflows");
+                uint256 srcRepOld = srcRepNum > 0 ? checkpoints[srcRep][srcRepNum - 1].votes : 0;
+                uint256 srcRepNew = srcRepOld.sub(amount, "_moveVotes: underflows");
                 _writeCheckpoint(srcRep, srcRepNum, srcRepOld, srcRepNew);
             }
 
             if (dstRep != address(0)) {
                 uint32 dstRepNum = numCheckpoints[dstRep];
-                uint dstRepOld = dstRepNum > 0 ? checkpoints[dstRep][dstRepNum - 1].votes : 0;
-                uint dstRepNew = dstRepOld.add(amount);
+                uint256 dstRepOld = dstRepNum > 0 ? checkpoints[dstRep][dstRepNum - 1].votes : 0;
+                uint256 dstRepNew = dstRepOld.add(amount);
                 _writeCheckpoint(dstRep, dstRepNum, dstRepOld, dstRepNew);
             }
         }
     }
 
-    function _writeCheckpoint(address delegatee, uint32 nCheckpoints, uint oldVotes, uint newVotes) internal {
-      uint32 blockNumber = safe32(block.number, "_writeCheckpoint: 32 bits");
+    function _writeCheckpoint(
+        address delegatee,
+        uint32 nCheckpoints,
+        uint256 oldVotes,
+        uint256 newVotes
+    ) internal {
+        uint32 blockNumber = safe32(block.number, "_writeCheckpoint: 32 bits");
 
-      if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
-          checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
-      } else {
-          checkpoints[delegatee][nCheckpoints] = Checkpoint(blockNumber, newVotes);
-          numCheckpoints[delegatee] = nCheckpoints + 1;
-      }
+        if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlock == blockNumber) {
+            checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
+        } else {
+            checkpoints[delegatee][nCheckpoints] = Checkpoint(blockNumber, newVotes);
+            numCheckpoints[delegatee] = nCheckpoints + 1;
+        }
 
-      emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
+        emit DelegateVotesChanged(delegatee, oldVotes, newVotes);
     }
 
-    function safe32(uint n, string memory errorMessage) internal pure returns (uint32) {
+    function safe32(uint256 n, string memory errorMessage) internal pure returns (uint32) {
         require(n < 2**32, errorMessage);
         return uint32(n);
     }
 
     /// @notice The standard EIP-20 transfer event
-    event Transfer(address indexed from, address indexed to, uint amount);
+    event Transfer(address indexed from, address indexed to, uint256 amount);
 
     /// @notice The standard EIP-20 approval event
-    event Approval(address indexed owner, address indexed spender, uint amount);
+    event Approval(address indexed owner, address indexed spender, uint256 amount);
 
     /// @notice Submit a job
-    event SubmitJob(address indexed job, address indexed liquidity, address indexed provider, uint block, uint credit);
+    event SubmitJob(address indexed job, address indexed liquidity, address indexed provider, uint256 block, uint256 credit);
 
     /// @notice Apply credit to a job
-    event ApplyCredit(address indexed job, address indexed liquidity, address indexed provider, uint block, uint credit);
+    event ApplyCredit(address indexed job, address indexed liquidity, address indexed provider, uint256 block, uint256 credit);
 
     /// @notice Remove credit for a job
-    event RemoveJob(address indexed job, address indexed liquidity, address indexed provider, uint block, uint credit);
+    event RemoveJob(address indexed job, address indexed liquidity, address indexed provider, uint256 block, uint256 credit);
 
     /// @notice Unbond credit for a job
-    event UnbondJob(address indexed job, address indexed liquidity, address indexed provider, uint block, uint credit);
+    event UnbondJob(address indexed job, address indexed liquidity, address indexed provider, uint256 block, uint256 credit);
 
     /// @notice Added a Job
-    event JobAdded(address indexed job, uint block, address governance);
+    event JobAdded(address indexed job, uint256 block, address governance);
 
     /// @notice Removed a job
-    event JobRemoved(address indexed job, uint block, address governance);
+    event JobRemoved(address indexed job, uint256 block, address governance);
 
     /// @notice Worked a job
-    event KeeperWorked(address indexed credit, address indexed job, address indexed keeper, uint block, uint amount);
+    event KeeperWorked(address indexed credit, address indexed job, address indexed keeper, uint256 block, uint256 amount);
 
     /// @notice Keeper bonding
-    event KeeperBonding(address indexed keeper, uint block, uint active, uint bond);
+    event KeeperBonding(address indexed keeper, uint256 block, uint256 active, uint256 bond);
 
     /// @notice Keeper bonded
-    event KeeperBonded(address indexed keeper, uint block, uint activated, uint bond);
+    event KeeperBonded(address indexed keeper, uint256 block, uint256 activated, uint256 bond);
 
     /// @notice Keeper unbonding
-    event KeeperUnbonding(address indexed keeper, uint block, uint deactive, uint bond);
+    event KeeperUnbonding(address indexed keeper, uint256 block, uint256 deactive, uint256 bond);
 
     /// @notice Keeper unbound
-    event KeeperUnbound(address indexed keeper, uint block, uint deactivated, uint bond);
+    event KeeperUnbound(address indexed keeper, uint256 block, uint256 deactivated, uint256 bond);
 
     /// @notice Keeper slashed
-    event KeeperSlashed(address indexed keeper, address indexed slasher, uint block, uint slash);
+    event KeeperSlashed(address indexed keeper, address indexed slasher, uint256 block, uint256 slash);
 
     /// @notice Keeper disputed
-    event KeeperDispute(address indexed keeper, uint block);
+    event KeeperDispute(address indexed keeper, uint256 block);
 
     /// @notice Keeper resolved
-    event KeeperResolved(address indexed keeper, uint block);
+    event KeeperResolved(address indexed keeper, uint256 block);
 
-    event AddCredit(address indexed credit, address indexed job, address indexed creditor, uint block, uint amount);
+    event AddCredit(address indexed credit, address indexed job, address indexed creditor, uint256 block, uint256 amount);
 
     /// @notice 1 day to bond to become a keeper
-    uint constant public BOND = 3 days;
+    uint256 public constant BOND = 3 days;
     /// @notice 14 days to unbond to remove funds from being a keeper
-    uint constant public UNBOND = 14 days;
+    uint256 public constant UNBOND = 14 days;
     /// @notice 3 days till liquidity can be bound
-    uint constant public LIQUIDITYBOND = 3 days;
+    uint256 public constant LIQUIDITYBOND = 3 days;
 
     /// @notice direct liquidity fee 0.3%
-    uint constant public FEE = 30;
-    uint constant public BASE = 10000;
+    uint256 public constant FEE = 30;
+    uint256 public constant BASE = 10000;
 
     /// @notice address used for ETH transfers
-    address constant public ETH = address(0xE);
+    address public constant ETH = address(0xE);
 
     /// @notice tracks all current bondings (time)
-    mapping(address => mapping(address => uint)) public bondings;
+    mapping(address => mapping(address => uint256)) public bondings;
     /// @notice tracks all current unbondings (time)
-    mapping(address => mapping(address => uint)) public unbondings;
+    mapping(address => mapping(address => uint256)) public unbondings;
     /// @notice allows for partial unbonding
-    mapping(address => mapping(address => uint)) public partialUnbonding;
+    mapping(address => mapping(address => uint256)) public partialUnbonding;
     /// @notice tracks all current pending bonds (amount)
-    mapping(address => mapping(address => uint)) public pendingbonds;
+    mapping(address => mapping(address => uint256)) public pendingbonds;
     /// @notice tracks how much a keeper has bonded
-    mapping(address => mapping(address => uint)) public bonds;
+    mapping(address => mapping(address => uint256)) public bonds;
     /// @notice tracks underlying votes (that don't have bond)
-    mapping(address => uint) public votes;
+    mapping(address => uint256) public votes;
 
     /// @notice total bonded (totalSupply for bonds)
-    uint public totalBonded = 0;
+    uint256 public totalBonded = 0;
     /// @notice tracks when a keeper was first registered
-    mapping(address => uint) public firstSeen;
+    mapping(address => uint256) public firstSeen;
 
     /// @notice tracks if a keeper has a pending dispute
     mapping(address => bool) public disputes;
 
     /// @notice tracks last job performed for a keeper
-    mapping(address => uint) public lastJob;
+    mapping(address => uint256) public lastJob;
     /// @notice tracks the total job executions for a keeper
-    mapping(address => uint) public workCompleted;
+    mapping(address => uint256) public workCompleted;
     /// @notice list of all jobs registered for the keeper system
     mapping(address => bool) public jobs;
     /// @notice the current credit available for a job
-    mapping(address => mapping(address => uint)) public credits;
+    mapping(address => mapping(address => uint256)) public credits;
     /// @notice the balances for the liquidity providers
-    mapping(address => mapping(address => mapping(address => uint))) public liquidityProvided;
+    mapping(address => mapping(address => mapping(address => uint256))) public liquidityProvided;
     /// @notice liquidity unbonding days
-    mapping(address => mapping(address => mapping(address => uint))) public liquidityUnbonding;
+    mapping(address => mapping(address => mapping(address => uint256))) public liquidityUnbonding;
     /// @notice liquidity unbonding amounts
-    mapping(address => mapping(address => mapping(address => uint))) public liquidityAmountsUnbonding;
+    mapping(address => mapping(address => mapping(address => uint256))) public liquidityAmountsUnbonding;
     /// @notice job proposal delay
-    mapping(address => uint) public jobProposalDelay;
+    mapping(address => uint256) public jobProposalDelay;
     /// @notice liquidity apply date
-    mapping(address => mapping(address => mapping(address => uint))) public liquidityApplied;
+    mapping(address => mapping(address => mapping(address => uint256))) public liquidityApplied;
     /// @notice liquidity amount to apply
-    mapping(address => mapping(address => mapping(address => uint))) public liquidityAmount;
+    mapping(address => mapping(address => mapping(address => uint256))) public liquidityAmount;
 
     /// @notice list of all current keepers
     mapping(address => bool) public keepers;
@@ -383,7 +435,7 @@ contract Keep3rV1 is ReentrancyGuard {
 
     address[] public liquidityPairs;
 
-    uint internal _gasUsed;
+    uint256 internal _gasUsed;
 
     constructor(address _kph) public {
         // Set governance for this token
@@ -398,7 +450,7 @@ contract Keep3rV1 is ReentrancyGuard {
      */
     function addCreditETH(address job) external payable {
         require(jobs[job], "addCreditETH: !job");
-        uint _fee = msg.value.mul(FEE).div(BASE);
+        uint256 _fee = msg.value.mul(FEE).div(BASE);
         credits[job][ETH] = credits[job][ETH].add(msg.value.sub(_fee));
         payable(governance).transfer(_fee);
 
@@ -411,12 +463,16 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param job the job being credited
      * @param amount the amount of credit being added to the job
      */
-    function addCredit(address credit, address job, uint amount) external nonReentrant {
+    function addCredit(
+        address credit,
+        address job,
+        uint256 amount
+    ) external nonReentrant {
         require(jobs[job], "addCreditETH: !job");
-        uint _before = IERC20(credit).balanceOf(address(this));
+        uint256 _before = IERC20(credit).balanceOf(address(this));
         IERC20(credit).safeTransferFrom(msg.sender, address(this), amount);
-        uint _received = IERC20(credit).balanceOf(address(this)).sub(_before);
-        uint _fee = _received.mul(FEE).div(BASE);
+        uint256 _received = IERC20(credit).balanceOf(address(this)).sub(_before);
+        uint256 _fee = _received.mul(FEE).div(BASE);
         credits[job][credit] = credits[job][credit].add(_received.sub(_fee));
         IERC20(credit).safeTransfer(governance, _fee);
 
@@ -428,7 +484,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param voter to add the votes to
      * @param amount of votes to add
      */
-    function addVotes(address voter, uint amount) external { // onlyGovernance
+    function addVotes(address voter, uint256 amount) external {
+        // onlyGovernance
         require(msg.sender == governance, "addVotes: !gov");
         _activate(voter, address(this));
         votes[voter] = votes[voter].add(amount);
@@ -441,7 +498,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param voter to subtract the votes
      * @param amount of votes to remove
      */
-    function removeVotes(address voter, uint amount) external { // onlyGovernance
+    function removeVotes(address voter, uint256 amount) external {
+        // onlyGovernance
         require(msg.sender == governance, "addVotes: !gov");
         votes[voter] = votes[voter].sub(amount);
         totalBonded = totalBonded.sub(amount);
@@ -453,7 +511,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param job the job being credited
      * @param amount the amount of credit being added to the job
      */
-    function addKPRCredit(address job, uint amount) external { // onlyGovernance
+    function addKPRCredit(address job, uint256 amount) external {
+        // onlyGovernance
         require(msg.sender == governance, "addKPRCredit: !gov");
         require(jobs[job], "addKPRCredit: !job");
         credits[job][address(this)] = credits[job][address(this)].add(amount);
@@ -465,7 +524,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Approve a liquidity pair for being accepted in future
      * @param liquidity the liquidity no longer accepted
      */
-    function approveLiquidity(address liquidity) external { // onlyGovernance
+    function approveLiquidity(address liquidity) external {
+        // onlyGovernance
         require(msg.sender == governance, "approveLiquidity: !gov");
         require(!liquidityAccepted[liquidity], "approveLiquidity: !pair");
         liquidityAccepted[liquidity] = true;
@@ -476,7 +536,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Revoke a liquidity pair from being accepted in future
      * @param liquidity the liquidity no longer accepted
      */
-    function revokeLiquidity(address liquidity) external { // onlyGovernance
+    function revokeLiquidity(address liquidity) external {
+        // onlyGovernance
         require(msg.sender == governance, "revokeLiquidity: !gov");
         liquidityAccepted[liquidity] = false;
     }
@@ -494,7 +555,11 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param job the job to assign credit to
      * @param amount the amount of liquidity tokens to use
      */
-    function addLiquidityToJob(address liquidity, address job, uint amount) external nonReentrant {
+    function addLiquidityToJob(
+        address liquidity,
+        address job,
+        uint256 amount
+    ) external nonReentrant {
         require(liquidityAccepted[liquidity], "addLiquidityToJob: !pair");
         IERC20(liquidity).safeTransferFrom(msg.sender, address(this), amount);
         liquidityProvided[msg.sender][liquidity][job] = liquidityProvided[msg.sender][liquidity][job].add(amount);
@@ -515,12 +580,16 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param liquidity the pair being added as liquidity
      * @param job the job that is receiving the credit
      */
-    function applyCreditToJob(address provider, address liquidity, address job) external {
+    function applyCreditToJob(
+        address provider,
+        address liquidity,
+        address job
+    ) external {
         require(liquidityAccepted[liquidity], "addLiquidityToJob: !pair");
         require(liquidityApplied[provider][liquidity][job] != 0, "credit: no bond");
         require(liquidityApplied[provider][liquidity][job] < now, "credit: bonding");
-        uint _liquidity = Keep3rV1Library.getReserve(liquidity, address(this));
-        uint _credit = _liquidity.mul(liquidityAmount[provider][liquidity][job]).div(IERC20(liquidity).totalSupply());
+        uint256 _liquidity = Keep3rV1Library.getReserve(liquidity, address(this));
+        uint256 _credit = _liquidity.mul(liquidityAmount[provider][liquidity][job]).div(IERC20(liquidity).totalSupply());
         _mint(address(this), _credit);
         credits[job][address(this)] = credits[job][address(this)].add(_credit);
         liquidityAmount[provider][liquidity][job] = 0;
@@ -534,14 +603,21 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param job the job being unbound from
      * @param amount the amount of liquidity being removed
      */
-    function unbondLiquidityFromJob(address liquidity, address job, uint amount) external {
+    function unbondLiquidityFromJob(
+        address liquidity,
+        address job,
+        uint256 amount
+    ) external {
         require(liquidityAmount[msg.sender][liquidity][job] == 0, "credit: pending credit");
         liquidityUnbonding[msg.sender][liquidity][job] = now.add(UNBOND);
         liquidityAmountsUnbonding[msg.sender][liquidity][job] = liquidityAmountsUnbonding[msg.sender][liquidity][job].add(amount);
-        require(liquidityAmountsUnbonding[msg.sender][liquidity][job] <= liquidityProvided[msg.sender][liquidity][job], "unbondLiquidityFromJob: insufficient funds");
+        require(
+            liquidityAmountsUnbonding[msg.sender][liquidity][job] <= liquidityProvided[msg.sender][liquidity][job],
+            "unbondLiquidityFromJob: insufficient funds"
+        );
 
-        uint _liquidity = Keep3rV1Library.getReserve(liquidity, address(this));
-        uint _credit = _liquidity.mul(amount).div(IERC20(liquidity).totalSupply());
+        uint256 _liquidity = Keep3rV1Library.getReserve(liquidity, address(this));
+        uint256 _credit = _liquidity.mul(amount).div(IERC20(liquidity).totalSupply());
         if (_credit > credits[job][address(this)]) {
             _burn(address(this), credits[job][address(this)]);
             credits[job][address(this)] = 0;
@@ -561,7 +637,7 @@ contract Keep3rV1 is ReentrancyGuard {
     function removeLiquidityFromJob(address liquidity, address job) external {
         require(liquidityUnbonding[msg.sender][liquidity][job] != 0, "removeJob: unbond");
         require(liquidityUnbonding[msg.sender][liquidity][job] < now, "removeJob: unbonding");
-        uint _amount = liquidityAmountsUnbonding[msg.sender][liquidity][job];
+        uint256 _amount = liquidityAmountsUnbonding[msg.sender][liquidity][job];
         liquidityProvided[msg.sender][liquidity][job] = liquidityProvided[msg.sender][liquidity][job].sub(_amount);
         liquidityAmountsUnbonding[msg.sender][liquidity][job] = 0;
         IERC20(liquidity).safeTransfer(msg.sender, _amount);
@@ -573,7 +649,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to mint new tokens to treasury
      * @param amount the amount of tokens to mint to treasury
      */
-    function mint(uint amount) external { // onlyGovernance
+    function mint(uint256 amount) external {
+        // onlyGovernance
         require(msg.sender == governance, "mint: !gov");
         _mint(governance, amount);
     }
@@ -582,11 +659,11 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice burn owned tokens
      * @param amount the amount of tokens to burn
      */
-    function burn(uint amount) external {
+    function burn(uint256 amount) external {
         _burn(msg.sender, amount);
     }
 
-    function _mint(address dst, uint amount) internal {
+    function _mint(address dst, uint256 amount) internal {
         // mint the amount
         totalSupply = totalSupply.add(amount);
         // transfer the amount to the recipient
@@ -594,7 +671,7 @@ contract Keep3rV1 is ReentrancyGuard {
         emit Transfer(address(0), dst, amount);
     }
 
-    function _burn(address dst, uint amount) internal {
+    function _burn(address dst, uint256 amount) internal {
         require(dst != address(0), "_burn: zero address");
         balances[dst] = balances[dst].sub(amount, "_burn: exceeds balance");
         totalSupply = totalSupply.sub(amount);
@@ -614,7 +691,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param keeper address of the keeper that performed the work
      * @param amount the reward that should be allocated
      */
-    function workReceipt(address keeper, uint amount) public {
+    function workReceipt(address keeper, uint256 amount) public {
         require(jobs[msg.sender], "workReceipt: !job");
         require(amount <= KPRH.getQuoteLimit(_gasUsed.sub(gasleft())), "workReceipt: max limit");
         credits[msg.sender][address(this)] = credits[msg.sender][address(this)].sub(amount, "workReceipt: insuffient funds");
@@ -630,7 +707,11 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param keeper address of the keeper that performed the work
      * @param amount the reward that should be allocated
      */
-    function receipt(address credit, address keeper, uint amount) external {
+    function receipt(
+        address credit,
+        address keeper,
+        uint256 amount
+    ) external {
         require(jobs[msg.sender], "receipt: !job");
         credits[msg.sender][credit] = credits[msg.sender][credit].sub(amount, "workReceipt: insuffient funds");
         lastJob[keeper] = now;
@@ -643,7 +724,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param keeper address of the keeper that performed the work
      * @param amount the amount of ETH sent to the keeper
      */
-    function receiptETH(address keeper, uint amount) external {
+    function receiptETH(address keeper, uint256 amount) external {
         require(jobs[msg.sender], "receipt: !job");
         credits[msg.sender][ETH] = credits[msg.sender][ETH].sub(amount, "workReceipt: insuffient funds");
         lastJob[keeper] = now;
@@ -651,14 +732,18 @@ contract Keep3rV1 is ReentrancyGuard {
         emit KeeperWorked(ETH, msg.sender, keeper, block.number, amount);
     }
 
-    function _reward(address _from, uint _amount) internal {
+    function _reward(address _from, uint256 _amount) internal {
         bonds[_from][address(this)] = bonds[_from][address(this)].add(_amount);
         totalBonded = totalBonded.add(_amount);
         _moveDelegates(address(0), delegates[_from], _amount);
         emit Transfer(msg.sender, _from, _amount);
     }
 
-    function _bond(address bonding, address _from, uint _amount) internal {
+    function _bond(
+        address bonding,
+        address _from,
+        uint256 _amount
+    ) internal {
         bonds[_from][bonding] = bonds[_from][bonding].add(_amount);
         if (bonding == address(this)) {
             totalBonded = totalBonded.add(_amount);
@@ -666,20 +751,24 @@ contract Keep3rV1 is ReentrancyGuard {
         }
     }
 
-    function _unbond(address bonding, address _from, uint _amount) internal {
+    function _unbond(
+        address bonding,
+        address _from,
+        uint256 _amount
+    ) internal {
         bonds[_from][bonding] = bonds[_from][bonding].sub(_amount);
         if (bonding == address(this)) {
             totalBonded = totalBonded.sub(_amount);
             _moveDelegates(delegates[_from], address(0), _amount);
         }
-
     }
 
     /**
      * @notice Allows governance to add new job systems
      * @param job address of the contract for which work should be performed
      */
-    function addJob(address job) external { // onlyGovernance
+    function addJob(address job) external {
+        // onlyGovernance
         require(msg.sender == governance, "addJob: !gov");
         require(!jobs[job], "addJob: job known");
         jobs[job] = true;
@@ -699,7 +788,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to remove a job from the systems
      * @param job address of the contract for which work should be performed
      */
-    function removeJob(address job) external { // onlyGovernance
+    function removeJob(address job) external {
+        // onlyGovernance
         require(msg.sender == governance, "removeJob: !gov");
         jobs[job] = false;
         emit JobRemoved(job, block.number, msg.sender);
@@ -709,7 +799,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to change the Keep3rHelper for max spend
      * @param _kprh new helper address to set
      */
-    function setKeep3rHelper(IKeep3rV1Helper _kprh) external { // onlyGovernance
+    function setKeep3rHelper(IKeep3rV1Helper _kprh) external {
+        // onlyGovernance
         require(msg.sender == governance, "setKeep3rHelper: !gov");
         KPRH = _kprh;
     }
@@ -718,7 +809,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice Allows governance to change governance (for future upgradability)
      * @param _governance new governance address to set
      */
-    function setGovernance(address _governance) external { // onlyGovernance
+    function setGovernance(address _governance) external {
+        // onlyGovernance
         require(msg.sender == governance, "setGovernance: !gov");
         pendingGovernance = _governance;
     }
@@ -749,12 +841,18 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param age the age of the keeper in the system
      * @return true/false if the address is a keeper and has more than the bond
      */
-    function isMinKeeper(address keeper, uint minBond, uint earned, uint age) external returns (bool) {
+    function isMinKeeper(
+        address keeper,
+        uint256 minBond,
+        uint256 earned,
+        uint256 age
+    ) external returns (bool) {
         _gasUsed = gasleft();
-        return keepers[keeper]
-                && bonds[keeper][address(this)].add(votes[keeper]) >= minBond
-                && workCompleted[keeper] >= earned
-                && now.sub(firstSeen[keeper]) >= age;
+        return
+            keepers[keeper] &&
+            bonds[keeper][address(this)].add(votes[keeper]) >= minBond &&
+            workCompleted[keeper] >= earned &&
+            now.sub(firstSeen[keeper]) >= age;
     }
 
     /**
@@ -766,12 +864,15 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param age the age of the keeper in the system
      * @return true/false if the address is a keeper and has more than the bond
      */
-    function isBondedKeeper(address keeper, address bond, uint minBond, uint earned, uint age) external returns (bool) {
+    function isBondedKeeper(
+        address keeper,
+        address bond,
+        uint256 minBond,
+        uint256 earned,
+        uint256 age
+    ) external returns (bool) {
         _gasUsed = gasleft();
-        return keepers[keeper]
-                && bonds[keeper][bond] >= minBond
-                && workCompleted[keeper] >= earned
-                && now.sub(firstSeen[keeper]) >= age;
+        return keepers[keeper] && bonds[keeper][bond] >= minBond && workCompleted[keeper] >= earned && now.sub(firstSeen[keeper]) >= age;
     }
 
     /**
@@ -779,13 +880,13 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param bonding the asset being bound
      * @param amount the amount of bonding asset being bound
      */
-    function bond(address bonding, uint amount) external nonReentrant {
+    function bond(address bonding, uint256 amount) external nonReentrant {
         require(!blacklist[msg.sender], "bond: blacklisted");
         bondings[msg.sender][bonding] = now.add(BOND);
         if (bonding == address(this)) {
             _transferTokens(msg.sender, address(this), amount);
         } else {
-            uint _before = IERC20(bonding).balanceOf(address(this));
+            uint256 _before = IERC20(bonding).balanceOf(address(this));
             IERC20(bonding).safeTransferFrom(msg.sender, address(this), amount);
             amount = IERC20(bonding).balanceOf(address(this)).sub(_before);
         }
@@ -809,12 +910,12 @@ contract Keep3rV1 is ReentrancyGuard {
         require(bondings[msg.sender][bonding] != 0 && bondings[msg.sender][bonding] < now, "activate: bonding");
         _activate(msg.sender, bonding);
     }
-    
+
     function _activate(address keeper, address bonding) internal {
         if (firstSeen[keeper] == 0) {
-          firstSeen[keeper] = now;
-          keeperList.push(keeper);
-          lastJob[keeper] = now;
+            firstSeen[keeper] = now;
+            keeperList.push(keeper);
+            lastJob[keeper] = now;
         }
         keepers[keeper] = true;
         _bond(bonding, keeper, pendingbonds[keeper][bonding]);
@@ -827,7 +928,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param bonding the asset being unbound
      * @param amount allows for partial unbonding
      */
-    function unbond(address bonding, uint amount) external {
+    function unbond(address bonding, uint256 amount) external {
         unbondings[msg.sender][bonding] = now.add(UNBOND);
         _unbond(bonding, msg.sender, amount);
         partialUnbonding[msg.sender][bonding] = partialUnbonding[msg.sender][bonding].add(amount);
@@ -855,7 +956,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice allows governance to create a dispute for a given keeper
      * @param keeper the address in dispute
      */
-    function dispute(address keeper) external { // onlyGovernance
+    function dispute(address keeper) external {
+        // onlyGovernance
         require(msg.sender == governance, "dispute: !gov");
         disputes[keeper] = true;
         emit KeeperDispute(keeper, block.number);
@@ -867,7 +969,12 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param keeper the address being slashed
      * @param amount the amount being slashed
      */
-    function slash(address bonded, address keeper, uint amount) public nonReentrant { // onlyGovernance
+    function slash(
+        address bonded,
+        address keeper,
+        uint256 amount
+    ) public nonReentrant {
+        // onlyGovernance
         require(msg.sender == governance, "slash: !gov");
         if (bonded == address(this)) {
             _transferTokens(address(this), governance, amount);
@@ -883,7 +990,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice blacklists a keeper from participating in the network
      * @param keeper the address being slashed
      */
-    function revoke(address keeper) external { // onlyGovernance
+    function revoke(address keeper) external {
+        // onlyGovernance
         require(msg.sender == governance, "slash: !gov");
         keepers[keeper] = false;
         blacklist[keeper] = true;
@@ -894,7 +1002,8 @@ contract Keep3rV1 is ReentrancyGuard {
      * @notice allows governance to resolve a dispute on a keeper
      * @param keeper the address cleared
      */
-    function resolve(address keeper) external { // onlyGovernance
+    function resolve(address keeper) external {
+        // onlyGovernance
         require(msg.sender == governance, "resolve: !gov");
         disputes[keeper] = false;
         emit KeeperResolved(keeper, block.number);
@@ -906,7 +1015,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param spender The address of the account spending the funds
      * @return The number of tokens approved
      */
-    function allowance(address account, address spender) external view returns (uint) {
+    function allowance(address account, address spender) external view returns (uint256) {
         return allowances[account][spender];
     }
 
@@ -918,7 +1027,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param amount The number of tokens that are approved (2^256-1 means infinite)
      * @return Whether or not the approval succeeded
      */
-    function approve(address spender, uint amount) public returns (bool) {
+    function approve(address spender, uint256 amount) public returns (bool) {
         allowances[msg.sender][spender] = amount;
 
         emit Approval(msg.sender, spender, amount);
@@ -935,7 +1044,15 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param r Half of the ECDSA signature pair
      * @param s Half of the ECDSA signature pair
      */
-    function permit(address owner, address spender, uint amount, uint deadline, uint8 v, bytes32 r, bytes32 s) external {
+    function permit(
+        address owner,
+        address spender,
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external {
         bytes32 structHash = keccak256(abi.encode(PERMIT_TYPEHASH, owner, spender, amount, nonces[owner]++, deadline));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", DOMAINSEPARATOR, structHash));
         address signatory = ecrecover(digest, v, r, s);
@@ -953,7 +1070,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param account The address of the account to get the balance of
      * @return The number of tokens held
      */
-    function balanceOf(address account) external view returns (uint) {
+    function balanceOf(address account) external view returns (uint256) {
         return balances[account];
     }
 
@@ -963,7 +1080,7 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transfer(address dst, uint amount) public returns (bool) {
+    function transfer(address dst, uint256 amount) public returns (bool) {
         _transferTokens(msg.sender, dst, amount);
         return true;
     }
@@ -975,12 +1092,16 @@ contract Keep3rV1 is ReentrancyGuard {
      * @param amount The number of tokens to transfer
      * @return Whether or not the transfer succeeded
      */
-    function transferFrom(address src, address dst, uint amount) external returns (bool) {
+    function transferFrom(
+        address src,
+        address dst,
+        uint256 amount
+    ) external returns (bool) {
         address spender = msg.sender;
-        uint spenderAllowance = allowances[src][spender];
+        uint256 spenderAllowance = allowances[src][spender];
 
-        if (spender != src && spenderAllowance != uint(-1)) {
-            uint newAllowance = spenderAllowance.sub(amount, "transferFrom: exceeds spender allowance");
+        if (spender != src && spenderAllowance != uint256(-1)) {
+            uint256 newAllowance = spenderAllowance.sub(amount, "transferFrom: exceeds spender allowance");
             allowances[src][spender] = newAllowance;
 
             emit Approval(src, spender, newAllowance);
@@ -990,7 +1111,11 @@ contract Keep3rV1 is ReentrancyGuard {
         return true;
     }
 
-    function _transferTokens(address src, address dst, uint amount) internal {
+    function _transferTokens(
+        address src,
+        address dst,
+        uint256 amount
+    ) internal {
         require(src != address(0), "_transferTokens: zero address");
         require(dst != address(0), "_transferTokens: zero address");
 
@@ -999,9 +1124,11 @@ contract Keep3rV1 is ReentrancyGuard {
         emit Transfer(src, dst, amount);
     }
 
-    function _getChainId() internal pure returns (uint) {
-        uint chainId;
-        assembly { chainId := chainid() }
+    function _getChainId() internal pure returns (uint256) {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
         return chainId;
     }
 }

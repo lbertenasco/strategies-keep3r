@@ -1,11 +1,10 @@
 /**
  *Submitted for verification at Etherscan.io on 2020-11-07
-*/
+ */
 
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.5.17;
-
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
@@ -65,7 +64,11 @@ interface IERC20 {
      *
      * Emits a {Transfer} event.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
 
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -136,7 +139,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function sub(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         require(b <= a, errorMessage);
         uint256 c = a - b;
 
@@ -194,7 +201,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function div(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         // Solidity only automatically asserts when dividing by 0
         require(b > 0, errorMessage);
         uint256 c = a / b;
@@ -231,7 +242,11 @@ library SafeMath {
      *
      * _Available since v2.4.0._
      */
-    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {
+    function mod(
+        uint256 a,
+        uint256 b,
+        string memory errorMessage
+    ) internal pure returns (uint256) {
         require(b != 0, errorMessage);
         return a % b;
     }
@@ -249,7 +264,7 @@ library Address {
      * It is unsafe to assume that an address for which this function returns
      * false is an externally-owned account (EOA) and not a contract.
      *
-     * Among others, `isContract` will return false for the following 
+     * Among others, `isContract` will return false for the following
      * types of addresses:
      *
      *  - an externally-owned account
@@ -265,7 +280,9 @@ library Address {
         bytes32 codehash;
         bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
         // solhint-disable-next-line no-inline-assembly
-        assembly { codehash := extcodehash(account) }
+        assembly {
+            codehash := extcodehash(account)
+        }
         return (codehash != accountHash && codehash != 0x0);
     }
 
@@ -319,31 +336,50 @@ library SafeERC20 {
     using SafeMath for uint256;
     using Address for address;
 
-    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+    function safeTransfer(
+        IERC20 token,
+        address to,
+        uint256 value
+    ) internal {
         callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
     }
 
-    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+    function safeTransferFrom(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 value
+    ) internal {
         callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
     }
 
-    function safeApprove(IERC20 token, address spender, uint256 value) internal {
+    function safeApprove(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
         // safeApprove should only be called when setting an initial allowance,
         // or when resetting it to zero. To increase and decrease it, use
         // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'
         // solhint-disable-next-line max-line-length
-        require((value == 0) || (token.allowance(address(this), spender) == 0),
-            "SafeERC20: approve from non-zero to non-zero allowance"
-        );
+        require((value == 0) || (token.allowance(address(this), spender) == 0), "SafeERC20: approve from non-zero to non-zero allowance");
         callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
     }
 
-    function safeIncreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+    function safeIncreaseAllowance(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
         uint256 newAllowance = token.allowance(address(this), spender).add(value);
         callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
 
-    function safeDecreaseAllowance(IERC20 token, address spender, uint256 value) internal {
+    function safeDecreaseAllowance(
+        IERC20 token,
+        address spender,
+        uint256 value
+    ) internal {
         uint256 newAllowance = token.allowance(address(this), spender).sub(value, "SafeERC20: decreased allowance below zero");
         callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
     }
@@ -369,29 +405,42 @@ library SafeERC20 {
         (bool success, bytes memory returndata) = address(token).call(data);
         require(success, "SafeERC20: low-level call failed");
 
-        if (returndata.length > 0) { // Return data is optional
+        if (returndata.length > 0) {
+            // Return data is optional
             // solhint-disable-next-line max-line-length
             require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
         }
     }
 }
+
 interface IController {
     function withdraw(address, uint256) external;
+
     function balanceOf(address) external view returns (uint256);
+
     function earn(address, uint256) external;
+
     function want(address) external view returns (address);
+
     function rewards() external view returns (address);
+
     function vaults(address) external view returns (address);
+
     function strategies(address) external view returns (address);
 }
+
 interface Gauge {
     function deposit(uint256) external;
+
     function balanceOf(address) external view returns (uint256);
+
     function withdraw(uint256) external;
 }
+
 interface Mintr {
     function mint(address) external;
 }
+
 interface Uni {
     function swapExactTokensForTokens(
         uint256,
@@ -401,11 +450,9 @@ interface Uni {
         uint256
     ) external;
 }
+
 interface ICurveFi {
-    function add_liquidity(
-        uint256[2] calldata amounts,
-        uint256 min_mint_amount
-    ) external;
+    function add_liquidity(uint256[2] calldata amounts, uint256 min_mint_amount) external;
 }
 
 interface VoterProxy {
@@ -414,10 +461,15 @@ interface VoterProxy {
         address _token,
         uint256 _amount
     ) external returns (uint256);
+
     function balanceOf(address _gauge) external view returns (uint256);
+
     function withdrawAll(address _gauge, address _token) external returns (uint256);
+
     function deposit(address _gauge, address _token) external;
+
     function harvest(address _gauge) external;
+
     function lock() external;
 }
 
@@ -449,9 +501,9 @@ contract StrategyCurveCompoundVoterProxy {
     address public controller;
     address public strategist;
 
-    uint256 public earned;  // lifetime strategy earnings denominated in `want` token
+    uint256 public earned; // lifetime strategy earnings denominated in `want` token
 
-    event Harvest(uint wantEarned, uint lifetimeEarned);
+    event Harvest(uint256 wantEarned, uint256 lifetimeEarned);
 
     constructor(address _controller) public {
         governance = msg.sender;
@@ -483,7 +535,7 @@ contract StrategyCurveCompoundVoterProxy {
         performanceFee = _performanceFee;
     }
 
-    function setStrategistReward(uint _strategistReward) external {
+    function setStrategistReward(uint256 _strategistReward) external {
         require(msg.sender == governance, "!governance");
         strategistReward = _strategistReward;
     }
