@@ -4,7 +4,6 @@ const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
-
 const prompt = new Confirm('Do you wish to deploy keep3r escrow contract?');
 
 async function main() {
@@ -31,7 +30,10 @@ function promptAndSubmit(Keep3rEscrowJob) {
           );
           console.timeEnd('Keep3rEscrowJob deployed');
           console.log('Keep3rEscrowJob address:', keep3rEscrowJob.address);
-          console.log('TODO: change .config.json & example.config.json keep3rEscrowJob address to:', keep3rEscrowJob.address);
+          console.log(
+            'TODO: change .config.json & example.config.json keep3rEscrowJob address to:',
+            keep3rEscrowJob.address
+          );
           resolve();
         } else {
           console.error('Aborted!');
@@ -44,12 +46,11 @@ function promptAndSubmit(Keep3rEscrowJob) {
   });
 }
 
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

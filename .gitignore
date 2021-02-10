@@ -1,7 +1,14 @@
+# General
 node_modules
+.DS_STORE
 
-#Hardhat files
+# Coverage
+coverage.json
+coverage
+
+# Hardhat files
 cache
 artifacts
 
+# Config files
 .config.json

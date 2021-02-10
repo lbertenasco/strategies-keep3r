@@ -4,9 +4,9 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import '@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol';
+import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
 
-import '../sugar-mommy/Keep3rJob.sol';
+import "../sugar-mommy/Keep3rJob.sol";
 
 import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
@@ -185,5 +185,4 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
     function _tend(address _strategy) internal {
         IBaseStrategy(_strategy).tend();
     }
-
 }
