@@ -40,14 +40,12 @@ function run() {
       config.accounts.mainnet.keep3rGovernance
     );
 
-    // DEPLOYED
-    // const vaultKeep3rJob = await ethers.getContractAt('VaultKeep3rJob', escrowContracts.jobs.vaultKeep3rJob, deployer);
-    // NOT YET DEPLOYED
-    const VaultKeep3rJob = await ethers.getContractFactory('VaultKeep3rJob');
-    const vaultKeep3rJob = await VaultKeep3rJob.deploy(
-      escrowContracts.sugarMommy,
-      SIX_HOURS
+    const vaultKeep3rJob = await ethers.getContractAt(
+      'VaultKeep3rJob',
+      escrowContracts.jobs.vaultKeep3rJob,
+      deployer
     );
+
     // Setup crv vaults
     const requiredEarn = 100000;
     const vaults = [
