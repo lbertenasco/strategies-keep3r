@@ -5,6 +5,8 @@
 .gitignore
 .gitattributes
 .versionrc
+.env
+.env.example
 
 # Hardhat
 artifacts
