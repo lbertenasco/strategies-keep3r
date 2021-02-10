@@ -36,7 +36,7 @@ jobs:
         run: npm run lint:check
 
       - name: Trigger unit tests
-        if: ${{ github.event_name == 'pull_request' && success() }}
+        if: success()
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
