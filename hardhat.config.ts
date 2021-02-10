@@ -11,12 +11,6 @@ module.exports = {
   networks: {
     hardhat: {
       enabled: process.env.FORK ? true : false,
-      accounts: [
-        {
-          privateKey: config.accounts.mainnet.privateKey,
-          balance: utils.parseEther('1000').toString(),
-        },
-      ],
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       },
