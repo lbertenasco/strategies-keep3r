@@ -45,6 +45,12 @@ interface IKeep3rV2StrategyJob {
     event TendStrategyRemoved(address _strategy);
 
     // Setters
+    function addStrategies(
+        address[] calldata _strategy,
+        uint256[] calldata _requiredHarvest,
+        uint256[] calldata _requiredTend
+    ) external;
+
     function addStrategy(
         address _strategy,
         uint256 _requiredHarvest,
