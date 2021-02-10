@@ -7,16 +7,16 @@ interface IFreeFromUpTo {
 }
 abstract contract Keep3rGasSaver {
     using SafeMath for uint256;
-    IFreeFromUpTo chi = IFreeFromUpTo(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
-    IFreeFromUpTo gst2 = IFreeFromUpTo(0x0000000000b3F879cb30FE243b4Dfee438691c04);
+    address public constant chi = address(0x0000000000004946c0e9F43F4Dee607b0eF1fA1c);
+    address public constant gst2 = address(0x0000000000b3F879cb30FE243b4Dfee438691c04);
 
     modifier saveOnGas(address _gas_token) {
-        if (_gas_token == address(chi)) {
+        if (_gas_token == chi) {
             uint256 gasStart = gasleft();
             _;
             uint256 gasSpent = (gasStart - gasleft()) + 21000 + (16 * msg.data.length);
-            chi.freeFromUpTo(msg.sender, (gasSpent + 14154) / 41130);
-        } else if (_gas_token == address(gst2)) {
+            IFreeFromUpTo(chi).freeFromUpTo(msg.sender, (gasSpent + 14154) / 41130);
+        } else if (_gas_token == gst2) {
             uint256 gasStart = gasleft();
             _;
 
@@ -49,7 +49,7 @@ abstract contract Keep3rGasSaver {
                 }
 
                 if (tokensToFree > 0) {
-                    gst2.freeFromUpTo(msg.sender, tokensToFree);
+                    IFreeFromUpTo(gst2).freeFromUpTo(msg.sender, tokensToFree);
                 }
             }
         } else {
