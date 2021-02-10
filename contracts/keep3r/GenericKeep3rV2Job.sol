@@ -34,14 +34,36 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
         slidingOracle = _slidingOracle;
     }
 
-    // Unique method to add a strategy to the system
+    // Unique methods to add a strategy to the system
     // If you don't require harvest, use _requiredHarvest = 0
     // If you don't require tend, use _requiredTend = 0
+    function addStrategies(
+        address[] calldata _strategies,
+        uint256[] calldata _requiredHarvests,
+        uint256[] calldata _requiredTends
+    ) external override onlyGovernor {
+        require(
+            _strategies.length == _requiredHarvests.length && _strategies.length == _requiredTends.length,
+            "crv-strategy-keep3r::add-strategies:strategies-required-harvests-and-tends-different-length"
+        );
+        for (uint256 i; i < _strategies.length; i++) {
+            _addStrategy(_strategies[i], _requiredHarvests[i], _requiredTends[i]);
+        }
+    }
+
     function addStrategy(
         address _strategy,
         uint256 _requiredHarvest,
         uint256 _requiredTend
     ) external override onlyGovernor {
+        _addStrategy(_strategy, _requiredHarvest, _requiredTend);
+    }
+
+    function _addStrategy(
+        address _strategy,
+        uint256 _requiredHarvest,
+        uint256 _requiredTend
+    ) internal {
         require(_requiredHarvest > 0 || _requiredTend > 0, "generic-keep3r-v2::add-strategy:should-need-harvest-or-tend");
         if (_requiredHarvest > 0) {
             _addHarvestStrategy(_strategy, _requiredHarvest);
