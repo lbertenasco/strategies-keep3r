@@ -24,7 +24,8 @@ module.exports = {
       url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       accounts: [config.accounts.mainnet.privateKey],
       gasMultiplier: 1.1,
-      gasPrice: 'auto',
+      // gasPrice: 'auto',
+      gasPrice: 110000000000, // 110 gwei
     },
   },
   solidity: {

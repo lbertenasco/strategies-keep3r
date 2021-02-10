@@ -44,14 +44,10 @@ function run() {
     // const vaultKeep3rJob = await ethers.getContractAt('VaultKeep3rJob', escrowContracts.jobs.vaultKeep3rJob, deployer);
     // NOT YET DEPLOYED
     const VaultKeep3rJob = await ethers.getContractFactory('VaultKeep3rJob');
-    console.log(1);
-    console.log(escrowContracts.sugarMommy);
-    console.log(SIX_HOURS);
     const vaultKeep3rJob = await VaultKeep3rJob.deploy(
       escrowContracts.sugarMommy,
       SIX_HOURS
     );
-    console.log(2);
     // Setup crv vaults
     const requiredEarn = 100000;
     const vaults = [
@@ -146,8 +142,8 @@ function run() {
     // }
 
     // setup required earn decimals
+    console.time('setupDecimals');
     for (const vault of vaults) {
-      console.log(vault.name);
       const vaultContract = await ethers.getContractAt('yVault', vault.address);
       const tokenAddress = await vaultContract.token();
       const tokenContract = await ethers.getContractAt(
@@ -159,13 +155,13 @@ function run() {
         .pow(decimals)
         .mul(vault.requiredEarn || requiredEarn);
     }
-    console.log(4);
+    console.timeEnd('setupDecimals');
 
     // Add crv vaults to crv keep3r
     console.time('addVaults');
     await vaultKeep3rJob.addVaults(
       vaults.map((vault) => vault.address),
-      vaults.map((vault) => vault.requiredHarvestAmount)
+      vaults.map((vault) => vault.requiredEarn)
     );
     console.timeEnd('addVaults');
 

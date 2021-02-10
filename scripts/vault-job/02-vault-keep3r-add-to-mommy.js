@@ -32,13 +32,13 @@ function run() {
       escrowContracts.sugarMommy,
       deployer
     );
-    const crvStrategyKeep3rJob = await ethers.getContractAt(
-      'CrvStrategyKeep3rJob',
-      escrowContracts.jobs.crvStrategyKeep3rJob,
+    const vaultKeep3rJob = await ethers.getContractAt(
+      'VaultKeep3rJob',
+      escrowContracts.jobs.vaultKeep3rJob,
       deployer
     );
 
-    await keep3rSugarMommy.addValidJob(crvStrategyKeep3rJob.address);
+    await keep3rSugarMommy.addValidJob(vaultKeep3rJob.address);
     console.log(await keep3rSugarMommy.jobs());
     resolve();
   });
