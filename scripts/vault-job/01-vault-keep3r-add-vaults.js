@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
-const { e18, e18ToDecimal, ZERO_ADDRESS } = require('../../utils/web3-utils');
+const { e18, e18ToDecimal, SIX_HOURS } = require('../../utils/web3-utils');
 
 async function main() {
   await hre.run('compile');
@@ -40,18 +40,25 @@ function run() {
       config.accounts.mainnet.keep3rGovernance
     );
 
-    const Keep3rSugarMommy = await ethers.getContractFactory(
-      'Keep3rSugarMommy'
-    );
+    // DEPLOYED
     // const vaultKeep3rJob = await ethers.getContractAt('VaultKeep3rJob', escrowContracts.jobs.vaultKeep3rJob, deployer);
-
+    // NOT YET DEPLOYED
+    const VaultKeep3rJob = await ethers.getContractFactory('VaultKeep3rJob');
+    console.log(1);
+    console.log(escrowContracts.sugarMommy);
+    console.log(SIX_HOURS);
+    const vaultKeep3rJob = await VaultKeep3rJob.deploy(
+      escrowContracts.sugarMommy,
+      SIX_HOURS
+    );
+    console.log(2);
     // Setup crv vaults
     const requiredEarn = 100000;
-
     const vaults = [
       {
         name: 'yearn Curve.fi DAI / USDC / USDT',
         address: '0x9cA85572E6A3EbF24dEDd195623F188735A5179f',
+        requiredEarn: 200000,
       },
       {
         name: 'yearn Curve.fi bBTC / sbtcCRV',
@@ -104,6 +111,7 @@ function run() {
       {
         name: 'yearn Curve.fi renBTC / wBTC / sBTC',
         address: '0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6',
+        requiredEarn: 3,
       },
       {
         name: 'yearn Curve.fi DAI / USDC / USDT / sUSD',
@@ -124,6 +132,12 @@ function run() {
       {
         name: 'yearn Curve.fi yDAI / yUSDC / yUSDT / yTUSD',
         address: '0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c',
+        requiredEarn: 200000,
+      },
+      {
+        name: 'yearn USD//C ',
+        address: '0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e',
+        requiredEarn: 200000,
       },
     ];
 
@@ -133,6 +147,7 @@ function run() {
 
     // setup required earn decimals
     for (const vault of vaults) {
+      console.log(vault.name);
       const vaultContract = await ethers.getContractAt('yVault', vault.address);
       const tokenAddress = await vaultContract.token();
       const tokenContract = await ethers.getContractAt(
@@ -142,8 +157,9 @@ function run() {
       const decimals = await tokenContract.callStatic.decimals();
       vault.requiredEarn = ethers.BigNumber.from(10)
         .pow(decimals)
-        .mul(requiredEarn);
+        .mul(vault.requiredEarn || requiredEarn);
     }
+    console.log(4);
 
     // Add crv vaults to crv keep3r
     console.time('addVaults');

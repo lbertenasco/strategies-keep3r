@@ -33,6 +33,7 @@
     "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-solhint": "^2.0.0",
     "prompt-confirm": "2.0.4"
   },
   "devDependencies": {
