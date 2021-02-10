@@ -6,8 +6,8 @@ jobs:
   files:
     runs-on: ubuntu-latest
     env:
-      LOCAL_MAINNET_PRIVATE_KEY: 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-      MOCHA_TIMEOUT: 600000
+      LOCAL_MAINNET_PRIVATE_KEY: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      MOCHA_TIMEOUT: "600000"
     steps:
       - name: Check out github repository
         uses: actions/checkout@v2
