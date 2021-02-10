@@ -28,7 +28,7 @@
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "release": "standard-version",
-    "test": "TEST=true npx hardhat --network hardhat test",
+    "test": "TEST=true npx hardhat test",
     "test:e2e": "npm run test ./test/e2e/*.spec.ts",
     "test:e2e:gas": "REPORT_GAS=1 npm run test:e2e",
     "test:gas": "REPORT_GAS=1 npm run test",

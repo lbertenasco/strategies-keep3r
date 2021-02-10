@@ -8,29 +8,31 @@ import { utils } from 'ethers';
 
 module.exports = {
   defaultNetwork: 'hardhat',
-  networks: {
-    hardhat: {
-      enabled: process.env.FORK ? true : false,
-      accounts: [
-        {
-          privateKey: process.env.MAINNET_PRIVATE_KEY,
-          balance: utils.parseEther('1000').toString(),
+  networks: process.env.TEST
+    ? {}
+    : {
+        hardhat: {
+          enabled: process.env.FORK ? true : false,
+          accounts: [
+            {
+              privateKey: process.env.MAINNET_PRIVATE_KEY,
+              balance: utils.parseEther('1000').toString(),
+            },
+          ],
+          forking: {
+            url: process.env.MAINNET_HTTPS_URL,
+          },
         },
-      ],
-      forking: {
-        url: process.env.MAINNET_HTTPS_URL,
+        localMainnet: {
+          url: process.env.LOCAL_MAINNET_HTTPS_URL,
+          accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
+        },
+        mainnet: {
+          url: process.env.MAINNET_HTTPS_URL,
+          accounts: [process.env.MAINNET_PRIVATE_KEY],
+          gasPrice: 'auto',
+        },
       },
-    },
-    localMainnet: {
-      url: process.env.LOCAL_MAINNET_HTTPS_URL,
-      accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
-    },
-    mainnet: {
-      url: process.env.MAINNET_HTTPS_URL,
-      accounts: [process.env.MAINNET_PRIVATE_KEY],
-      gasPrice: 'auto',
-    },
-  },
   solidity: {
     compilers: [
       {
