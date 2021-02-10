@@ -12,7 +12,7 @@ jobs:
       - name: Check out github repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          ref: ${{ github.event.client_payload.sha }}
 
       - name: Cache node modules
         uses: actions/cache@v2
