@@ -29,7 +29,11 @@
     "postpublish": "pinst --enable",
     "release": "standard-version",
     "test": "npx hardhat test",
-    "test:gas": "REPORT_GAS=1 npx hardhat test",
+    "test:e2e": "npx hardhat test ./test/e2e/*.spec.ts",
+    "test:e2e:gas": "REPORT_GAS=1 npm run test:e2e",
+    "test:gas": "REPORT_GAS=1 npm run test",
+    "test:unit": "npx hardhat test ./test/unit/*.spec.ts",
+    "test:unit:gas": "REPORT_GAS=1 npm run test:unit",
     "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   },
   "dependencies": {
