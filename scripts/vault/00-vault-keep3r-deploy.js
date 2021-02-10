@@ -20,12 +20,18 @@ function promptAndSubmit(VaultKeep3rJob) {
         if (answer) {
           console.time('VaultKeep3rJob deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
-          const vaultKeep3rJob = await VaultKeep3rJob.deploy(escrowContracts.sugarMommy ,SIX_HOURS);
+          const vaultKeep3rJob = await VaultKeep3rJob.deploy(
+            escrowContracts.sugarMommy,
+            SIX_HOURS
+          );
           console.timeEnd('VaultKeep3rJob deployed');
 
           console.log('VaultKeep3rJob address:', vaultKeep3rJob.address);
-          
-          console.log('TODO: change .config.json & example.config.json vaultKeep3rJob address to:', vaultKeep3rJob.address);
+
+          console.log(
+            'TODO: change .config.json & example.config.json vaultKeep3rJob address to:',
+            vaultKeep3rJob.address
+          );
 
           resolve();
         } else {
@@ -39,12 +45,11 @@ function promptAndSubmit(VaultKeep3rJob) {
   });
 }
 
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

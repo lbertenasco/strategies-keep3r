@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol"; 
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 interface IController {
     function withdraw(address, uint256) external;
@@ -21,7 +21,7 @@ interface IController {
 
     function strategies(address) external view returns (address);
 }
- 
+
 interface Gauge {
     function deposit(uint256) external;
 
@@ -29,11 +29,11 @@ interface Gauge {
 
     function withdraw(uint256) external;
 }
- 
+
 interface Mintr {
     function mint(address) external;
 }
- 
+
 interface Uni {
     function swapExactTokensForTokens(
         uint256,
