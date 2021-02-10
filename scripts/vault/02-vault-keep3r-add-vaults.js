@@ -4,7 +4,6 @@ const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18 } = require('../../utils/web3-utils');
 
-
 const prompt = new Confirm('Do you wish to add vaults to vault keep3r?');
 
 async function main() {
@@ -23,13 +22,22 @@ function promptAndSubmit() {
           if (owner.address == config.accounts.mainnet.deployer) {
             deployer = owner;
           } else {
-            await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
-            deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
+            await hre.network.provider.request({
+              method: 'hardhat_impersonateAccount',
+              params: [config.accounts.mainnet.deployer],
+            });
+            deployer = owner.provider.getUncheckedSigner(
+              config.accounts.mainnet.deployer
+            );
           }
 
           // Setup dforce strategy keep3r
-          const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address, deployer);
-          // const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address);      
+          const vaultKeep3r = await ethers.getContractAt(
+            'VaultKeep3r',
+            config.contracts.mainnet.vaultKeep3r.address,
+            deployer
+          );
+          // const vaultKeep3r = await ethers.getContractAt('VaultKeep3r', config.contracts.mainnet.vaultKeep3r.address);
 
           console.time('vaultKeep3r addVault');
           const requiredEarnAmount = e18.mul(20000); // 20k earn amount
@@ -51,8 +59,15 @@ function promptAndSubmit() {
 
           // Setup vaults
           for (const vault in vaults) {
-            console.log(`vaultKeep3r.addVault(${vault})`, config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount.div(e18).toNumber());
-            await vaultKeep3r.addVault(config.contracts.mainnet[vault].address, vaults[vault].requiredEarnAmount);
+            console.log(
+              `vaultKeep3r.addVault(${vault})`,
+              config.contracts.mainnet[vault].address,
+              vaults[vault].requiredEarnAmount.div(e18).toNumber()
+            );
+            await vaultKeep3r.addVault(
+              config.contracts.mainnet[vault].address,
+              vaults[vault].requiredEarnAmount
+            );
           }
           console.timeEnd('vaultKeep3r addVault');
 
@@ -68,12 +83,11 @@ function promptAndSubmit() {
   });
 }
 
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

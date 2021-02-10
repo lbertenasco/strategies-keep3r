@@ -5,22 +5,21 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./StrategyCurveYVoterProxyAbstract.sol";
+
 /*
- * MockStrategy 
+ * MockStrategy
  */
 
 contract MockStrategy is StrategyCurveYVoterProxy {
     using SafeMath for uint256;
 
-    constructor(address _controller) public StrategyCurveYVoterProxy(_controller) {
-    }
+    constructor(address _controller) public StrategyCurveYVoterProxy(_controller) {}
 
     function harvest() public override {
         require(msg.sender == strategist || msg.sender == governance, "!authorized");
-        
+
         uint256 _crv = IERC20(crv).balanceOf(address(this));
         if (_crv > 0) {
-        
             // Replaces this code below:
 
             IERC20(crv).safeApprove(uni, 0);
@@ -34,5 +33,4 @@ contract MockStrategy is StrategyCurveYVoterProxy {
             Uni(uni).swapExactTokensForTokens(_crv, uint256(0), path, address(this), now.add(1800));
         }
     }
-
 }

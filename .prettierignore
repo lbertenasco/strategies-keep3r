@@ -1,0 +1,18 @@
+# General
+.prettierignore
+.solhintignore
+.husky
+.gitignore
+.gitattributes
+.versionrc
+
+# Hardhat
+artifacts
+cache
+
+# JS
+node_modules
+package-lock.json
+
+# Solidity
+contracts/mock

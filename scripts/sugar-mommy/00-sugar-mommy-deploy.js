@@ -4,7 +4,6 @@ const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
-
 const prompt = new Confirm('Do you wish to deploy keep3r escrow contract?');
 
 async function main() {
@@ -33,10 +32,15 @@ function promptAndSubmit(Keep3rSugarMommy) {
           escrowContracts.keep3rSugarMommy = keep3rSugarMommy.address;
           console.timeEnd('Keep3rSugarMommy deployed');
           console.log('Keep3rSugarMommy address:', keep3rSugarMommy.address);
-          console.log('TODO: change .config.json & example.config.json keep3rSugarMommy address to:', keep3rSugarMommy.address);
+          console.log(
+            'TODO: change .config.json & example.config.json keep3rSugarMommy address to:',
+            keep3rSugarMommy.address
+          );
           // Setup Keep3rSugarMommy as a keep3r job
-          console.log('keep3r governance needs to do:')
-          console.log(`${escrowContracts.keep3r}.addJob(${keep3rSugarMommy.address})`);
+          console.log('keep3r governance needs to do:');
+          console.log(
+            `${escrowContracts.keep3r}.addJob(${keep3rSugarMommy.address})`
+          );
           resolve();
         } else {
           console.error('Aborted!');
@@ -49,12 +53,11 @@ function promptAndSubmit(Keep3rSugarMommy) {
   });
 }
 
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

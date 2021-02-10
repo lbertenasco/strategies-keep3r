@@ -4,8 +4,9 @@ const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18 } = require('../../utils/web3-utils');
 
-
-const prompt = new Confirm('Do you wish to add crv strategies as keep3r strategies?');
+const prompt = new Confirm(
+  'Do you wish to add crv strategies as keep3r strategies?'
+);
 
 async function main() {
   await hre.run('compile');
@@ -23,12 +24,21 @@ function promptAndSubmit() {
           if (owner.address == config.accounts.mainnet.deployer) {
             deployer = owner;
           } else {
-            await hre.network.provider.request({ method: "hardhat_impersonateAccount", params: [config.accounts.mainnet.deployer] });
-            deployer = owner.provider.getUncheckedSigner(config.accounts.mainnet.deployer);
+            await hre.network.provider.request({
+              method: 'hardhat_impersonateAccount',
+              params: [config.accounts.mainnet.deployer],
+            });
+            deployer = owner.provider.getUncheckedSigner(
+              config.accounts.mainnet.deployer
+            );
           }
 
           // Setup crv strategy keep3r
-          const crvStrategyKeep3r = await ethers.getContractAt('CrvStrategyKeep3r', config.contracts.mainnet.crvStrategyKeep3r.address, deployer);      
+          const crvStrategyKeep3r = await ethers.getContractAt(
+            'CrvStrategyKeep3r',
+            config.contracts.mainnet.crvStrategyKeep3r.address,
+            deployer
+          );
 
           const strategies = {
             // 'ycrv': {}, 'busd': {}, 'sbtc': {}, 'pool3': {}, 'comp': {}, 'gusd': {},
@@ -38,14 +48,19 @@ function promptAndSubmit() {
 
           console.time('crvStrategyKeep3r addStrategies');
           for (const strategy in strategies) {
-            console.log(`adding: ${strategy}`)
-            await crvStrategyKeep3r.addStrategy(config.contracts.mainnet[strategy].address, requiredHarvestAmount);
+            console.log(`adding: ${strategy}`);
+            await crvStrategyKeep3r.addStrategy(
+              config.contracts.mainnet[strategy].address,
+              requiredHarvestAmount
+            );
           }
           console.timeEnd('crvStrategyKeep3r addStrategy');
 
-          console.log('TODO from multisig:')
+          console.log('TODO from multisig:');
           for (const strategy in strategies) {
-            console.log(`${strategy}: ${config.contracts.mainnet[strategy].address}.setStrategist(${crvStrategyKeep3r.address})`)
+            console.log(
+              `${strategy}: ${config.contracts.mainnet[strategy].address}.setStrategist(${crvStrategyKeep3r.address})`
+            );
           }
 
           resolve();
@@ -60,12 +75,11 @@ function promptAndSubmit() {
   });
 }
 
-
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });
