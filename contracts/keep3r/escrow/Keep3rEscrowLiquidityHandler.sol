@@ -2,13 +2,9 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
-
 import "./Keep3rEscrowParameters.sol";
 
-interface IKeep3rLiquidtyHandler {
+interface IKeep3rEscrowLiquidityHandler {
     event LiquidityAddedToJob(address _liquidity, address _job, uint256 _amount);
     event LiquidityRemovedFromJob(address _liquidity, address _job);
     event LiquidityUnbondedFromJob(address _liquidity, address _job, uint256 _amount);
@@ -28,13 +24,7 @@ interface IKeep3rLiquidtyHandler {
     ) external;
 }
 
-abstract contract Keep3rLiquidtyHandler is Keep3rEscrowParameters, IKeep3rLiquidtyHandler {
-    constructor(
-        address _governance,
-        IKeep3rV1 _keep3r,
-        IERC20 _lpToken
-    ) public Keep3rEscrowParameters(_governance, _keep3r, _lpToken) {}
-
+abstract contract Keep3rEscrowLiquidityHandler is Keep3rEscrowParameters, IKeep3rEscrowLiquidityHandler {
     function _addLiquidityToJob(
         address _liquidity,
         address _job,
