@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.8;
 
-interface IKeep3rV2StrategyJob {
+interface IGenericV2Keep3rJob {
     event Keep3rSet(address keep3r);
     event Keep3rHelperSet(address keep3rHelper);
     event SlidingOracleSet(address slidingOracle);
@@ -45,6 +45,12 @@ interface IKeep3rV2StrategyJob {
     event TendStrategyRemoved(address _strategy);
 
     // Setters
+    function setHarvestCooldown(uint256 _harvestCooldown) external;
+
+    function setTendCooldown(uint256 _tendCooldown) external;
+
+    function setMaxCredits(uint256 _maxCredits) external;
+
     function addStrategies(
         address[] calldata _strategy,
         uint256[] calldata _requiredHarvest,
