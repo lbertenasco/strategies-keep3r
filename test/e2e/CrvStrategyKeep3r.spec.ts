@@ -1,48 +1,11 @@
 import { expect } from 'chai';
 import { ethers, network } from 'hardhat';
-import { e18, ZERO_ADDRESS } from '../utils/web3-utils';
-import config from '../.config.json';
+import { e18, ZERO_ADDRESS } from '../../utils/web3-utils';
+import config from '../../.config.json';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { Contract, ContractFactory } from 'ethers';
 
-// Example file for Yearn Test
-
-describe('CrvStrategyKeep3r Unit Test', function () {
-  let crvStrategyKeep3rContract: ContractFactory;
-  let crvStrategyKeep3r: Contract;
-
-  before('Setup accounts and contracts', async () => {
-    crvStrategyKeep3rContract = await ethers.getContractFactory(
-      'CrvStrategyKeep3r'
-    );
-  });
-
-  beforeEach(async () => {
-    // crvStrategyKeep3r = await crvStrategyKeep3rContract.deploy(
-    //   config.contracts.mainnet.keep3r.address,
-    //   ZERO_ADDRESS,
-    //   0,
-    //   0,
-    //   0,
-    //   true
-    // );
-  });
-
-  describe('isCrvStrategyKeep3r', () => {
-    it('returns true');
-  });
-
-  describe('addStrategy', () => {
-    context('when strategy is already added', () => {
-      it('reverts with message');
-    });
-    context('when strategy was not added', () => {
-      it('adds strategy and emits event');
-    });
-  });
-});
-
-describe('CrvStrategyKeep3r Mainnet Test', () => {
+describe('CrvStrategyKeep3r', () => {
   let owner: SignerWithAddress;
 
   before('Setup accounts and contracts', async () => {
@@ -62,6 +25,8 @@ describe('CrvStrategyKeep3r Mainnet Test', () => {
       ],
     });
   });
+
+  it.only('passes', async () => {});
 
   it('should deploy new CrvStrategyKeep3r with keep3r', async function () {
     const CrvStrategyKeep3r = await ethers.getContractFactory(
