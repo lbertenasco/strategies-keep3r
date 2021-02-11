@@ -1,15 +1,27 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { expect } from 'chai';
+import { Contract, ContractFactory } from 'ethers';
 import { ethers, network } from 'hardhat';
 
 describe('Keep3rEscrowParameters', () => {
   let owner: SignerWithAddress;
+  let keep3rEscrowParametersContract: ContractFactory;
+  let keep3rEscrowParameters: Contract;
 
   before('Setup accounts and contracts', async () => {
     [owner] = await ethers.getSigners();
+    keep3rEscrowParametersContract = await ethers.getContractFactory(
+      'contracts/mock/keep3r/escrow/Keep3rEscrowParameters.sol:Keep3rEscrowParametersMock'
+    );
   });
 
-  beforeEach('Deploy necessary contracts', async () => {});
+  beforeEach('Deploy necessary contracts', async () => {
+    keep3rEscrowParameters = await keep3rEscrowParametersContract.deploy(
+      '0x0000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000001',
+      '0x0000000000000000000000000000000000000001'
+    );
+  });
 
   describe('constructor', () => {
     context('when governance address is zero', () => {
@@ -28,7 +40,7 @@ describe('Keep3rEscrowParameters', () => {
 
   describe('setGovernance', () => {
     context('when governance address is zero', () => {
-      it('reverts with message');
+      it('reverts with message', async () => {});
     });
     context('when governance address is not zero', () => {
       it('sets governance and emits event');
