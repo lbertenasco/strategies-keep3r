@@ -17,10 +17,10 @@
   },
   "scripts": {
     "commit": "git-cz",
-    "compile": "npx hardhat compile",
-    "coverage": "npx hardhat coverage",
-    "fork": "FORK=true npx hardhat node",
-    "fork:script": "FORK=true npx hardhat run",
+    "compile": "hardhat compile",
+    "coverage": "hardhat coverage",
+    "fork": "FORK=true hardhat node",
+    "fork:script": "FORK=true hardhat run",
     "fork:test": "FORK=true npm run test",
     "postinstall": "husky install",
     "lint:check": "solhint 'contracts/**/*.sol' 'interfaces/**/*.sol' && prettier --check './**'",
@@ -28,13 +28,13 @@
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "release": "standard-version",
-    "test": "TEST=true npx hardhat test",
-    "test:e2e": "npm run test ./test/e2e/*.spec.ts",
+    "test": "TEST=true mocha --require hardhat/register",
+    "test:e2e": "npm run test ./test/e2e/**/*.spec.ts",
     "test:e2e:gas": "REPORT_GAS=1 npm run test:e2e",
     "test:gas": "REPORT_GAS=1 npm run test",
-    "test:unit": "npm run test ./test/unit/*.spec.ts",
+    "test:unit": "npm run test --recursive 'test/unit/**/*.spec.ts'",
     "test:unit:gas": "REPORT_GAS=1 npm run test:unit",
-    "verify": "npx hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
+    "verify": "hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   },
   "dependencies": {
     "prompt-confirm": "2.0.4"
