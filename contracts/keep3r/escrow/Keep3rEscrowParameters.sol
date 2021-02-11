@@ -7,9 +7,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 interface IKeep3rEscrowParameters {
-    event GovernaceSet(address _governance);
+    event GovernanceSet(address _governance);
     event Keep3rV1Set(IKeep3rV1 _keep3rV1);
     event LPTokenSet(IERC20 _lpToken);
+    event LPsReturnedToGovernance(address _governance, uint256 _amount);
 
     function governance() external returns (address);
 
@@ -46,7 +47,7 @@ abstract contract Keep3rEscrowParameters is IKeep3rEscrowParameters {
     function _setGovernance(address _governance) internal {
         require(_governance != address(0), "Keep3rEscrowParameters::_setGovernance::zero-address");
         governance = _governance;
-        emit GovernaceSet(_governance);
+        emit GovernanceSet(_governance);
     }
 
     function _setKeep3rV1(IKeep3rV1 _keep3rV1) internal {
@@ -65,5 +66,6 @@ abstract contract Keep3rEscrowParameters is IKeep3rEscrowParameters {
         uint256 _tokenBalance = lpToken.balanceOf(address(this));
         require(_tokenBalance > 0, "Keep3rEscrowParameters::_returnLPsToGovernance::no-lp-tokens");
         lpToken.transfer(governance, _tokenBalance);
+        emit LPsReturnedToGovernance(governance, _tokenBalance);
     }
 }
