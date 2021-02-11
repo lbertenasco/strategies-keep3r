@@ -11,27 +11,70 @@ import "../sugar-mommy/Keep3rJob.sol";
 import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
-import "../../interfaces/keep3r/IKeep3rV2StrategyJob.sol";
+import "../../interfaces/keep3r/IGenericV2Keep3rJob.sol";
 
-contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
+contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     using SafeMath for uint256;
-
-    EnumerableSet.AddressSet internal availableStrategies;
-    mapping(address => uint256) public requiredHarvest;
-    mapping(address => uint256) public requiredTend;
-    address public keep3rHelper;
-    address public slidingOracle;
 
     address public constant KP3R = address(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44);
     address public constant WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
+    address public keep3rHelper;
+    address public slidingOracle;
+
+    EnumerableSet.AddressSet internal availableStrategies;
+
+    mapping(address => uint256) public requiredHarvest;
+    mapping(address => uint256) public requiredTend;
+
+    mapping(address => uint256) public lastHarvestAt;
+    mapping(address => uint256) public lastTendAt;
+
+    uint256 public harvestCooldown;
+    uint256 public tendCooldown;
+
+    uint256 public maxCredits;
+
     constructor(
         address _keep3rSugarMommy,
         address _keep3rHelper,
-        address _slidingOracle
+        address _slidingOracle,
+        uint256 _harvestCooldown,
+        uint256 _tendCooldown,
+        uint256 _maxCredits
     ) public UtilsReady() Keep3rJob(_keep3rSugarMommy) {
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
+        _setHarvestCooldown(_harvestCooldown);
+        _setTendCooldown(_tendCooldown);
+        _setMaxCredits(_maxCredits);
+    }
+
+    // Setters
+    function setHarvestCooldown(uint256 _harvestCooldown) external override onlyGovernor {
+        _setHarvestCooldown(_harvestCooldown);
+    }
+
+    function _setHarvestCooldown(uint256 _harvestCooldown) internal {
+        require(_harvestCooldown > 0, "generic-keep3r-v2::set-harvest-cooldown:should-not-be-zero");
+        harvestCooldown = _harvestCooldown;
+    }
+
+    function setTendCooldown(uint256 _tendCooldown) external override onlyGovernor {
+        _setTendCooldown(_tendCooldown);
+    }
+
+    function _setTendCooldown(uint256 _tendCooldown) internal {
+        require(_tendCooldown > 0, "generic-keep3r-v2::set-tend-cooldown:should-not-be-zero");
+        tendCooldown = _tendCooldown;
+    }
+
+    function setMaxCredits(uint256 _maxCredits) external override onlyGovernor {
+        _setMaxCredits(_maxCredits);
+    }
+
+    function _setMaxCredits(uint256 _maxCredits) internal {
+        maxCredits = _maxCredits;
     }
 
     // Unique methods to add a strategy to the system
@@ -44,7 +87,7 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
     ) external override onlyGovernor {
         require(
             _strategies.length == _requiredHarvests.length && _strategies.length == _requiredTends.length,
-            "crv-strategy-keep3r::add-strategies:strategies-required-harvests-and-tends-different-length"
+            "generic-keep3r-v2::add-strategies:strategies-required-harvests-and-tends-different-length"
         );
         for (uint256 i; i < _strategies.length; i++) {
             _addStrategy(_strategies[i], _requiredHarvests[i], _requiredTends[i]);
@@ -154,6 +197,7 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
 
     function harvestable(address _strategy) public view override returns (bool) {
         require(requiredHarvest[_strategy] > 0, "generic-keep3r-v2::harvestable:strategy-not-added");
+        require(block.timestamp > lastHarvestAt[_strategy].add(harvestCooldown), "generic-keep3r-v2::harvestable:strategy-harvest-cooldown");
 
         uint256 kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredHarvest[_strategy]);
         uint256 ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, kp3rCallCost, WETH);
@@ -162,6 +206,7 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
 
     function tendable(address _strategy) public view override returns (bool) {
         require(requiredTend[_strategy] > 0, "generic-keep3r-v2::tendable:strategy-not-added");
+        require(block.timestamp > lastTendAt[_strategy].add(tendCooldown), "generic-keep3r-v2::tendable:strategy-tend-cooldown");
 
         uint256 kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredTend[_strategy]);
         uint256 ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, kp3rCallCost, WETH);
@@ -174,7 +219,7 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
 
         _startJob(msg.sender);
         _harvest(_strategy);
-        _endJob(msg.sender);
+        uint256 credits = _endJob(msg.sender);
 
         emit HarvestedByKeeper(_strategy);
     }
@@ -202,9 +247,11 @@ contract GenericKeep3rV2 is UtilsReady, Keep3rJob, IKeep3rV2StrategyJob {
 
     function _harvest(address _strategy) internal {
         IBaseStrategy(_strategy).harvest();
+        lastHarvestAt[_strategy] = block.timestamp;
     }
 
     function _tend(address _strategy) internal {
         IBaseStrategy(_strategy).tend();
+        lastTendAt[_strategy] = block.timestamp;
     }
 }
