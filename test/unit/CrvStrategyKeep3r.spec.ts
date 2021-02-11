@@ -4,7 +4,7 @@ import { Contract, ContractFactory } from 'ethers';
 
 // Example file for Yearn Test
 
-describe.only('CrvStrategyKeep3r', function () {
+describe('CrvStrategyKeep3r', function () {
   let crvStrategyKeep3rContract: ContractFactory;
   // let crvStrategyKeep3r: Contract;
 

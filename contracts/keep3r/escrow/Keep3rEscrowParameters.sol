@@ -9,7 +9,7 @@ import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 interface IKeep3rEscrowParameters {
     event GovernaceSet(address _governance);
     event Keep3rV1Set(IKeep3rV1 _keep3rV1);
-    event LpTokenSet(IERC20 _lpToken);
+    event LPTokenSet(IERC20 _lpToken);
 
     function governance() external returns (address);
 
@@ -17,13 +17,13 @@ interface IKeep3rEscrowParameters {
 
     function lpToken() external returns (IERC20);
 
-    function returnLPsToGovernance() external;
-
     function setGovernance(address _governance) external;
 
     function setKeep3rV1(IKeep3rV1 _keep3rV1) external;
 
     function setLPToken(IERC20 _lpToken) external;
+
+    function returnLPsToGovernance() external;
 }
 
 abstract contract Keep3rEscrowParameters is IKeep3rEscrowParameters {
@@ -43,10 +43,6 @@ abstract contract Keep3rEscrowParameters is IKeep3rEscrowParameters {
         _setLPToken(_lpToken);
     }
 
-    function _returnLPsToGovernance() internal {
-        lpToken.transfer(governance, lpToken.balanceOf(address(this)));
-    }
-
     function _setGovernance(address _governance) internal {
         require(_governance != address(0), "Keep3rEscrowParameters::_setGovernance::zero-address");
         governance = _governance;
@@ -62,6 +58,12 @@ abstract contract Keep3rEscrowParameters is IKeep3rEscrowParameters {
     function _setLPToken(IERC20 _lpToken) internal {
         require(address(_lpToken) != address(0), "Keep3rEscrowParameters::_setLPToken::zero-address");
         lpToken = _lpToken;
-        emit LpTokenSet(_lpToken);
+        emit LPTokenSet(_lpToken);
+    }
+
+    function _returnLPsToGovernance() internal {
+        uint256 _tokenBalance = lpToken.balanceOf(address(this));
+        require(_tokenBalance > 0, "Keep3rEscrowParameters::_returnLPsToGovernance::no-lp-tokens");
+        lpToken.transfer(governance, _tokenBalance);
     }
 }
