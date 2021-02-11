@@ -29,8 +29,12 @@ function promptAndSubmit(GenericV2Keep3rJob) {
 
           const genericV2Keep3rJob = await GenericV2Keep3rJob.deploy(
             escrowContracts.sugarMommy,
+            escrowContracts.keep3r,
             genericV2Keep3rJobContracts.keep3rHelper,
-            genericV2Keep3rJobContracts.slidingOracle
+            genericV2Keep3rJobContracts.slidingOracle,
+            6 * 60 * 60, // 6 hours
+            10 * 60, // 10 minutes
+            e18.mul(50)
           );
 
           console.timeEnd('GenericV2Keep3rJob deployed');

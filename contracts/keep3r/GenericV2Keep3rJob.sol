@@ -5,6 +5,7 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../sugar-mommy/Keep3rJob.sol";
 
@@ -19,10 +20,11 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     address public constant KP3R = address(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44);
     address public constant WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
+    address public keep3r;
     address public keep3rHelper;
     address public slidingOracle;
 
-    EnumerableSet.AddressSet internal availableStrategies;
+    EnumerableSet.AddressSet internal _availableStrategies;
 
     mapping(address => uint256) public requiredHarvest;
     mapping(address => uint256) public requiredTend;
@@ -33,16 +35,19 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     uint256 public harvestCooldown;
     uint256 public tendCooldown;
 
+    uint256 public usedCredits;
     uint256 public maxCredits;
 
     constructor(
         address _keep3rSugarMommy,
+        address _keep3r,
         address _keep3rHelper,
         address _slidingOracle,
         uint256 _harvestCooldown,
         uint256 _tendCooldown,
         uint256 _maxCredits
     ) public UtilsReady() Keep3rJob(_keep3rSugarMommy) {
+        keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
         _setHarvestCooldown(_harvestCooldown);
@@ -74,6 +79,7 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     }
 
     function _setMaxCredits(uint256 _maxCredits) internal {
+        usedCredits = 0;
         maxCredits = _maxCredits;
     }
 
@@ -116,7 +122,7 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
             _addTendStrategy(_strategy, _requiredTend);
         }
 
-        availableStrategies.add(_strategy);
+        _availableStrategies.add(_strategy);
     }
 
     function _addHarvestStrategy(address _strategy, uint256 _requiredHarvest) internal {
@@ -147,7 +153,7 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
         require(requiredHarvest[_strategy] > 0 || requiredTend[_strategy] > 0, "generic-keep3r-v2::remove-strategy:strategy-not-added");
         delete requiredHarvest[_strategy];
         delete requiredTend[_strategy];
-        availableStrategies.remove(_strategy);
+        _availableStrategies.remove(_strategy);
         emit StrategyRemoved(_strategy);
     }
 
@@ -156,7 +162,7 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
         delete requiredHarvest[_strategy];
 
         if (requiredTend[_strategy] == 0) {
-            availableStrategies.remove(_strategy);
+            _availableStrategies.remove(_strategy);
         }
 
         emit HarvestStrategyRemoved(_strategy);
@@ -167,7 +173,7 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
         delete requiredTend[_strategy];
 
         if (requiredHarvest[_strategy] == 0) {
-            availableStrategies.remove(_strategy);
+            _availableStrategies.remove(_strategy);
         }
 
         emit TendStrategyRemoved(_strategy);
@@ -189,9 +195,9 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     }
 
     function strategies() public view override returns (address[] memory _strategies) {
-        _strategies = new address[](availableStrategies.length());
-        for (uint256 i; i < availableStrategies.length(); i++) {
-            _strategies[i] = availableStrategies.at(i);
+        _strategies = new address[](_availableStrategies.length());
+        for (uint256 i; i < _availableStrategies.length(); i++) {
+            _strategies[i] = _availableStrategies.at(i);
         }
     }
 
@@ -214,17 +220,17 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     }
 
     // Keep3r actions
-    function harvest(address _strategy) external override {
+    function harvest(address _strategy) external override updateCredits {
         require(harvestable(_strategy), "generic-keep3r-v2::harvest:not-workable");
 
         _startJob(msg.sender);
         _harvest(_strategy);
-        uint256 credits = _endJob(msg.sender);
+        _endJob(msg.sender);
 
         emit HarvestedByKeeper(_strategy);
     }
 
-    function tend(address _strategy) external override {
+    function tend(address _strategy) external override updateCredits {
         require(tendable(_strategy), "generic-keep3r-v2::tend:not-workable");
 
         _startJob(msg.sender);
@@ -253,5 +259,13 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
     function _tend(address _strategy) internal {
         IBaseStrategy(_strategy).tend();
         lastTendAt[_strategy] = block.timestamp;
+    }
+
+    modifier updateCredits() {
+        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rSugarMommy), keep3r);
+        _;
+        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rSugarMommy), keep3r);
+        usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
+        require(usedCredits <= maxCredits, "generic-keep3r-v2::update-credits:used-credits-exceed-max-credits");
     }
 }
