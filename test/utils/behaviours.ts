@@ -1,11 +1,32 @@
 import { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import chai from 'chai';
-import { Contract } from 'ethers';
+import { Contract, ContractFactory } from 'ethers';
+import { TransactionRequest } from '@ethersproject/abstract-provider';
 
 chai.use(chaiAsPromised);
 
-const shouldRevertWithZeroAddress = async ({
+const checkTxRevertedWithMessage = async ({
+  tx,
+  message,
+}: {
+  tx: Promise<TransactionRequest>;
+  message: RegExp;
+}): Promise<void> => {
+  await expect(tx).to.be.reverted;
+  await expect(tx).eventually.rejected.have.property('message').match(message);
+};
+
+const checkTxRevertedWithZeroAddress = async (
+  tx: Promise<TransactionRequest>
+): Promise<void> => {
+  await checkTxRevertedWithMessage({
+    tx,
+    message: /zero-address/,
+  });
+};
+
+const txShouldRevertWithZeroAddress = async ({
   contract,
   func,
   args,
@@ -13,15 +34,25 @@ const shouldRevertWithZeroAddress = async ({
   contract: Contract;
   func: string;
   args: any[];
+  tx?: Promise<TransactionRequest>;
 }) => {
   const tx = contract[func].apply(this, args);
-  await expect(tx).to.be.reverted;
-  await expect(tx)
-    .eventually.rejected.have.property('message')
-    .match(/zero-address/);
+  await checkTxRevertedWithZeroAddress(tx);
 };
 
-const shouldSetVariableAndEmitEvent = async ({
+const deployShouldRevertWithZeroAddress = async ({
+  contract,
+  args,
+}: {
+  contract: ContractFactory;
+  args: any[];
+}) => {
+  const deployContractTx = await contract.getDeployTransaction(...args);
+  const tx = contract.signer.sendTransaction(deployContractTx);
+  await checkTxRevertedWithZeroAddress(tx);
+};
+
+const txShouldSetVariableAndEmitEvent = async ({
   contract,
   setterFunc,
   getterFunc,
@@ -42,6 +73,7 @@ const shouldSetVariableAndEmitEvent = async ({
 };
 
 export default {
-  shouldRevertWithZeroAddress,
-  shouldSetVariableAndEmitEvent,
+  txShouldRevertWithZeroAddress,
+  deployShouldRevertWithZeroAddress,
+  txShouldSetVariableAndEmitEvent,
 };

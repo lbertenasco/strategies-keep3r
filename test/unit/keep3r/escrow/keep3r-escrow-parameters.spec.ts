@@ -2,6 +2,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { expect } from 'chai';
 import { Contract, ContractFactory, utils } from 'ethers';
 import { ethers, network } from 'hardhat';
+import { ZERO_ADDRESS } from '../../../../utils/web3-utils';
 import { behaviours, constants, erc20 } from '../../../utils';
 
 describe('Keep3rEscrowParameters', () => {
@@ -24,15 +25,42 @@ describe('Keep3rEscrowParameters', () => {
     );
   });
 
-  describe('constructor', () => {
+  describe.only('constructor', () => {
     context('when governance address is zero', () => {
-      it('reverts with message');
+      it('reverts with message', async () => {
+        await behaviours.deployShouldRevertWithZeroAddress({
+          contract: keep3rEscrowParametersContract,
+          args: [
+            constants.ZERO_ADDRESS,
+            constants.NOT_ZERO_ADDRESS,
+            constants.NOT_ZERO_ADDRESS,
+          ],
+        });
+      });
     });
     context('when keep3r address is zero', () => {
-      it('reverts with message');
+      it('reverts with message', async () => {
+        await behaviours.deployShouldRevertWithZeroAddress({
+          contract: keep3rEscrowParametersContract,
+          args: [
+            constants.NOT_ZERO_ADDRESS,
+            constants.ZERO_ADDRESS,
+            constants.NOT_ZERO_ADDRESS,
+          ],
+        });
+      });
     });
     context('when lpToken address is zero', () => {
-      it('reverts with message');
+      it('reverts with message', async () => {
+        await behaviours.deployShouldRevertWithZeroAddress({
+          contract: keep3rEscrowParametersContract,
+          args: [
+            constants.NOT_ZERO_ADDRESS,
+            constants.NOT_ZERO_ADDRESS,
+            constants.ZERO_ADDRESS,
+          ],
+        });
+      });
     });
     context('when no address is zero', () => {
       it('deploys, sets data correctly and emits events');
@@ -42,7 +70,7 @@ describe('Keep3rEscrowParameters', () => {
   describe('setGovernance', () => {
     context('when governance address is zero', () => {
       it('reverts with message', async () => {
-        await behaviours.shouldRevertWithZeroAddress({
+        await behaviours.txShouldRevertWithZeroAddress({
           contract: keep3rEscrowParameters,
           func: 'setGovernance',
           args: [constants.ZERO_ADDRESS],
@@ -51,7 +79,7 @@ describe('Keep3rEscrowParameters', () => {
     });
     context('when governance address is not zero', () => {
       it('sets governance and emits event', async () => {
-        await behaviours.shouldSetVariableAndEmitEvent({
+        await behaviours.txShouldSetVariableAndEmitEvent({
           contract: keep3rEscrowParameters,
           getterFunc: 'governance',
           setterFunc: 'setGovernance',
@@ -65,7 +93,7 @@ describe('Keep3rEscrowParameters', () => {
   describe('setKeep3rV1', () => {
     context('when keep3rV1 address is zero', () => {
       it('reverts with message', async () => {
-        await behaviours.shouldRevertWithZeroAddress({
+        await behaviours.txShouldRevertWithZeroAddress({
           contract: keep3rEscrowParameters,
           func: 'setKeep3rV1',
           args: [constants.ZERO_ADDRESS],
@@ -74,7 +102,7 @@ describe('Keep3rEscrowParameters', () => {
     });
     context('when keep3rV1 address is not zero', () => {
       it('sets keep3rV1 and emits event', async () => {
-        await behaviours.shouldSetVariableAndEmitEvent({
+        await behaviours.txShouldSetVariableAndEmitEvent({
           contract: keep3rEscrowParameters,
           getterFunc: 'keep3rV1',
           setterFunc: 'setKeep3rV1',
@@ -88,7 +116,7 @@ describe('Keep3rEscrowParameters', () => {
   describe('setLPToken', () => {
     context('when lpToken address is zero', () => {
       it('reverts with message', async () => {
-        await behaviours.shouldRevertWithZeroAddress({
+        await behaviours.txShouldRevertWithZeroAddress({
           contract: keep3rEscrowParameters,
           func: 'setLPToken',
           args: [constants.ZERO_ADDRESS],
@@ -97,7 +125,7 @@ describe('Keep3rEscrowParameters', () => {
     });
     context('when lpToken address is not zero', () => {
       it('sets lpToken and emits event', async () => {
-        await behaviours.shouldSetVariableAndEmitEvent({
+        await behaviours.txShouldSetVariableAndEmitEvent({
           contract: keep3rEscrowParameters,
           getterFunc: 'lpToken',
           setterFunc: 'setLPToken',
