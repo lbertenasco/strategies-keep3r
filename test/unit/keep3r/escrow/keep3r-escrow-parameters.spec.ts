@@ -25,7 +25,7 @@ describe('Keep3rEscrowParameters', () => {
     );
   });
 
-  describe.only('constructor', () => {
+  describe('constructor', () => {
     context('when governance address is zero', () => {
       it('reverts with message', async () => {
         await behaviours.deployShouldRevertWithZeroAddress({
@@ -63,7 +63,23 @@ describe('Keep3rEscrowParameters', () => {
       });
     });
     context('when no address is zero', () => {
-      it('deploys, sets data correctly and emits events');
+      it('deploys, sets data correctly and emits events', async () => {
+        await behaviours.deployShouldSetVariablesAndEmitEvents({
+          contract: keep3rEscrowParametersContract,
+          args: [
+            constants.NOT_ZERO_ADDRESS,
+            constants.NOT_ZERO_ADDRESS,
+            constants.NOT_ZERO_ADDRESS,
+          ],
+          settersGettersVariablesAndEvents: [
+            {
+              getterFunc: 'governance',
+              variable: constants.NOT_ZERO_ADDRESS,
+              eventEmitted: 'GovernanceSet',
+            },
+          ],
+        });
+      });
     });
   });
 
