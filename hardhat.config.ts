@@ -25,7 +25,7 @@ module.exports = {
       accounts: [config.accounts.mainnet.privateKey],
       gasMultiplier: 1.1,
       // gasPrice: 'auto',
-      gasPrice: 110000000000, // 110 gwei
+      gasPrice: 165000000000, // 165 gwei
     },
   },
   solidity: {
