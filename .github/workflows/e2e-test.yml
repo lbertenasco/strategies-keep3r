@@ -3,7 +3,7 @@ name: E2E tests
 on: [pull_request]
 
 jobs:
-  files:
+  tests:
     runs-on: ubuntu-latest
     env:
       MOCHA_TIMEOUT: "600000"

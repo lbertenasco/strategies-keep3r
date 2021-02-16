@@ -8,28 +8,6 @@
       "deployer": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74"
     }
   },
-  "infura": {
-    "_name": "",
-    "apiKey": ""
-  },
-  "etherscan": {
-    "_name": "",
-    "apiKey": ""
-  },
-  "coinmarketcap": {
-    "_name": "",
-    "apiKey": ""
-  },
-  "alchemy": {
-    "mainnet": {
-      "_name": "",
-      "apiKey": ""
-    },
-    "ropsten": {
-      "_name": "",
-      "apiKey": ""
-    }
-  },
   "contracts": {
     "mainnet": {
       "escrow": {

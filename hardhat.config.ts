@@ -4,7 +4,6 @@ import '@nomiclabs/hardhat-etherscan';
 import { removeConsoleLog } from 'hardhat-preprocessor';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
-import { utils } from 'ethers';
 
 module.exports = {
   defaultNetwork: 'hardhat',
@@ -42,9 +41,6 @@ module.exports = {
         version: '0.5.17',
       },
     ],
-  },
-  mocha: {
-    timeout: process.env.MOCHA_TIMEOUT,
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS ? true : false,
