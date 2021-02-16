@@ -11,11 +11,6 @@ interface ICrvStrategyKeep3rJob {
     // Actions forced by governor
     event ForceWorked(address _strategy);
 
-    // Keep3r actions
-    function getWorkData() external returns (bytes memory _workData);
-
-    function workable() external returns (bool);
-
     // Setters
     function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external;
 

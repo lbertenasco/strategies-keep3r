@@ -5,9 +5,9 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
 
-import "../sugar-mommy/Keep3rJob.sol";
+import "../proxy-job/Keep3rJob.sol";
+import "../../interfaces/jobs/IVaultKeep3rJob.sol";
 
-import "../../interfaces/keep3r/IVaultKeep3rJob.sol";
 import "../../interfaces/yearn/IEarnableVault.sol";
 
 contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
@@ -19,7 +19,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
 
     EnumerableSet.AddressSet internal _availableVaults;
 
-    constructor(address _keep3rSugarMommy, uint256 _earnCooldown) public UtilsReady() Keep3rJob(_keep3rSugarMommy) {
+    constructor(address _keep3rProxyJob, uint256 _earnCooldown) public UtilsReady() Keep3rJob(_keep3rProxyJob) {
         _setEarnCooldown(_earnCooldown);
     }
 
@@ -29,7 +29,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
 
     // Setters
     function addVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external override onlyGovernor {
-        require(_vaults.length == _requiredEarns.length, "vault-keep3r::add-vaults:vaults-required-earns-different-length");
+        require(_vaults.length == _requiredEarns.length, "VaultKeep3rJob::add-vaults:vaults-required-earns-different-length");
         for (uint256 i; i < _vaults.length; i++) {
             _addVault(_vaults[i], _requiredEarns[i]);
         }
@@ -40,27 +40,27 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     function _addVault(address _vault, uint256 _requiredEarn) internal {
-        require(requiredEarn[_vault] == 0, "vault-keep3r::add-vault:vault-already-added");
+        require(requiredEarn[_vault] == 0, "VaultKeep3rJob::add-vault:vault-already-added");
         _setRequiredEarn(_vault, _requiredEarn);
         _availableVaults.add(_vault);
         emit VaultAdded(_vault, _requiredEarn);
     }
 
     function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernor {
-        require(requiredEarn[_vault] > 0, "vault-keep3r::update-required-earn:vault-not-added");
+        require(requiredEarn[_vault] > 0, "VaultKeep3rJob::update-required-earn:vault-not-added");
         _setRequiredEarn(_vault, _requiredEarn);
         emit VaultModified(_vault, _requiredEarn);
     }
 
     function removeVault(address _vault) external override onlyGovernor {
-        require(requiredEarn[_vault] > 0, "vault-keep3r::remove-vault:vault-not-added");
+        require(requiredEarn[_vault] > 0, "VaultKeep3rJob::remove-vault:vault-not-added");
         requiredEarn[_vault] = 0;
         _availableVaults.remove(_vault);
         emit VaultRemoved(_vault);
     }
 
     function _setRequiredEarn(address _vault, uint256 _requiredEarn) internal {
-        require(_requiredEarn > 0, "vault-keep3r::set-required-earn:should-not-be-zero");
+        require(_requiredEarn > 0, "VaultKeep3rJob::set-required-earn:should-not-be-zero");
         requiredEarn[_vault] = _requiredEarn;
     }
 
@@ -69,7 +69,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     function _setEarnCooldown(uint256 _earnCooldown) internal {
-        require(_earnCooldown > 0, "vault-keep3r::set-earn-cooldown:should-not-be-zero");
+        require(_earnCooldown > 0, "VaultKeep3rJob::set-earn-cooldown:should-not-be-zero");
         earnCooldown = _earnCooldown;
     }
 
@@ -81,23 +81,40 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
         }
     }
 
+    // Job actions
+    function getWorkData() public override returns (bytes memory _workData) {
+        for (uint256 i; i < _availableVaults.length(); i++) {
+            address _vault = _availableVaults.at(i);
+            if (_workable(_vault)) return abi.encode(_vault);
+        }
+    }
+
+    function decodeWorkData(bytes memory _workData) public pure returns (address _vault) {
+        return abi.decode(_workData, (address));
+    }
+
     function calculateEarn(address _vault) public view override returns (uint256 _amount) {
-        require(requiredEarn[_vault] > 0, "vault-keep3r::calculate-earn:vault-not-added");
+        require(requiredEarn[_vault] > 0, "VaultKeep3rJob::calculate-earn:vault-not-added");
         return IEarnableVault(_vault).available();
     }
 
-    function workable(address _vault) public view override returns (bool) {
-        require(requiredEarn[_vault] > 0, "vault-keep3r::workable:vault-not-added");
+    function workable() public override returns (bool) {
+        for (uint256 i; i < _availableVaults.length(); i++) {
+            if (_workable(_availableVaults.at(i))) return true;
+        }
+        return false;
+    }
+
+    function _workable(address _vault) internal returns (bool) {
+        require(requiredEarn[_vault] > 0, "VaultKeep3rJob::workable:vault-not-added");
         return (calculateEarn(_vault) >= requiredEarn[_vault] && block.timestamp > lastEarnAt[_vault].add(earnCooldown));
     }
 
     // Keep3r actions
     function work(address _vault) external override {
-        require(workable(_vault), "vault-keep3r::earn:not-workable");
+        require(workable(_vault), "VaultKeep3rJob::earn:not-workable");
 
-        _startJob(msg.sender);
         _earn(_vault);
-        _endJob(msg.sender);
 
         emit EarnByKeeper(_vault);
     }

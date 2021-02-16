@@ -52,7 +52,7 @@ contract Keep3rProxyJob is UtilsReady, Keep3r, IKeep3rProxyJob {
     }
 
     // Keep3r-Job actions
-    function workable(address _job) external view override returns (bool _workable) {
+    function workable(address _job) external override returns (bool _workable) {
         require(isValidJob(msg.sender), "yearnKeep3rProxyJob::workable:invalid-job");
         return IKeep3rJob(_job).workable();
     }
