@@ -10,11 +10,6 @@ interface IKeep3rEscrowJob {
     // Actions forced by governor
     event ForceWorked();
 
-    // Keep3r actions
-    function getWorkData() external view returns (bytes memory _workData);
-
-    function workable() external view returns (bool);
-
     // Governor actions
     function returnLPsToGovernance(address _escrow) external;
 

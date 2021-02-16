@@ -84,10 +84,10 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
         return;
     }
 
-    function getWorkData() public view override returns (bytes memory _workData) {}
+    function getWorkData() public override returns (bytes memory _workData) {}
 
     // Keep3r actions
-    function workable() public view override notPaused returns (bool) {
+    function workable() public override notPaused returns (bool) {
         (, Actions _action) = getNextAction();
         return _workable(_action);
     }

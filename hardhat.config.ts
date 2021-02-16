@@ -15,18 +15,18 @@ module.exports = {
         url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
       },
     },
-    localMainnet: {
-      url: 'http://127.0.0.1:8545',
-      accounts: [config.accounts.mainnet.privateKey],
-      gasMultiplier: 1.1,
-    },
-    mainnet: {
-      url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
-      accounts: [config.accounts.mainnet.privateKey],
-      gasMultiplier: 1.1,
-      // gasPrice: 'auto',
-      gasPrice: 165000000000, // 165 gwei
-    },
+    // localMainnet: {
+    //   url: 'http://127.0.0.1:8545',
+    //   accounts: [config.accounts.mainnet.privateKey],
+    //   gasMultiplier: 1.1,
+    // },
+    // mainnet: {
+    //   url: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
+    //   accounts: [config.accounts.mainnet.privateKey],
+    //   gasMultiplier: 1.1,
+    //   // gasPrice: 'auto',
+    //   gasPrice: 165000000000, // 165 gwei
+    // },
   },
   solidity: {
     compilers: [

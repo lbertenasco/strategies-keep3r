@@ -6,7 +6,8 @@ interface IKeep3rProxyJob {
 
     function jobs() external view returns (address[] memory validJobs);
 
-    function workable(address _job) external view returns (bool _workable);
-
     function work(address _job, bytes calldata _workData) external;
+
+    // use callStatic
+    function workable(address _job) external returns (bool _workable);
 }
