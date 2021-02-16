@@ -18,7 +18,7 @@ describe('CrvStrategyKeep3r', () => {
       params: [
         {
           forking: {
-            jsonRpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${config.alchemy.mainnet.apiKey}`,
+            jsonRpcUrl: process.env.MAINNET_HTTPS_URL,
             blockNumber: 11724476,
           },
         },
