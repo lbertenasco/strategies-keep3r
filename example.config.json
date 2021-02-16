@@ -43,8 +43,13 @@
         "jobs": {
           "escrowJob": "0x83A34a6469dbFd7654aE6D842d20977E89CcD73D",
           "crvStrategyKeep3rJob": "0xBa0b43AB3966Db791b4Db1811C3096568aD8a99c",
-          "vaultKeep3rJob": ""
+          "vaultKeep3rJob": "0xB06b3394B34e2f80CEdad89CfC62bfa43CDf7D83",
+          "genericKeep3rV2": ""
         }
+      },
+      "genericV2Keep3rJob": {
+        "keep3rHelper": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",
+        "slidingOracle": "0x73353801921417F465377c8d898c6f4C0270282C"
       },
       "keep3r": {
         "address": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"

@@ -13,12 +13,6 @@ module.exports = {
     : {
         hardhat: {
           enabled: process.env.FORK ? true : false,
-          accounts: [
-            {
-              privateKey: process.env.MAINNET_PRIVATE_KEY,
-              balance: utils.parseEther('1000').toString(),
-            },
-          ],
           forking: {
             url: process.env.MAINNET_HTTPS_URL,
           },

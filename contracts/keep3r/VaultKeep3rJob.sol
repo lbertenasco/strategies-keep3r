@@ -15,9 +15,9 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
 
     mapping(address => uint256) public requiredEarn;
     mapping(address => uint256) public lastEarnAt;
-    uint256 earnCooldown;
+    uint256 public earnCooldown;
 
-    EnumerableSet.AddressSet internal availableVaults;
+    EnumerableSet.AddressSet internal _availableVaults;
 
     constructor(address _keep3rSugarMommy, uint256 _earnCooldown) public UtilsReady() Keep3rJob(_keep3rSugarMommy) {
         _setEarnCooldown(_earnCooldown);
@@ -42,7 +42,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     function _addVault(address _vault, uint256 _requiredEarn) internal {
         require(requiredEarn[_vault] == 0, "vault-keep3r::add-vault:vault-already-added");
         _setRequiredEarn(_vault, _requiredEarn);
-        availableVaults.add(_vault);
+        _availableVaults.add(_vault);
         emit VaultAdded(_vault, _requiredEarn);
     }
 
@@ -55,7 +55,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     function removeVault(address _vault) external override onlyGovernor {
         require(requiredEarn[_vault] > 0, "vault-keep3r::remove-vault:vault-not-added");
         requiredEarn[_vault] = 0;
-        availableVaults.remove(_vault);
+        _availableVaults.remove(_vault);
         emit VaultRemoved(_vault);
     }
 
@@ -75,9 +75,9 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
 
     // Getters
     function vaults() public view override returns (address[] memory _vaults) {
-        _vaults = new address[](availableVaults.length());
-        for (uint256 i; i < availableVaults.length(); i++) {
-            _vaults[i] = availableVaults.at(i);
+        _vaults = new address[](_availableVaults.length());
+        for (uint256 i; i < _availableVaults.length(); i++) {
+            _vaults[i] = _availableVaults.at(i);
         }
     }
 

@@ -2,7 +2,7 @@ const Confirm = require('prompt-confirm');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
-const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
+const { e18, SIX_HOURS } = require('../../utils/web3-utils');
 
 const prompt = new Confirm('Do you wish to deploy VaultKeep3rJob contract?');
 
@@ -22,7 +22,8 @@ function promptAndSubmit(VaultKeep3rJob) {
           const escrowContracts = config.contracts.mainnet.escrow;
 
           const vaultKeep3rJob = await VaultKeep3rJob.deploy(
-            escrowContracts.sugarMommy
+            escrowContracts.sugarMommy,
+            SIX_HOURS
           );
 
           console.timeEnd('VaultKeep3rJob deployed');
