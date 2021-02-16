@@ -23,10 +23,6 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
         _setEarnCooldown(_earnCooldown);
     }
 
-    function isVaultKeep3rJob() external pure override returns (bool) {
-        return true;
-    }
-
     // Setters
     function addVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external override onlyGovernor {
         require(_vaults.length == _requiredEarns.length, "VaultKeep3rJob::add-vaults:vaults-required-earns-different-length");
@@ -105,24 +101,25 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
         return false;
     }
 
-    function _workable(address _vault) internal returns (bool) {
+    function _workable(address _vault) internal view returns (bool) {
         require(requiredEarn[_vault] > 0, "VaultKeep3rJob::workable:vault-not-added");
         return (calculateEarn(_vault) >= requiredEarn[_vault] && block.timestamp > lastEarnAt[_vault].add(earnCooldown));
     }
 
     // Keep3r actions
-    function work(address _vault) external override {
-        require(workable(_vault), "VaultKeep3rJob::earn:not-workable");
+    function work(bytes memory _workData) external override notPaused onlyProxyJob {
+        address _vault = decodeWorkData(_workData);
+        require(_workable(_vault), "VaultKeep3rJob::earn:not-workable");
 
         _earn(_vault);
 
-        emit EarnByKeeper(_vault);
+        emit Worked(_vault);
     }
 
     // Governor keeper bypass
     function forceWork(address _vault) external override onlyGovernor {
         _earn(_vault);
-        emit EarnByGovernor(_vault);
+        emit ForceWorked(_vault);
     }
 
     function _earn(address _vault) internal {

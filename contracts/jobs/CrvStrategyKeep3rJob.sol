@@ -111,8 +111,7 @@ contract CrvStrategyKeep3rJob is UtilsReady, Keep3rJob, ICrvStrategyKeep3rJob {
     }
 
     // Governor keeper bypass
-    function forceWork(bytes memory _workData) external override onlyGovernor {
-        address _strategy = decodeWorkData(_workData);
+    function forceWork(address _strategy) external override onlyGovernor {
         _harvest(_strategy);
         emit ForceWorked(_strategy);
     }

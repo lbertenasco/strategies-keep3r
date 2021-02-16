@@ -26,4 +26,7 @@ interface IVaultKeep3rJob {
     function vaults() external view returns (address[] memory _vaults);
 
     function calculateEarn(address _vault) external view returns (uint256 _amount);
+
+    // Governor work bypass
+    function forceWork(address _vault) external;
 }

@@ -24,4 +24,7 @@ interface ICrvStrategyKeep3rJob {
     function strategies() external view returns (address[] memory _strategies);
 
     function calculateHarvest(address _strategy) external returns (uint256 _amount);
+
+    // Governor work bypass
+    function forceWork(address _strategy) external;
 }
