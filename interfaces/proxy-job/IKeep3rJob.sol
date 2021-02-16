@@ -4,8 +4,6 @@ pragma solidity 0.6.12;
 interface IKeep3rJob {
     function work(bytes calldata _workData) external;
 
-    function forceWork(bytes calldata _workData) external;
-
     // use callStatic for the following functions:
     function workable() external returns (bool);
 

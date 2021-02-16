@@ -35,4 +35,7 @@ interface IKeep3rEscrowJob {
 
     // Getters
     function getNextAction() external view returns (IKeep3rEscrow Escrow, Actions _action);
+
+    // Governor work bypass
+    function forceWork() external;
 }

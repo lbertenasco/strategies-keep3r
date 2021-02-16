@@ -107,6 +107,13 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
         emit Worked();
     }
 
+    // Governor escrow bypass
+    function forceWork() external override onlyGovernor {
+        (IKeep3rEscrow Escrow, Actions _action) = getNextAction();
+        _work(Escrow, _action);
+        emit ForceWorked();
+    }
+
     function _work(IKeep3rEscrow Escrow, Actions _action) internal {
         if (_action == Actions.addLiquidityToJob) {
             uint256 _amount = Liquidity.balanceOf(address(Escrow));
@@ -151,15 +158,6 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
             Escrow.addLiquidityToJob(address(Liquidity), address(Keep3rProxyJob), _amount);
             return;
         }
-    }
-
-    // Governor escrow bypass
-    function forceWork(bytes memory _workData) external override onlyGovernor {
-        _workData; // shh, decodeWorkData(_workData);
-
-        (IKeep3rEscrow Escrow, Actions _action) = getNextAction();
-        _work(Escrow, _action);
-        emit ForceWorked();
     }
 
     function returnLPsToGovernance(address _escrow) external override onlyGovernor {
