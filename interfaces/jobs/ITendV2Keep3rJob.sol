@@ -1,18 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.8;
 
-interface IGenericV2Keep3rJob {
+interface ITendV2Keep3rJob {
     event Keep3rSet(address keep3r);
     event Keep3rHelperSet(address keep3rHelper);
     event SlidingOracleSet(address slidingOracle);
 
     // Actions by Keeper
-    event HarvestedByKeeper(address _strategy);
-    event TendedByKeeper(address _strategy);
-
-    // Actions forced by governance
-    event HarvestedByGovernor(address _strategy);
-    event TendedByGovernor(address _strategy);
+    event Worked(address _strategy);
+    // Actions forced by governor
+    event ForceWorked(address _strategy);
 
     // Getters
     function strategies() external view returns (address[] memory);
@@ -72,4 +69,7 @@ interface IGenericV2Keep3rJob {
     function removeHarvestStrategy(address _strategy) external;
 
     function removeTendStrategy(address _strategy) external;
+
+    // Governor work bypass
+    function forceWork(address _strategy) external;
 }

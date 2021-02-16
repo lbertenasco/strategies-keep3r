@@ -79,12 +79,12 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
     }
 
     // Job actions (not relevant to this job, but added to maintain consistency)
+    function getWorkData() public override returns (bytes memory _workData) {}
+
     function decodeWorkData(bytes memory _workData) public pure {
         _workData; // shh
         return;
     }
-
-    function getWorkData() public override returns (bytes memory _workData) {}
 
     // Keep3r actions
     function workable() public override notPaused returns (bool) {

@@ -7,14 +7,14 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
-import "../sugar-mommy/Keep3rJob.sol";
+import "../proxy-job/Keep3rJob.sol";
+import "../../interfaces/jobs/ITendV2Keep3rJob.sol";
 
 import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
-import "../../interfaces/keep3r/IGenericV2Keep3rJob.sol";
 
-contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
+contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     using SafeMath for uint256;
 
     address public constant KP3R = address(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44);
@@ -191,7 +191,7 @@ contract GenericV2Keep3rJob is UtilsReady, Keep3rJob, IGenericV2Keep3rJob {
 
     // Getters
     function name() external pure override returns (string memory) {
-        return "Generic Vault V2 Strategy Keep3r";
+        return "Tend Vault V2 Strategy Keep3r";
     }
 
     function strategies() public view override returns (address[] memory _strategies) {
