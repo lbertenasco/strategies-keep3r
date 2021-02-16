@@ -44,7 +44,7 @@
           "escrowJob": "0x83A34a6469dbFd7654aE6D842d20977E89CcD73D",
           "crvStrategyKeep3rJob": "0xBa0b43AB3966Db791b4Db1811C3096568aD8a99c",
           "vaultKeep3rJob": "0xB06b3394B34e2f80CEdad89CfC62bfa43CDf7D83",
-          "genericKeep3rV2": ""
+          "genericV2Keep3rJob": "0xf796c1a96c1E803cb748F2E7124B427536277480"
         }
       },
       "genericV2Keep3rJob": {
