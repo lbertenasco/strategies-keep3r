@@ -4,7 +4,6 @@ import '@nomiclabs/hardhat-etherscan';
 import { removeConsoleLog } from 'hardhat-preprocessor';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
-import { utils } from 'ethers';
 
 module.exports = {
   defaultNetwork: 'hardhat',
@@ -13,12 +12,6 @@ module.exports = {
     : {
         hardhat: {
           enabled: process.env.FORK ? true : false,
-          accounts: [
-            {
-              privateKey: process.env.MAINNET_PRIVATE_KEY,
-              balance: utils.parseEther('1000').toString(),
-            },
-          ],
           forking: {
             url: process.env.MAINNET_HTTPS_URL,
           },
@@ -48,9 +41,6 @@ module.exports = {
         version: '0.5.17',
       },
     ],
-  },
-  mocha: {
-    timeout: process.env.MOCHA_TIMEOUT,
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS ? true : false,
