@@ -45,7 +45,9 @@ function run() {
       escrowContracts.keep3r,
       keep3rGovernance
     );
-    const Keep3rEscrow = await ethers.getContractFactory('Keep3rEscrow');
+    const Keep3rEscrow = await ethers.getContractFactory(
+      'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow'
+    );
     const Keep3rSugarMommy = await ethers.getContractFactory(
       'Keep3rSugarMommy'
     );
@@ -60,12 +62,12 @@ function run() {
 
     // Setup deployed keep3rEscrow
     const keep3rEscrow1 = await ethers.getContractAt(
-      'Keep3rEscrow',
+      'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow',
       escrowContracts.escrow1,
       deployer
     );
     const keep3rEscrow2 = await ethers.getContractAt(
-      'Keep3rEscrow',
+      'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow',
       escrowContracts.escrow2,
       deployer
     );
