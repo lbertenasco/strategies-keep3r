@@ -8,7 +8,9 @@ const prompt = new Confirm('Do you wish to deploy keep3r escrow contract?');
 
 async function main() {
   await hre.run('compile');
-  const Keep3rEscrow = await ethers.getContractFactory('Keep3rEscrow');
+  const Keep3rEscrow = await ethers.getContractFactory(
+    'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow'
+  );
 
   await promptAndSubmit(Keep3rEscrow);
 }
