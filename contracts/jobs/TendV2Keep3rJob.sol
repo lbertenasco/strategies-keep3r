@@ -26,45 +26,30 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
-    mapping(address => uint256) public requiredHarvest;
     mapping(address => uint256) public requiredTend;
-
-    mapping(address => uint256) public lastHarvestAt;
     mapping(address => uint256) public lastTendAt;
 
-    uint256 public harvestCooldown;
     uint256 public tendCooldown;
 
     uint256 public usedCredits;
     uint256 public maxCredits;
 
     constructor(
-        address _keep3rSugarMommy,
+        address _keep3rProxyJob,
         address _keep3r,
         address _keep3rHelper,
         address _slidingOracle,
-        uint256 _harvestCooldown,
         uint256 _tendCooldown,
         uint256 _maxCredits
-    ) public UtilsReady() Keep3rJob(_keep3rSugarMommy) {
+    ) public UtilsReady() Keep3rJob(_keep3rProxyJob) {
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
-        _setHarvestCooldown(_harvestCooldown);
         _setTendCooldown(_tendCooldown);
         _setMaxCredits(_maxCredits);
     }
 
     // Setters
-    function setHarvestCooldown(uint256 _harvestCooldown) external override onlyGovernor {
-        _setHarvestCooldown(_harvestCooldown);
-    }
-
-    function _setHarvestCooldown(uint256 _harvestCooldown) internal {
-        require(_harvestCooldown > 0, "generic-keep3r-v2::set-harvest-cooldown:should-not-be-zero");
-        harvestCooldown = _harvestCooldown;
-    }
-
     function setTendCooldown(uint256 _tendCooldown) external override onlyGovernor {
         _setTendCooldown(_tendCooldown);
     }
@@ -86,61 +71,27 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     // Unique methods to add a strategy to the system
     // If you don't require harvest, use _requiredHarvest = 0
     // If you don't require tend, use _requiredTend = 0
-    function addStrategies(
-        address[] calldata _strategies,
-        uint256[] calldata _requiredHarvests,
-        uint256[] calldata _requiredTends
-    ) external override onlyGovernor {
-        require(
-            _strategies.length == _requiredHarvests.length && _strategies.length == _requiredTends.length,
-            "generic-keep3r-v2::add-strategies:strategies-required-harvests-and-tends-different-length"
-        );
+    function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredTends) external override onlyGovernor {
+        require(_strategies.length == _requiredTends.length, "generic-keep3r-v2::add-strategies:strategies-required-tends-different-length");
         for (uint256 i; i < _strategies.length; i++) {
-            _addStrategy(_strategies[i], _requiredHarvests[i], _requiredTends[i]);
+            _addStrategy(_strategies[i], _requiredTends[i]);
         }
     }
 
-    function addStrategy(
-        address _strategy,
-        uint256 _requiredHarvest,
-        uint256 _requiredTend
-    ) external override onlyGovernor {
-        _addStrategy(_strategy, _requiredHarvest, _requiredTend);
+    function addStrategy(address _strategy, uint256 _requiredTend) external override onlyGovernor {
+        _addStrategy(_strategy, _requiredTend);
     }
 
-    function _addStrategy(
-        address _strategy,
-        uint256 _requiredHarvest,
-        uint256 _requiredTend
-    ) internal {
-        require(_requiredHarvest > 0 || _requiredTend > 0, "generic-keep3r-v2::add-strategy:should-need-harvest-or-tend");
-        if (_requiredHarvest > 0) {
-            _addHarvestStrategy(_strategy, _requiredHarvest);
-        }
-
-        if (_requiredTend > 0) {
-            _addTendStrategy(_strategy, _requiredTend);
-        }
-
+    function _addStrategy(address _strategy, uint256 _requiredTend) internal {
+        require(_requiredTend > 0, "generic-keep3r-v2::add-strategy:should-need-harvest-or-tend");
+        _addTendStrategy(_strategy, _requiredTend);
         _availableStrategies.add(_strategy);
-    }
-
-    function _addHarvestStrategy(address _strategy, uint256 _requiredHarvest) internal {
-        require(requiredHarvest[_strategy] == 0, "generic-keep3r-v2::add-harvest-strategy:strategy-already-added");
-        _setRequiredHarvest(_strategy, _requiredHarvest);
-        emit HarvestStrategyAdded(_strategy, _requiredHarvest);
     }
 
     function _addTendStrategy(address _strategy, uint256 _requiredTend) internal {
         require(requiredTend[_strategy] == 0, "generic-keep3r-v2::add-tend-strategy:strategy-already-added");
         _setRequiredTend(_strategy, _requiredTend);
         emit TendStrategyAdded(_strategy, _requiredTend);
-    }
-
-    function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
-        require(requiredHarvest[_strategy] > 0, "generic-keep3r-v2::update-required-harvest:strategy-not-added");
-        _setRequiredHarvest(_strategy, _requiredHarvest);
-        emit HarvestStrategyModified(_strategy, _requiredHarvest);
     }
 
     function updateRequiredTendAmount(address _strategy, uint256 _requiredTend) external override onlyGovernor {
@@ -150,38 +101,10 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     }
 
     function removeStrategy(address _strategy) external override onlyGovernor {
-        require(requiredHarvest[_strategy] > 0 || requiredTend[_strategy] > 0, "generic-keep3r-v2::remove-strategy:strategy-not-added");
-        delete requiredHarvest[_strategy];
+        require(requiredTend[_strategy] > 0, "generic-keep3r-v2::remove-strategy:strategy-not-added");
         delete requiredTend[_strategy];
         _availableStrategies.remove(_strategy);
-        emit StrategyRemoved(_strategy);
-    }
-
-    function removeHarvestStrategy(address _strategy) external override onlyGovernor {
-        require(requiredHarvest[_strategy] > 0, "generic-keep3r-v2::remove-harvest-strategy:strategy-not-added");
-        delete requiredHarvest[_strategy];
-
-        if (requiredTend[_strategy] == 0) {
-            _availableStrategies.remove(_strategy);
-        }
-
-        emit HarvestStrategyRemoved(_strategy);
-    }
-
-    function removeTendStrategy(address _strategy) external override onlyGovernor {
-        require(requiredTend[_strategy] > 0, "generic-keep3r-v2::remove-tend-strategy:strategy-not-added");
-        delete requiredTend[_strategy];
-
-        if (requiredHarvest[_strategy] == 0) {
-            _availableStrategies.remove(_strategy);
-        }
-
         emit TendStrategyRemoved(_strategy);
-    }
-
-    function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
-        require(_requiredHarvest > 0, "generic-keep3r-v2::set-required-harvest:should-not-be-zero");
-        requiredHarvest[_strategy] = _requiredHarvest;
     }
 
     function _setRequiredTend(address _strategy, uint256 _requiredTend) internal {
@@ -190,10 +113,6 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     }
 
     // Getters
-    function name() external pure override returns (string memory) {
-        return "Tend Vault V2 Strategy Keep3r";
-    }
-
     function strategies() public view override returns (address[] memory _strategies) {
         _strategies = new address[](_availableStrategies.length());
         for (uint256 i; i < _availableStrategies.length(); i++) {
@@ -201,18 +120,28 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
         }
     }
 
-    function harvestable(address _strategy) public view override returns (bool) {
-        require(requiredHarvest[_strategy] > 0, "generic-keep3r-v2::harvestable:strategy-not-added");
-        require(block.timestamp > lastHarvestAt[_strategy].add(harvestCooldown), "generic-keep3r-v2::harvestable:strategy-harvest-cooldown");
-
-        uint256 kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredHarvest[_strategy]);
-        uint256 ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, kp3rCallCost, WETH);
-        return IBaseStrategy(_strategy).harvestTrigger(ethCallCost);
+    // Job actions
+    function getWorkData() public override returns (bytes memory _workData) {
+        for (uint256 i; i < _availableStrategies.length(); i++) {
+            address _strategy = _availableStrategies.at(i);
+            if (_workable(_strategy)) return abi.encode(_strategy);
+        }
     }
 
-    function tendable(address _strategy) public view override returns (bool) {
+    function decodeWorkData(bytes memory _workData) public pure returns (address _strategy) {
+        return abi.decode(_workData, (address));
+    }
+
+    function workable() public override returns (bool) {
+        for (uint256 i; i < _availableStrategies.length(); i++) {
+            if (_workable(_availableStrategies.at(i))) return true;
+        }
+        return false;
+    }
+
+    function _workable(address _strategy) internal view returns (bool) {
         require(requiredTend[_strategy] > 0, "generic-keep3r-v2::tendable:strategy-not-added");
-        require(block.timestamp > lastTendAt[_strategy].add(tendCooldown), "generic-keep3r-v2::tendable:strategy-tend-cooldown");
+        if (block.timestamp > lastTendAt[_strategy].add(tendCooldown)) return false;
 
         uint256 kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredTend[_strategy]);
         uint256 ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, kp3rCallCost, WETH);
@@ -220,40 +149,19 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     }
 
     // Keep3r actions
-    function harvest(address _strategy) external override updateCredits {
-        require(harvestable(_strategy), "generic-keep3r-v2::harvest:not-workable");
+    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
+        address _strategy = decodeWorkData(_workData);
+        require(_workable(_strategy), "generic-keep3r-v2::work:not-workable");
 
-        _startJob(msg.sender);
-        _harvest(_strategy);
-        _endJob(msg.sender);
-
-        emit HarvestedByKeeper(_strategy);
-    }
-
-    function tend(address _strategy) external override updateCredits {
-        require(tendable(_strategy), "generic-keep3r-v2::tend:not-workable");
-
-        _startJob(msg.sender);
         _tend(_strategy);
-        _endJob(msg.sender);
 
-        emit TendedByKeeper(_strategy);
+        emit Worked(_strategy);
     }
 
     // Governor keeper bypass
-    function forceHarvest(address _strategy) external override onlyGovernor {
-        _harvest(_strategy);
-        emit HarvestedByGovernor(_strategy);
-    }
-
-    function forceTend(address _strategy) external override onlyGovernor {
+    function forceWork(address _strategy) external override onlyGovernor {
         _tend(_strategy);
-        emit TendedByGovernor(_strategy);
-    }
-
-    function _harvest(address _strategy) internal {
-        IBaseStrategy(_strategy).harvest();
-        lastHarvestAt[_strategy] = block.timestamp;
+        emit ForceWorked(_strategy);
     }
 
     function _tend(address _strategy) internal {
@@ -262,9 +170,9 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     }
 
     modifier updateCredits() {
-        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rSugarMommy), keep3r);
+        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
         _;
-        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rSugarMommy), keep3r);
+        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
         usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
         require(usedCredits <= maxCredits, "generic-keep3r-v2::update-credits:used-credits-exceed-max-credits");
     }

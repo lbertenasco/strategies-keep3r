@@ -115,6 +115,7 @@ contract HarvestV2Keep3rJob is UtilsReady, Keep3rJob, IHarvestV2Keep3rJob {
         requiredHarvest[_strategy] = _requiredHarvest;
     }
 
+    // Getters
     function strategies() public view override returns (address[] memory _strategies) {
         _strategies = new address[](_availableStrategies.length());
         for (uint256 i; i < _availableStrategies.length(); i++) {
@@ -154,7 +155,7 @@ contract HarvestV2Keep3rJob is UtilsReady, Keep3rJob, IHarvestV2Keep3rJob {
     function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
         address _strategy = decodeWorkData(_workData);
 
-        require(_workable(_strategy), "HarvestV2Keep3rJob::harvest:not-workable");
+        require(_workable(_strategy), "HarvestV2Keep3rJob::work:not-workable");
 
         _harvest(_strategy);
 

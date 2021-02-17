@@ -14,8 +14,6 @@ interface IHarvestV2Keep3rJob {
     // Getters
     function strategies() external view returns (address[] memory);
 
-    function harvestable(address _strategy) external view returns (bool);
-
     event HarvestStrategyAdded(address _strategy, uint256 _requiredHarvest);
 
     event HarvestStrategyModified(address _strategy, uint256 _requiredHarvest);
