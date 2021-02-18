@@ -1,13 +1,13 @@
-const Confirm = require('prompt-confirm');
+const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { gwei, e18 } = require('../../utils/web3-utils');
 const taichi = require('../../utils/taichi');
 
-const prompt = new Confirm(
-  'Do you wish to calculate crv busd strategy harvest?'
-);
+const prompt = new Confirm({
+  message: 'Do you wish to calculate crv busd strategy harvest?',
+});
 
 async function main() {
   await hre.run('compile');
@@ -17,7 +17,7 @@ async function main() {
 function promptAndSubmit() {
   return new Promise((resolve) => {
     try {
-      prompt.ask(async (answer) => {
+      prompt.run().then(async (answer) => {
         if (answer) {
           const [owner] = await ethers.getSigners();
           const provider = ethers.getDefaultProvider();

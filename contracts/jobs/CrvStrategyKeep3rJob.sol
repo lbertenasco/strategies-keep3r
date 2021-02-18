@@ -3,6 +3,7 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
 import "../proxy-job/Keep3rJob.sol";
@@ -111,12 +112,27 @@ contract CrvStrategyKeep3rJob is UtilsReady, Keep3rJob, ICrvStrategyKeep3rJob {
     }
 
     // Governor keeper bypass
-    function forceWork(address _strategy) external override onlyGovernor {
+    function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _harvest(_strategy);
         emit ForceWorked(_strategy);
     }
 
     function _harvest(address _strategy) internal {
         IHarvestableStrategy(_strategy).harvest();
+    }
+
+    // Mechanics Setters
+    function addMechanic(address _mechanic) external override onlyGovernor {
+        _addMechanic(_mechanic);
+    }
+
+    function removeMechanic(address _mechanic) external override onlyGovernor {
+        _removeMechanic(_mechanic);
+    }
+
+    // Mechanics Modifiers
+    modifier onlyGovernorOrMechanic() {
+        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
+        _;
     }
 }

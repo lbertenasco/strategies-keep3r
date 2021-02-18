@@ -53,12 +53,12 @@ contract Keep3rProxyJob is UtilsReady, Keep3r, IKeep3rProxyJob {
 
     // Keep3r-Job actions
     function workable(address _job) external override returns (bool _workable) {
-        require(isValidJob(msg.sender), "yearnKeep3rProxyJob::workable:invalid-job");
+        require(isValidJob(_job), "yearnKeep3rProxyJob::workable:invalid-job");
         return IKeep3rJob(_job).workable();
     }
 
     function work(address _job, bytes calldata _workData) external override onlyKeeper paysKeeper {
-        require(isValidJob(msg.sender), "yearnKeep3rProxyJob::work:invalid-job");
+        require(isValidJob(_job), "yearnKeep3rProxyJob::work:invalid-job");
         IKeep3rJob(_job).work(_workData);
         emit Worked(_job, msg.sender);
     }
@@ -75,7 +75,7 @@ contract Keep3rProxyJob is UtilsReady, Keep3r, IKeep3rProxyJob {
     }
 
     // View helpers
-    function isValidJob(address _job) internal view returns (bool) {
+    function isValidJob(address _job) public view override returns (bool) {
         return _validJobs.contains(_job);
     }
 }

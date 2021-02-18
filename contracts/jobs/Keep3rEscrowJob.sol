@@ -108,7 +108,7 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
     }
 
     // Governor escrow bypass
-    function forceWork() external override onlyGovernor {
+    function forceWork() external override onlyGovernorOrMechanic {
         (IKeep3rEscrow Escrow, Actions _action) = getNextAction();
         _work(Escrow, _action);
         emit ForceWorked();
@@ -214,5 +214,20 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::removeLiquidityFromJob:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         Escrow.sendDust(_to, _token, _amount);
+    }
+
+    // Mechanics Setters
+    function addMechanic(address _mechanic) external override onlyGovernor {
+        _addMechanic(_mechanic);
+    }
+
+    function removeMechanic(address _mechanic) external override onlyGovernor {
+        _removeMechanic(_mechanic);
+    }
+
+    // Mechanics Modifiers
+    modifier onlyGovernorOrMechanic() {
+        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
+        _;
     }
 }

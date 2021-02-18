@@ -159,7 +159,7 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
     }
 
     // Governor keeper bypass
-    function forceWork(address _strategy) external override onlyGovernor {
+    function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _tend(_strategy);
         emit ForceWorked(_strategy);
     }
@@ -175,5 +175,20 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
         uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
         usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
         require(usedCredits <= maxCredits, "generic-keep3r-v2::update-credits:used-credits-exceed-max-credits");
+    }
+
+    // Mechanics Setters
+    function addMechanic(address _mechanic) external override onlyGovernor {
+        _addMechanic(_mechanic);
+    }
+
+    function removeMechanic(address _mechanic) external override onlyGovernor {
+        _removeMechanic(_mechanic);
+    }
+
+    // Mechanics Modifiers
+    modifier onlyGovernorOrMechanic() {
+        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
+        _;
     }
 }

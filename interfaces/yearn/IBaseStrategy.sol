@@ -12,6 +12,8 @@ interface IBaseStrategy {
 
     function want() external view returns (address _want);
 
+    function name() external view returns (string memory _name);
+
     // Setters
     function setStrategist(address _strategist) external;
 
