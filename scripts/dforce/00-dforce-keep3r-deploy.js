@@ -1,10 +1,12 @@
-const Confirm = require('prompt-confirm');
+const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
-const prompt = new Confirm('Do you wish to deploy dforce keep3r contract?');
+const prompt = new Confirm({
+  message: 'Do you wish to deploy dforce keep3r contract?',
+});
 
 async function main() {
   await hre.run('compile');
@@ -18,7 +20,7 @@ async function main() {
 function promptAndSubmit(DforceStrategyKeep3r) {
   return new Promise((resolve) => {
     try {
-      prompt.ask(async (answer) => {
+      prompt.run().then(async (answer) => {
         if (answer) {
           console.time('DforceStrategyKeep3r deployed');
           const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(

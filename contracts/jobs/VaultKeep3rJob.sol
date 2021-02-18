@@ -117,7 +117,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     // Governor keeper bypass
-    function forceWork(address _vault) external override onlyGovernor {
+    function forceWork(address _vault) external override onlyGovernorOrMechanic {
         _earn(_vault);
         emit ForceWorked(_vault);
     }
@@ -125,5 +125,20 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     function _earn(address _vault) internal {
         IEarnableVault(_vault).earn();
         lastEarnAt[_vault] = block.timestamp;
+    }
+
+    // Mechanics Setters
+    function addMechanic(address _mechanic) external override onlyGovernor {
+        _addMechanic(_mechanic);
+    }
+
+    function removeMechanic(address _mechanic) external override onlyGovernor {
+        _removeMechanic(_mechanic);
+    }
+
+    // Mechanics Modifiers
+    modifier onlyGovernorOrMechanic() {
+        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
+        _;
     }
 }

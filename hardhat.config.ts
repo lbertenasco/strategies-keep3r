@@ -16,15 +16,15 @@ module.exports = {
             url: process.env.MAINNET_HTTPS_URL,
           },
         },
-        localMainnet: {
-          url: process.env.LOCAL_MAINNET_HTTPS_URL,
-          accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
-        },
-        mainnet: {
-          url: process.env.MAINNET_HTTPS_URL,
-          accounts: [process.env.MAINNET_PRIVATE_KEY],
-          gasPrice: 'auto',
-        },
+        // localMainnet: {
+        //   url: process.env.LOCAL_MAINNET_HTTPS_URL,
+        //   accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
+        // },
+        // mainnet: {
+        //   url: process.env.MAINNET_HTTPS_URL,
+        //   accounts: [process.env.MAINNET_PRIVATE_KEY],
+        //   gasPrice: 'auto',
+        // },
       },
   solidity: {
     compilers: [

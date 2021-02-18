@@ -3,7 +3,7 @@ import { run, ethers } from 'hardhat';
 import config from '../../.config.json';
 import { ZERO_ADDRESS } from '../../utils/web3-utils';
 
-const Confirm = require('prompt-confirm');
+const { Confirm } = require('enquirer');
 const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
 
 async function main() {
@@ -18,7 +18,7 @@ function promptAndSubmit(
   crvStrategyKeep3rContract: ContractFactory
 ): Promise<void | Error> {
   return new Promise((resolve, reject) => {
-    prompt.ask(async (answer: any) => {
+    prompt.run().then(async (answer: any) => {
       if (answer) {
         console.time('CrvStrategyKeep3r deployed');
         try {

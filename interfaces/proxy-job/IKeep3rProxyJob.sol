@@ -10,4 +10,6 @@ interface IKeep3rProxyJob {
 
     // use callStatic
     function workable(address _job) external returns (bool _workable);
+
+    function isValidJob(address _job) external view returns (bool _valid);
 }

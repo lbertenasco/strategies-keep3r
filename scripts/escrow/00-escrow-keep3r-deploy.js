@@ -1,10 +1,12 @@
-const Confirm = require('prompt-confirm');
+const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
-const prompt = new Confirm('Do you wish to deploy keep3r escrow contract?');
+const prompt = new Confirm({
+  message: 'Do you wish to deploy keep3r escrow contract?',
+});
 
 async function main() {
   await hre.run('compile');
@@ -18,7 +20,7 @@ async function main() {
 function promptAndSubmit(Keep3rEscrow) {
   return new Promise((resolve) => {
     try {
-      prompt.ask(async (answer) => {
+      prompt.run().then(async (answer) => {
         if (answer) {
           console.time('Keep3rEscrow deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
