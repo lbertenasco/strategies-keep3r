@@ -60,6 +60,7 @@ function promptAndSubmit() {
               strategy.vault,
               deployer
             );
+            strategy.vaultTotalAssets = await strategy.vaultcontract.callStatic.totalAssets();
           }
 
           // TODO get fast gas from api or LINK on-chain oracle (see Keep3rHelper)
@@ -113,10 +114,11 @@ function promptAndSubmit() {
           }
 
           for (const strategy of v2Strategies) {
-            console.log(`strategy ${strategy.name}:`, strategy.address);
             logData(strategy, strategy.paramsPre);
+            logVaultData(strategy, strategy.paramsPre);
             logParams(strategy, strategy.paramsPre);
             logParams(strategy, strategy.paramsPost);
+            logVaultData(strategy, strategy.paramsPost);
           }
 
           resolve();
@@ -133,6 +135,8 @@ function promptAndSubmit() {
 
 function logData(strategy, params) {
   console.log(
+    `strategy ${strategy.name}:`,
+    strategy.address,
     'performanceFee:',
     params.performanceFee.toNumber(),
     'activation:',
@@ -141,10 +145,27 @@ function logData(strategy, params) {
     new Date(params.lastReport.toNumber()).toUTCString()
   );
 }
-function logParams(strategy, params) {
+
+function logVaultData(strategy, params) {
   console.log(
+    'vault:',
+    strategy.vault,
+    'vaultTotalAssets:',
+    bnToDecimal(strategy.vaultTotalAssets, strategy.decimals),
     'debtRatio:',
     params.debtRatio.toNumber(),
+    'availableDebt:',
+    bnToDecimal(
+      strategy.vaultTotalAssets
+        .sub(params.totalDebt)
+        .mul(10_000)
+        .div(params.debtRatio),
+      strategy.decimals
+    )
+  );
+}
+function logParams(strategy, params) {
+  console.log(
     'rateLimit:',
     bnToDecimal(params.rateLimit, strategy.decimals),
     'totalDebt:',
