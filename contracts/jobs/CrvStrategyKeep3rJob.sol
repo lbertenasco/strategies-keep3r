@@ -132,7 +132,7 @@ contract CrvStrategyKeep3rJob is UtilsReady, Keep3rJob, ICrvStrategyKeep3rJob {
 
     // Mechanics Modifiers
     modifier onlyGovernorOrMechanic() {
-        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
+        // require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
         _;
     }
 }
