@@ -37,7 +37,8 @@
     "verify": "hardhat verify --network mainnet --constructor-args utils/verify-args.js 0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   },
   "dependencies": {
-    "prompt-confirm": "2.0.4"
+    "prompt-confirm": "2.0.4",
+    "queue-microtask": "1.2.2"
   },
   "devDependencies": {
     "@commitlint/cli": "11.0.0",

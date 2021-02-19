@@ -29,6 +29,9 @@
         "keep3rHelper": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",
         "slidingOracle": "0x73353801921417F465377c8d898c6f4C0270282C"
       },
+      "v1registry": {
+        "address": "0x3eE41C098f9666ed2eA246f4D2558010e59d63A0"
+      },
       "keep3r": {
         "address": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"
       },

@@ -3,7 +3,7 @@ const axios = require('axios');
 const getGasPrice = async () => {
   try {
     const res = await axios.get('https://www.gasnow.org/api/v3/gas/price');
-    console.log(res.data);
+    // console.log(res.data);
     return res.data;
   } catch (error) {
     console.error(error);

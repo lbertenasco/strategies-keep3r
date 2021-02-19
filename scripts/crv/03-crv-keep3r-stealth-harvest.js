@@ -32,7 +32,14 @@ function promptAndSubmit() {
             signer
           );
 
-          const strategy = 'busd';
+          if (!process.env.STRATEGY) {
+            console.info(
+              'use STRATEGY=busd to set a strategy from config.json'
+            );
+            return;
+          }
+          const strategy = process.env.STRATEGY;
+          console.log('using strategy:', strategy);
 
           // Setup crv strategy
           const strategyContract = await ethers.getContractAt(
@@ -41,7 +48,7 @@ function promptAndSubmit() {
             signer
           );
 
-          console.time('current strategist');
+          // console.time('current strategist')
           const strategist = await strategyContract.strategist();
           console.log(
             `${strategy}.strategist()`,
@@ -49,10 +56,10 @@ function promptAndSubmit() {
               ? 'crvStrategyKeep3r'
               : strategist
           );
-          console.timeEnd('current strategist');
+          // console.timeEnd('current strategist')
 
           console.log(`calculating harvest for: ${strategy}. please wait ...`);
-          console.time('calculateHarvest');
+          // console.time('calculateHarvest')
           console.log(
             `calculateHarvest(${strategy})`,
             (
@@ -63,23 +70,32 @@ function promptAndSubmit() {
               .div(e18)
               .toString()
           );
-          console.timeEnd('calculateHarvest');
+          // console.timeEnd('calculateHarvest')
 
-          const gasResponse = await taichi.getGasPrice();
-          const gasPrice = ethers.BigNumber.from(gasResponse.data.fast);
-          if (gasPrice.gt(gwei.mul(100))) {
-            console.error('gas price > 100gwei');
+          if (process.env.GAS_PRICE) {
+            console.log('using env gasPrice in gwei:', process.env.GAS_PRICE);
+            gasPrice = gwei.mul(process.env.GAS_PRICE);
+          } else {
+            const gasResponse = await taichi.getGasPrice();
+            gasPrice = ethers.BigNumber.from(gasResponse.data.fast);
+            console.log('gasPrice in gwei:', gasPrice.div(gwei).toNumber());
+          }
+
+          const maxGwei = 200;
+          if (gasPrice.gt(gwei.mul(maxGwei))) {
+            console.error(`gas price > ${maxGwei}gwei`);
             return;
           }
 
-          const nonce = ethers.BigNumber.from(
-            await signer.getTransactionCount()
-          );
+          let nonce;
+          if (process.env.NONCE) {
+            console.log('using env nonce:', process.env.NONCE);
+            nonce = ethers.BigNumber.from(process.env.NONCE);
+          } else {
+            nonce = ethers.BigNumber.from(await signer.getTransactionCount());
+            console.log('using account nonce:', nonce.toNumber());
+          }
 
-          console.log({
-            gasPrice: gasPrice.toString(),
-            nonce: nonce.toString(),
-          });
           const rawMessage = await crvStrategyKeep3r.populateTransaction.forceHarvest(
             strategyContract.address,
             {
@@ -90,16 +106,24 @@ function promptAndSubmit() {
 
           const signedMessage = await signer.signTransaction(rawMessage);
 
+          if (process.env.SEND != true) {
+            console.info('use SEND=true to boardcast to taichi');
+            return;
+          }
+
           const res = await taichi.sendPrivateTransaction(signedMessage);
           const privateTxHash = res.result;
+
+          console.log({ privateTxHash });
+
           if (!privateTxHash) {
             console.error('!privateTxHash');
             return;
           }
-          let mined;
-          while (!mined) {
+          let received;
+          while (!received) {
             const query = await taichi.queryPrivateTransaction(privateTxHash);
-            mined = query.success && query.obj.status == 'success';
+            received = query.success && query.obj.status == 'pending';
             // TODO Wait a few seconds
           }
 

@@ -55,12 +55,12 @@ function promptAndSubmit() {
               deployer
             );
             strategy.decimals = await strategy.wantContract.callStatic.decimals();
-            strategy.vaultcontract = await ethers.getContractAt(
+            strategy.vaultContract = await ethers.getContractAt(
               'VaultAPI',
               strategy.vault,
               deployer
             );
-            strategy.vaultTotalAssets = await strategy.vaultcontract.callStatic.totalAssets();
+            strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
           }
 
           // TODO get fast gas from api or LINK on-chain oracle (see Keep3rHelper)
@@ -78,7 +78,7 @@ function promptAndSubmit() {
           }
 
           for (const strategy of v2Strategies) {
-            const params = await strategy.vaultcontract.callStatic.strategies(
+            const params = await strategy.vaultContract.callStatic.strategies(
               strategy.address
             );
             strategy.paramsPre = {
@@ -98,7 +98,7 @@ function promptAndSubmit() {
           }
 
           for (const strategy of v2Strategies) {
-            const params = await strategy.vaultcontract.callStatic.strategies(
+            const params = await strategy.vaultContract.callStatic.strategies(
               strategy.address
             );
             strategy.paramsPost = {
