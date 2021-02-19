@@ -22,6 +22,8 @@ interface VaultAPI is IERC20 {
 
     function token() external view returns (address);
 
+    function totalAssets() external view returns (uint256);
+
     function strategies(address _strategy) external view returns (StrategyParams memory);
 
     /**
