@@ -41,8 +41,7 @@ function promptAndSubmit() {
             'sbtc': {},
             'pool3': {},
             'comp': {},
-            'gusd': {},
-            'gusdVoter': {},
+            'gusd3crv': {},
             'musd': {},
           };
           // Setup crv strategies

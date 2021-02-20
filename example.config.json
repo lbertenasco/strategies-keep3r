@@ -40,10 +40,10 @@
             "comp": {
                 "address": "0x530da5aeF3c8f9CCbc75C97C182D6ee2284B643F"
             },
-            "gusd": {
+            "gusd-deprecated": {
                 "address": "0xc8327D8E1094a94466e05a2CC1f10fA70a1dF119"
             },
-            "gusdVoter": {
+            "gusd3crv": {
                 "address": "0xD42eC70A590C6bc11e9995314fdbA45B4f74FABb"
             },
             "musd": {
