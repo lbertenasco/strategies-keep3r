@@ -11,7 +11,7 @@ module.exports = {
     ? {}
     : {
         hardhat: {
-          enabled: process.env.FORK ? true : false,
+          // enabled: process.env.FORK ? true : false,
           forking: {
             url: process.env.MAINNET_HTTPS_URL,
           },
