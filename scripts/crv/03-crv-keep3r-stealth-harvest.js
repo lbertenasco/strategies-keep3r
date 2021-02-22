@@ -139,7 +139,7 @@ function run() {
       while (!received) {
         const query = await taichi.queryPrivateTransaction(privateTxHash);
         received = query.success && query.obj.status == 'pending';
-        // TODO Wait a few seconds
+        await new Promise((r) => setTimeout(r, 2000)); // sleeps 2s
       }
 
       resolve();

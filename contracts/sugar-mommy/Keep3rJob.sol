@@ -3,7 +3,7 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 
 import "../../interfaces/sugar-mommy/IKeep3rSugarMommy.sol";
 import "../../interfaces/sugar-mommy/IKeep3rJob.sol";

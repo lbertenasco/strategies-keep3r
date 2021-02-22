@@ -3,14 +3,14 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 
 import "../proxy-job/Keep3rJob.sol";
 import "../../interfaces/jobs/IVaultKeep3rJob.sol";
 
 import "../../interfaces/yearn/IEarnableVault.sol";
 
-contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
+contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     using SafeMath for uint256;
 
     mapping(address => uint256) public requiredEarn;
@@ -19,7 +19,7 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
 
     EnumerableSet.AddressSet internal _availableVaults;
 
-    constructor(address _keep3rProxyJob, uint256 _earnCooldown) public UtilsReady() Keep3rJob(_keep3rProxyJob) {
+    constructor(address _keep3rProxyJob, uint256 _earnCooldown) public MachineryReady() Keep3rJob(_keep3rProxyJob) {
         _setEarnCooldown(_earnCooldown);
     }
 
@@ -125,20 +125,5 @@ contract VaultKeep3rJob is UtilsReady, Keep3rJob, IVaultKeep3rJob {
     function _earn(address _vault) internal {
         IEarnableVault(_vault).earn();
         lastEarnAt[_vault] = block.timestamp;
-    }
-
-    // Mechanics Setters
-    function addMechanic(address _mechanic) external override onlyGovernor {
-        _addMechanic(_mechanic);
-    }
-
-    function removeMechanic(address _mechanic) external override onlyGovernor {
-        _removeMechanic(_mechanic);
-    }
-
-    // Mechanics Modifiers
-    modifier onlyGovernorOrMechanic() {
-        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
-        _;
     }
 }

@@ -4,17 +4,17 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
-import "../proxy-job/Keep3rJob.sol";
-import "../../interfaces/jobs/ITendV2Keep3rJob.sol";
+import "../../proxy-job/Keep3rJob.sol";
+import "../../../interfaces/jobs/v2/ITendV2Keep3rJob.sol";
 
-import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
-import "../../interfaces/yearn/IBaseStrategy.sol";
-import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
+import "../../../interfaces/keep3r/IKeep3rV1Helper.sol";
+import "../../../interfaces/yearn/IBaseStrategy.sol";
+import "../../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 
-contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
+contract TendV2Keep3rJob is MachineryReady, Keep3rJob, ITendV2Keep3rJob {
     using SafeMath for uint256;
 
     address public constant KP3R = address(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44);
@@ -41,7 +41,7 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
         address _slidingOracle,
         uint256 _tendCooldown,
         uint256 _maxCredits
-    ) public UtilsReady() Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady() Keep3rJob(_keep3rProxyJob) {
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
@@ -175,20 +175,5 @@ contract TendV2Keep3rJob is UtilsReady, Keep3rJob, ITendV2Keep3rJob {
         uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
         usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
         require(usedCredits <= maxCredits, "generic-keep3r-v2::update-credits:used-credits-exceed-max-credits");
-    }
-
-    // Mechanics Setters
-    function addMechanic(address _mechanic) external override onlyGovernor {
-        _addMechanic(_mechanic);
-    }
-
-    function removeMechanic(address _mechanic) external override onlyGovernor {
-        _removeMechanic(_mechanic);
-    }
-
-    // Mechanics Modifiers
-    modifier onlyGovernorOrMechanic() {
-        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
-        _;
     }
 }
