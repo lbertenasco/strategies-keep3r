@@ -19,7 +19,11 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
 
     EnumerableSet.AddressSet internal _availableVaults;
 
-    constructor(address _keep3rProxyJob, uint256 _earnCooldown) public MachineryReady() Keep3rJob(_keep3rProxyJob) {
+    constructor(
+        address _mechanicsRegistry,
+        address _keep3rProxyJob,
+        uint256 _earnCooldown
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         _setEarnCooldown(_earnCooldown);
     }
 

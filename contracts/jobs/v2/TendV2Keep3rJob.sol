@@ -35,6 +35,7 @@ contract TendV2Keep3rJob is MachineryReady, V2Keep3rJob, ITendV2Keep3rJob {
     uint256 public maxCredits;
 
     constructor(
+        address _mechanicsRegistry,
         address _keep3rProxyJob,
         address _v2Keeper,
         address _keep3r,
@@ -42,7 +43,7 @@ contract TendV2Keep3rJob is MachineryReady, V2Keep3rJob, ITendV2Keep3rJob {
         address _slidingOracle,
         uint256 _tendCooldown,
         uint256 _maxCredits
-    ) public MachineryReady() V2Keep3rJob(_keep3rProxyJob, _v2Keeper) {
+    ) public MachineryReady(_mechanicsRegistry) V2Keep3rJob(_keep3rProxyJob, _v2Keeper) {
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
