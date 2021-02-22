@@ -22,12 +22,13 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
     IKeep3rEscrow public Escrow2;
 
     constructor(
+        address _mechanicsRegistry,
         address _keep3r,
         address _keep3rProxyJob,
         address _liquidity,
         address _escrow1,
         address _escrow2
-    ) public MachineryReady() Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         Keep3rV1 = IKeep3rV1(_keep3r);
         Liquidity = IERC20(_liquidity);
         Escrow1 = IKeep3rEscrow(_escrow1);

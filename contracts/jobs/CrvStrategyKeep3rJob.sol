@@ -20,7 +20,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
-    constructor(address _keep3rProxyJob) public MachineryReady() Keep3rJob(_keep3rProxyJob) {}
+    constructor(address _mechanicsRegistry, address _keep3rProxyJob) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {}
 
     // Setters
     function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external override onlyGovernor {
