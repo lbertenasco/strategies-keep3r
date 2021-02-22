@@ -4,22 +4,22 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../../proxy-job/Keep3rJob.sol";
 import "../../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../../interfaces/keep3r/IKeep3rV1Helper.sol";
-import "../../../interfaces/yearn/IBaseStrategy.sol";
 import "../../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
+import "../../../interfaces/yearn/IBaseStrategy.sol";
 
-contract V2Keeper is MachineryReady, IV2Keeper {
+contract V2Keeper is UtilsReady, IV2Keeper {
     using SafeMath for uint256;
 
     EnumerableSet.AddressSet internal _v2Jobs;
 
-    constructor() public MachineryReady() {}
+    constructor() public UtilsReady() {}
 
     // Setters
     function addJobs(address[] calldata _jobs) external override onlyGovernor {
@@ -48,5 +48,20 @@ contract V2Keeper is MachineryReady, IV2Keeper {
         for (uint256 i; i < _v2Jobs.length(); i++) {
             _jobs[i] = _v2Jobs.at(i);
         }
+    }
+
+    // Modifiers
+    modifier onlyV2Job() {
+        require(_v2Jobs.contains(msg.sender), "v2-keeper::only-v2-job:sender-not-v2-job");
+        _;
+    }
+
+    // Jobs actions
+    function tend(address _strategy) external override onlyV2Job {
+        IBaseStrategy(_strategy).tend();
+    }
+
+    function harvest(address _strategy) external override onlyV2Job {
+        IBaseStrategy(_strategy).harvest();
     }
 }
