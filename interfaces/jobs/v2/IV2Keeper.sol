@@ -14,4 +14,9 @@ interface IV2Keeper {
     function addJob(address _job) external;
 
     function removeJob(address _job) external;
+
+    // Jobs actions
+    function tend(address _strategy) external;
+
+    function harvest(address _strategy) external;
 }

@@ -7,14 +7,14 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
-import "../../proxy-job/Keep3rJob.sol";
+import "./V2Keep3rJob.sol";
 import "../../../interfaces/jobs/v2/ITendV2Keep3rJob.sol";
 
 import "../../../interfaces/keep3r/IKeep3rV1Helper.sol";
 import "../../../interfaces/yearn/IBaseStrategy.sol";
 import "../../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 
-contract TendV2Keep3rJob is MachineryReady, Keep3rJob, ITendV2Keep3rJob {
+contract TendV2Keep3rJob is MachineryReady, V2Keep3rJob, ITendV2Keep3rJob {
     using SafeMath for uint256;
 
     address public constant KP3R = address(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44);
@@ -36,12 +36,13 @@ contract TendV2Keep3rJob is MachineryReady, Keep3rJob, ITendV2Keep3rJob {
 
     constructor(
         address _keep3rProxyJob,
+        address _v2Keeper,
         address _keep3r,
         address _keep3rHelper,
         address _slidingOracle,
         uint256 _tendCooldown,
         uint256 _maxCredits
-    ) public MachineryReady() Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady() V2Keep3rJob(_keep3rProxyJob, _v2Keeper) {
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
@@ -165,7 +166,7 @@ contract TendV2Keep3rJob is MachineryReady, Keep3rJob, ITendV2Keep3rJob {
     }
 
     function _tend(address _strategy) internal {
-        IBaseStrategy(_strategy).tend();
+        V2Keeper.tend(_strategy);
         lastTendAt[_strategy] = block.timestamp;
     }
 
