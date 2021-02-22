@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../proxy-job/Keep3rJob.sol";
@@ -12,7 +12,7 @@ import "../../interfaces/jobs/IKeep3rEscrowJob.sol";
 
 import "../../interfaces/keep3r/IKeep3rEscrow.sol";
 
-contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
+contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
     using SafeMath for uint256;
 
     IKeep3rV1 public Keep3rV1;
@@ -27,7 +27,7 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
         address _liquidity,
         address _escrow1,
         address _escrow2
-    ) public UtilsReady() Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady() Keep3rJob(_keep3rProxyJob) {
         Keep3rV1 = IKeep3rV1(_keep3r);
         Liquidity = IERC20(_liquidity);
         Escrow1 = IKeep3rEscrow(_escrow1);
@@ -214,20 +214,5 @@ contract Keep3rEscrowJob is UtilsReady, Keep3rJob, IKeep3rEscrowJob {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::removeLiquidityFromJob:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         Escrow.sendDust(_to, _token, _amount);
-    }
-
-    // Mechanics Setters
-    function addMechanic(address _mechanic) external override onlyGovernor {
-        _addMechanic(_mechanic);
-    }
-
-    function removeMechanic(address _mechanic) external override onlyGovernor {
-        _removeMechanic(_mechanic);
-    }
-
-    // Mechanics Modifiers
-    modifier onlyGovernorOrMechanic() {
-        require(isGovernor(msg.sender) || isMechanic(msg.sender), "CrvStrategyKeep3rJob::onlyGovernorOrMechanic:invalid-msg-sender");
-        _;
     }
 }

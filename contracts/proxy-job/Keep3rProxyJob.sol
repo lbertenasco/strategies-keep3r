@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
