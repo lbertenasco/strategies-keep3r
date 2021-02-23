@@ -1,3 +1,4 @@
+const axios = require('axios');
 const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
@@ -33,11 +34,36 @@ function promptAndSubmit() {
             );
           }
 
-          const v2Strategies = [
-            { address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C' },
-            { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
-            { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
-          ];
+          console.log('using vaults.finance/all API as registry');
+          const response = await axios.get('https://vaults.finance/all');
+          const vaults = response.data
+            .filter((vault) => vault.type === 'v2')
+            .map((vault) => ({
+              address: vault.address,
+              strategies: vault.strategies,
+              decimals: vault.decimals,
+              name: vault.name,
+              endorsed: vault.endorsed,
+              symbol: vault.symbol,
+              token: {
+                address: vault.token.address,
+                name: vault.token.name,
+                symbol: vault.token.symbol,
+                decimals: vault.token.decimals,
+              },
+            }));
+          const endorsedVaults = vaults.filter((vault) => vault.endorsed);
+          console.log(endorsedVaults.length, 'endorsed v2 vaults');
+
+          // HARDCODED v2 Strats
+          // const v2Strategies = [
+          //   { address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C' },
+          //   { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
+          //   { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
+          // ];
+          const v2Strategies = endorsedVaults
+            .map((vault) => vault.strategies)
+            .flat();
 
           for (const strategy of v2Strategies) {
             strategy.contract = await ethers.getContractAt(
@@ -45,20 +71,38 @@ function promptAndSubmit() {
               strategy.address,
               deployer
             );
-            strategy.vault = await strategy.contract.callStatic.vault();
+
+            // keep3r setup and contract overwrite
             strategy.keeper = await strategy.contract.callStatic.keeper();
+            await hre.network.provider.request({
+              method: 'hardhat_impersonateAccount',
+              params: [strategy.keeper],
+            });
+            strategy.keeperAccount = owner.provider.getUncheckedSigner(
+              strategy.keeper
+            );
+            strategy.contract = await ethers.getContractAt(
+              'IBaseStrategy',
+              strategy.address,
+              strategy.keeperAccount
+            );
+            (
+              await ethers.getContractFactory('ForceETH')
+            ).deploy(strategy.keeper, { value: e18.mul(100) });
+
+            strategy.vault = await strategy.contract.callStatic.vault();
             strategy.want = await strategy.contract.callStatic.want();
             strategy.name = await strategy.contract.callStatic.name();
             strategy.wantContract = await ethers.getContractAt(
               'ERC20Mock',
               strategy.want,
-              deployer
+              strategy.keeperAccount
             );
             strategy.decimals = await strategy.wantContract.callStatic.decimals();
             strategy.vaultContract = await ethers.getContractAt(
               'VaultAPI',
               strategy.vault,
-              deployer
+              strategy.keeperAccount
             );
             strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
           }
@@ -70,11 +114,27 @@ function promptAndSubmit() {
             const harvestable = await strategy.contract.callStatic.harvestTrigger(
               gasPrice.mul(gasLimit)
             );
-            console.log(strategy.address, 'harvestable:', harvestable);
+            const tendable = await strategy.contract.callStatic.tendTrigger(
+              gasPrice.mul(gasLimit)
+            );
+
+            console.log(
+              strategy.address,
+              'harvestable:',
+              harvestable,
+              'tendable:',
+              tendable
+            );
+
             if (harvestable)
               console.log(
                 `harvest with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
               );
+            if (tendable)
+              console.log(
+                `tend with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
+              );
+            console.log();
           }
 
           for (const strategy of v2Strategies) {
@@ -159,7 +219,7 @@ function logVaultData(strategy, params) {
       strategy.vaultTotalAssets
         .sub(params.totalDebt)
         .mul(10_000)
-        .div(params.debtRatio),
+        .div(params.debtRatio.eq(0) ? 10_000 : params.debtRatio),
       strategy.decimals
     )
   );
