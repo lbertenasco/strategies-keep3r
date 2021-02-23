@@ -4,11 +4,17 @@ const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { gwei, e18, bnToDecimal } = require('../../utils/web3-utils');
 const taichi = require('../../utils/taichi');
+const registryData = require('../../utils/v1-registry-data.json');
 
 const selectStrategyPrompt = new Select({
   name: 'strategy',
   message: 'Select a crv strategy to stealth harvest',
   choices: ['ycrv', 'busd', 'sbtc', 'pool3', 'comp', 'gusd3crv', 'musd'],
+});
+const earnVaultPrompt = new Toggle({
+  message: 'Send vault.earn tx first?',
+  enabled: 'Yes',
+  disabled: 'No',
 });
 const customGasPrompt = new Toggle({
   message: 'Send custom gasPrice?',
@@ -58,18 +64,14 @@ function run() {
         signer
       );
 
-      // console.time('current strategist')
       const strategist = await strategyContract.strategist();
       console.log(
-        `${strategy}.strategist()`,
+        `${strategy}.strategist():`,
         strategist == crvStrategyKeep3r.address
           ? 'crvStrategyKeep3r'
           : strategist
       );
-      // console.timeEnd('current strategist')
 
-      console.log(`calculating harvest for: ${strategy}. please wait ...`);
-      // console.time('calculateHarvest')
       console.log(
         `calculateHarvest(${strategy})`,
         (
@@ -80,7 +82,41 @@ function run() {
           .div(e18)
           .toString()
       );
-      // console.timeEnd('calculateHarvest')
+
+      // Setup vault
+      const vaultData = registryData.find(
+        (data) => data.strategy === strategyContract.address
+      );
+      const vault = {
+        contract: await ethers.getContractAt(
+          'IV1Vault',
+          vaultData.address,
+          owner
+        ),
+      };
+      vault.token = await vault.contract.token();
+      vault.tokenContract = await ethers.getContractAt(
+        'ERC20Mock',
+        vault.token
+      );
+      vault.tokenSymbol = await vault.tokenContract.symbol();
+      vault.tokenDecimals = await vault.tokenContract.decimals();
+      vault.available = await vault.contract.available();
+      vault.decimals = await vault.contract.decimals();
+      // TODO print available with token decimals and token name
+      console.log(
+        vault.tokenSymbol,
+        'available in vault:',
+        bnToDecimal(vault.available, vault.tokenDecimals)
+      );
+      await vault.contract.earn();
+      console.log(
+        'after earn:',
+        bnToDecimal(await vault.contract.available(), vault.tokenDecimals)
+      );
+
+      let sendVaultEarnTx = await earnVaultPrompt.run();
+
       const gasResponse = await taichi.getGasPrice();
       console.log('taichi gasPrices:', {
         fast: Math.floor(gasResponse.data.fast / 10 ** 9),
@@ -114,13 +150,23 @@ function run() {
         console.log('using account nonce:', nonce.toNumber());
       }
 
-      const rawMessage = await crvStrategyKeep3r.populateTransaction.forceHarvest(
-        strategyContract.address,
-        {
-          gasPrice,
-          nonce,
-        }
-      );
+      let rawMessage;
+      if (sendVaultEarnTx) {
+        rawMessage = await vault.contract
+          .connect(signer)
+          .populateTransaction.earn({
+            gasPrice,
+            nonce,
+          });
+      } else {
+        rawMessage = await crvStrategyKeep3r.populateTransaction.forceHarvest(
+          strategyContract.address,
+          {
+            gasPrice,
+            nonce,
+          }
+        );
+      }
 
       const signedMessage = await signer.signTransaction(rawMessage);
 
