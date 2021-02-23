@@ -17,4 +17,8 @@ interface IV1Vault {
     function governance() external view returns (address);
 
     function getPricePerFullShare() external view returns (uint256);
+
+    function available() external view returns (uint256);
+
+    function earn() external;
 }
