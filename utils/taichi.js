@@ -1,9 +1,7 @@
 const axios = require('axios');
-// TODO Remove console.logs
 const getGasPrice = async () => {
   try {
     const res = await axios.get('https://www.gasnow.org/api/v3/gas/price');
-    // console.log(res.data);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -22,7 +20,6 @@ const sendPrivateTransaction = async (signedMessage) => {
         id: 1,
       }
     );
-    console.log(res.data);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -35,7 +32,6 @@ const queryPrivateTransaction = async (txHash) => {
     const res = await axios.get(
       'https://api.taichi.network:10001/txscan/priTx?txHash=' + txHash
     );
-    console.log(res.data);
     return res.data;
   } catch (error) {
     console.error(error);

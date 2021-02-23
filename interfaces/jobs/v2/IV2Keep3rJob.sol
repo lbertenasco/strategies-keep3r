@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.6.8;
 
-interface ITendV2Keep3rJob {
+interface IV2Keep3rJob {
     event Keep3rSet(address keep3r);
     event Keep3rHelperSet(address keep3rHelper);
     event SlidingOracleSet(address slidingOracle);
@@ -14,22 +14,22 @@ interface ITendV2Keep3rJob {
     // Getters
     function strategies() external view returns (address[] memory);
 
-    event TendStrategyAdded(address _strategy, uint256 _requiredTend);
+    event StrategyAdded(address _strategy, uint256 _requiredAmount);
 
-    event TendStrategyModified(address _strategy, uint256 _requiredTend);
+    event StrategyModified(address _strategy, uint256 _requiredAmount);
 
-    event TendStrategyRemoved(address _strategy);
+    event StrategyRemoved(address _strategy);
 
     // Setters
-    function setTendCooldown(uint256 _tendCooldown) external;
+    function setWorkCooldown(uint256 _workCooldown) external;
 
     function setMaxCredits(uint256 _maxCredits) external;
 
-    function addStrategies(address[] calldata _strategy, uint256[] calldata _requiredTend) external;
+    function addStrategies(address[] calldata _strategy, uint256[] calldata _requiredAmount) external;
 
-    function addStrategy(address _strategy, uint256 _requiredTend) external;
+    function addStrategy(address _strategy, uint256 _requiredAmount) external;
 
-    function updateRequiredTendAmount(address _strategy, uint256 _requiredTend) external;
+    function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external;
 
     function removeStrategy(address _strategy) external;
 

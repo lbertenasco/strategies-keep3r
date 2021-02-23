@@ -2,7 +2,7 @@ const { Confirm, NumberPrompt, Select, Toggle } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
-const { gwei, e18 } = require('../../utils/web3-utils');
+const { gwei, e18, bnToDecimal } = require('../../utils/web3-utils');
 const taichi = require('../../utils/taichi');
 
 const selectStrategyPrompt = new Select({
@@ -81,19 +81,23 @@ function run() {
           .toString()
       );
       // console.timeEnd('calculateHarvest')
-
+      const gasResponse = await taichi.getGasPrice();
+      console.log('taichi gasPrices:', {
+        fast: Math.floor(gasResponse.data.fast / 10 ** 9),
+        standard: Math.floor(gasResponse.data.standard / 10 ** 9),
+        slow: Math.floor(gasResponse.data.slow / 10 ** 9),
+      });
       let gasPrice;
       if (await customGasPrompt.run()) {
         gasPrice = await gasPricePrompt.run();
         console.log('using custom gasPrice in gwei:', gasPrice);
         gasPrice = gwei.mul(gasPrice);
       } else {
-        const gasResponse = await taichi.getGasPrice();
         gasPrice = ethers.BigNumber.from(gasResponse.data.fast);
         console.log('gasPrice in gwei:', gasPrice.div(gwei).toNumber());
       }
 
-      const maxGwei = 200;
+      const maxGwei = 220;
       if (gasPrice.gt(gwei.mul(maxGwei))) {
         reject(`gas price > ${maxGwei}gwei`);
       }
@@ -124,22 +128,29 @@ function run() {
 
       if ((await sendTxPrompt.run()) == false) {
         console.log('not sending tx, bye :)');
-        resolve();
+        return resolve();
       }
 
       const res = await taichi.sendPrivateTransaction(signedMessage);
-      const privateTxHash = res.result;
+      if (res.error) {
+        return reject(res.error.message);
+      }
 
+      const privateTxHash = res.result;
       console.log({ privateTxHash });
 
       if (!privateTxHash) {
-        reject('no privateTxHash from taichi');
+        return reject('no privateTxHash from taichi');
       }
       let received;
       while (!received) {
+        await new Promise((r) => setTimeout(r, 2000)); // sleeps 2s
         const query = await taichi.queryPrivateTransaction(privateTxHash);
         received = query.success && query.obj.status == 'pending';
-        await new Promise((r) => setTimeout(r, 2000)); // sleeps 2s
+        if (received) {
+          console.log('received tx:');
+          console.log(query.obj);
+        }
       }
 
       resolve();
