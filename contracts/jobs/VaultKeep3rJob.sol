@@ -4,6 +4,7 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
+import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../proxy-job/Keep3rJob.sol";
 import "../../interfaces/jobs/IVaultKeep3rJob.sol";
@@ -13,18 +14,23 @@ import "../../interfaces/yearn/IEarnableVault.sol";
 contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     using SafeMath for uint256;
 
+    address public keep3r;
+    uint256 public usedCredits;
+    uint256 public maxCredits;
+
     mapping(address => uint256) public requiredEarn;
     mapping(address => uint256) public lastEarnAt;
     uint256 public earnCooldown;
-
     EnumerableSet.AddressSet internal _availableVaults;
 
     constructor(
         address _mechanicsRegistry,
         address _keep3rProxyJob,
-        uint256 _earnCooldown
+        uint256 _earnCooldown,
+        uint256 _maxCredits
     ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         _setEarnCooldown(_earnCooldown);
+        _setMaxCredits(_maxCredits);
     }
 
     // Setters
@@ -111,7 +117,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob {
+    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
         address _vault = decodeWorkData(_workData);
         require(_workable(_vault), "VaultKeep3rJob::earn:not-workable");
 
@@ -120,7 +126,17 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         emit Worked(_vault);
     }
 
-    // Governor keeper bypass
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
+        _setMaxCredits(_maxCredits);
+    }
+
+    function _setMaxCredits(uint256 _maxCredits) internal {
+        usedCredits = 0;
+        maxCredits = _maxCredits;
+    }
+
+    // Mechanics keeper bypass
     function forceWork(address _vault) external override onlyGovernorOrMechanic {
         _earn(_vault);
         emit ForceWorked(_vault);
@@ -129,5 +145,13 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     function _earn(address _vault) internal {
         IEarnableVault(_vault).earn();
         lastEarnAt[_vault] = block.timestamp;
+    }
+
+    modifier updateCredits() {
+        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
+        _;
+        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
+        usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
+        require(usedCredits <= maxCredits, "VaultKeep3rJob::update-credits:used-credits-exceed-max-credits");
     }
 }

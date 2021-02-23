@@ -22,6 +22,8 @@ interface IVaultKeep3rJob {
 
     function setEarnCooldown(uint256 _earnCooldown) external;
 
+    function setMaxCredits(uint256 _maxCredits) external;
+
     // Getters
     function vaults() external view returns (address[] memory _vaults);
 
