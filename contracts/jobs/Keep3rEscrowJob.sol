@@ -28,7 +28,7 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
         address _liquidity,
         address _escrow1,
         address _escrow2
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, 0) {
         Keep3rV1 = IKeep3rV1(_keep3r);
         Liquidity = IERC20(_liquidity);
         Escrow1 = IKeep3rEscrow(_escrow1);
@@ -161,33 +161,33 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
         }
     }
 
-    function returnLPsToGovernance(address _escrow) external override onlyGovernor {
+    function returnLPsToGovernance(address _escrow) external override onlyGovernorOrMechanic {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::returnLPsToGovernance:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         Escrow.returnLPsToGovernance();
     }
 
-    function addLiquidityToJob(address _escrow) external override onlyGovernor {
+    function addLiquidityToJob(address _escrow) external override onlyGovernorOrMechanic {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::addLiquidityToJob:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         uint256 _amount = Liquidity.balanceOf(address(Escrow));
         Escrow.addLiquidityToJob(address(Liquidity), address(Keep3rProxyJob), _amount);
     }
 
-    function applyCreditToJob(address _escrow) external override onlyGovernor {
+    function applyCreditToJob(address _escrow) external override onlyGovernorOrMechanic {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::applyCreditToJob:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         Escrow.applyCreditToJob(address(Escrow), address(Liquidity), address(Keep3rProxyJob));
     }
 
-    function unbondLiquidityFromJob(address _escrow) external override onlyGovernor {
+    function unbondLiquidityFromJob(address _escrow) external override onlyGovernorOrMechanic {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::unbondLiquidityFromJob:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         uint256 _amount = Keep3rV1.liquidityProvided(address(Escrow), address(Liquidity), address(Keep3rProxyJob));
         Escrow.unbondLiquidityFromJob(address(Liquidity), address(Keep3rProxyJob), _amount);
     }
 
-    function removeLiquidityFromJob(address _escrow) external override onlyGovernor {
+    function removeLiquidityFromJob(address _escrow) external override onlyGovernorOrMechanic {
         require(_escrow == address(Escrow1) || _escrow == address(Escrow2), "Keep3rEscrowJob::removeLiquidityFromJob:invalid-escrow");
         IKeep3rEscrow Escrow = IKeep3rEscrow(_escrow);
         Escrow.removeLiquidityFromJob(address(Liquidity), address(Keep3rProxyJob));

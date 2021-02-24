@@ -22,13 +22,16 @@ interface IVaultKeep3rJob {
 
     function setEarnCooldown(uint256 _earnCooldown) external;
 
-    function setMaxCredits(uint256 _maxCredits) external;
-
     // Getters
     function vaults() external view returns (address[] memory _vaults);
 
     function calculateEarn(address _vault) external view returns (uint256 _amount);
 
-    // Governor work bypass
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external;
+
+    function setMaxGasPrice(uint256 _maxGasPrice) external;
+
+    // Mechanics keeper bypass
     function forceWork(address _vault) external;
 }

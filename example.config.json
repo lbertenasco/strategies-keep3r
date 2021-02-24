@@ -25,6 +25,9 @@
           "genericV2Keep3rJob": "0xf796c1a96c1E803cb748F2E7124B427536277480"
         }
       },
+      "mechanics": {
+        "registry": ""
+      },
       "genericV2Keep3rJob": {
         "keep3rHelper": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",
         "slidingOracle": "0x73353801921417F465377c8d898c6f4C0270282C"
@@ -114,86 +117,5 @@
         "address": "0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
       }
     }
-  },
-  "keep3r": {
-    "address": "0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44"
-  },
-  "ycrv": {
-    "address": "0x07DB4B9b3951094B9E278D336aDf46a036295DE7"
-  },
-  "busd": {
-    "address": "0x112570655b32A8c747845E0215ad139661e66E7F"
-  },
-  "sbtc": {
-    "address": "0x6D6c1AD13A5000148Aa087E7CbFb53D402c81341"
-  },
-  "pool3": {
-    "address": "0xC59601F0CC49baa266891b7fc63d2D5FE097A79D"
-  },
-  "comp": {
-    "address": "0x530da5aeF3c8f9CCbc75C97C182D6ee2284B643F"
-  },
-  "gusd": {
-    "address": "0xc8327D8E1094a94466e05a2CC1f10fA70a1dF119"
-  },
-  "gusdVoter": {
-    "address": "0xD42eC70A590C6bc11e9995314fdbA45B4f74FABb"
-  },
-  "musd": {
-    "address": "0xBA0c07BBE9C22a1ee33FE988Ea3763f21D0909a0"
-  },
-  "crvStrategyKeep3r": {
-    "address": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D"
-  },
-  "dforce-usdc": {
-    "address": "0xA30d1D98C502378ad61Fe71BcDc3a808CF60b897"
-  },
-  "dforce-usdt": {
-    "address": "0x787C771035bDE631391ced5C083db424A4A64bD8"
-  },
-  "dforceStrategyKeep3r": {
-    "address": "0x30084324619D9645019C3f2cb3a94611601a3078"
-  },
-  "mkr-dai": {
-    "address": "0x932fc4fd0eEe66F22f1E23fBA74D7058391c0b15"
-  },
-  "ycrvVault": {
-    "address": "0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c"
-  },
-  "busdVault": {
-    "address": "0x2994529C0652D127b7842094103715ec5299bBed"
-  },
-  "sbtcVault": {
-    "address": "0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6"
-  },
-  "pool3Vault": {
-    "address": "0x9cA85572E6A3EbF24dEDd195623F188735A5179f"
-  },
-  "compVault": {
-    "address": "0x629c759D1E83eFbF63d84eb3868B564d9521C129"
-  },
-  "usdtVault": {
-    "address": "0x2f08119C6f07c006695E079AAFc638b8789FAf18"
-  },
-  "tusdVault": {
-    "address": "0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a"
-  },
-  "musdVault": {
-    "address": "0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF"
-  },
-  "gusdVault": {
-    "address": "0xcC7E70A958917cCe67B4B87a8C30E6297451aE98"
-  },
-  "yvUSDC": {
-    "address": "0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e"
-  },
-  "musdVault2": {
-    "address": "0xE0db48B4F71752C4bEf16De1DBD042B82976b8C7"
-  },
-  "eursVault": {
-    "address": "0x98B058b2CBacF5E99bC7012DF757ea7CFEbd35BC"
-  },
-  "vaultKeep3r": {
-    "address": "0x054A87DdFdE3ccb5DDB03739375329BcC1b03203"
   }
 }

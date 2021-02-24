@@ -4,7 +4,6 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
-import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../proxy-job/Keep3rJob.sol";
 import "../../interfaces/jobs/IVaultKeep3rJob.sol";
@@ -13,10 +12,6 @@ import "../../interfaces/yearn/IEarnableVault.sol";
 
 contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     using SafeMath for uint256;
-
-    address public keep3r;
-    uint256 public usedCredits;
-    uint256 public maxCredits;
 
     mapping(address => uint256) public requiredEarn;
     mapping(address => uint256) public lastEarnAt;
@@ -28,20 +23,19 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         address _keep3rProxyJob,
         uint256 _earnCooldown,
         uint256 _maxCredits
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, _maxCredits) {
         _setEarnCooldown(_earnCooldown);
-        _setMaxCredits(_maxCredits);
     }
 
     // Setters
-    function addVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external override onlyGovernor {
+    function addVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external override onlyGovernorOrMechanic {
         require(_vaults.length == _requiredEarns.length, "VaultKeep3rJob::add-vaults:vaults-required-earns-different-length");
         for (uint256 i; i < _vaults.length; i++) {
             _addVault(_vaults[i], _requiredEarns[i]);
         }
     }
 
-    function addVault(address _vault, uint256 _requiredEarn) external override onlyGovernor {
+    function addVault(address _vault, uint256 _requiredEarn) external override onlyGovernorOrMechanic {
         _addVault(_vault, _requiredEarn);
     }
 
@@ -52,13 +46,13 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         emit VaultAdded(_vault, _requiredEarn);
     }
 
-    function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernor {
+    function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernorOrMechanic {
         require(requiredEarn[_vault] > 0, "VaultKeep3rJob::update-required-earn:vault-not-added");
         _setRequiredEarn(_vault, _requiredEarn);
         emit VaultModified(_vault, _requiredEarn);
     }
 
-    function removeVault(address _vault) external override onlyGovernor {
+    function removeVault(address _vault) external override onlyGovernorOrMechanic {
         require(requiredEarn[_vault] > 0, "VaultKeep3rJob::remove-vault:vault-not-added");
         requiredEarn[_vault] = 0;
         _availableVaults.remove(_vault);
@@ -70,7 +64,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         requiredEarn[_vault] = _requiredEarn;
     }
 
-    function setEarnCooldown(uint256 _earnCooldown) external override onlyGovernor {
+    function setEarnCooldown(uint256 _earnCooldown) external override onlyGovernorOrMechanic {
         _setEarnCooldown(_earnCooldown);
     }
 
@@ -104,7 +98,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         return IEarnableVault(_vault).available();
     }
 
-    function workable() public override returns (bool) {
+    function workable() public override notPaused returns (bool) {
         for (uint256 i; i < _availableVaults.length(); i++) {
             if (_workable(_availableVaults.at(i))) return true;
         }
@@ -117,7 +111,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
+    function work(bytes memory _workData) external override notPaused onlyProxyJob limitGasPrice updateCredits {
         address _vault = decodeWorkData(_workData);
         require(_workable(_vault), "VaultKeep3rJob::earn:not-workable");
 
@@ -131,9 +125,8 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         _setMaxCredits(_maxCredits);
     }
 
-    function _setMaxCredits(uint256 _maxCredits) internal {
-        usedCredits = 0;
-        maxCredits = _maxCredits;
+    function setMaxGasPrice(uint256 _maxGasPrice) external override onlyGovernorOrMechanic {
+        _setMaxGasPrice(_maxGasPrice);
     }
 
     // Mechanics keeper bypass
@@ -145,13 +138,5 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     function _earn(address _vault) internal {
         IEarnableVault(_vault).earn();
         lastEarnAt[_vault] = block.timestamp;
-    }
-
-    modifier updateCredits() {
-        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
-        _;
-        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
-        usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
-        require(usedCredits <= maxCredits, "VaultKeep3rJob::update-credits:used-credits-exceed-max-credits");
     }
 }

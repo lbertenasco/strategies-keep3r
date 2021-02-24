@@ -56,14 +56,14 @@ function promptAndSubmit() {
           console.log(endorsedVaults.length, 'endorsed v2 vaults');
 
           // HARDCODED v2 Strats
-          // const v2Strategies = [
-          //   { address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C' },
-          //   { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
-          //   { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
-          // ];
-          const v2Strategies = endorsedVaults
-            .map((vault) => vault.strategies)
-            .flat();
+          const v2Strategies = [
+            { address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C' },
+            { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
+            { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
+          ];
+          // const v2Strategies = endorsedVaults
+          //   .map((vault) => vault.strategies)
+          //   .flat();
 
           for (const strategy of v2Strategies) {
             strategy.contract = await ethers.getContractAt(
@@ -200,9 +200,9 @@ function logData(strategy, params) {
     'performanceFee:',
     params.performanceFee.toNumber(),
     'activation:',
-    new Date(params.activation.toNumber()).toUTCString(),
+    new Date(parseInt(params.activation.mul(1000).toString())).toUTCString(),
     'lastReport:',
-    new Date(params.lastReport.toNumber()).toUTCString()
+    new Date(parseInt(params.lastReport.mul(1000).toString())).toUTCString()
   );
 }
 
