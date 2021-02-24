@@ -20,10 +20,14 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
-    constructor(address _mechanicsRegistry, address _keep3rProxyJob) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {}
+    constructor(
+        address _mechanicsRegistry,
+        address _keep3rProxyJob,
+        uint256 _maxCredits
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, _maxCredits) {}
 
     // Setters
-    function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external override onlyGovernor {
+    function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external override onlyGovernorOrMechanic {
         require(
             _strategies.length == _requiredHarvests.length,
             "CrvStrategyKeep3rJob::add-strategies:strategies-required-harvests-different-length"
@@ -33,7 +37,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         }
     }
 
-    function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
+    function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernorOrMechanic {
         _addStrategy(_strategy, _requiredHarvest);
     }
 
@@ -44,13 +48,13 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         emit StrategyAdded(_strategy, _requiredHarvest);
     }
 
-    function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernor {
+    function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernorOrMechanic {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::update-required-harvest:strategy-not-added");
         _setRequiredHarvest(_strategy, _requiredHarvest);
         emit StrategyModified(_strategy, _requiredHarvest);
     }
 
-    function removeStrategy(address _strategy) external override onlyGovernor {
+    function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::remove-strategy:strategy-not-added");
         requiredHarvest[_strategy] = 0;
         _availableStrategies.remove(_strategy);
@@ -89,7 +93,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         return ICrvClaimable(_gauge).claimable_tokens(_voter);
     }
 
-    function workable() public override returns (bool) {
+    function workable() public override notPaused returns (bool) {
         for (uint256 i; i < _availableStrategies.length(); i++) {
             if (_workable(_availableStrategies.at(i))) return true;
         }
@@ -102,7 +106,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob {
+    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
         address _strategy = decodeWorkData(_workData);
         require(_workable(_strategy), "CrvStrategyKeep3rJob::harvest:not-workable");
 
@@ -111,7 +115,12 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         emit Worked(_strategy);
     }
 
-    // Governor keeper bypass
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
+        _setMaxCredits(_maxCredits);
+    }
+
+    // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _harvest(_strategy);
         emit ForceWorked(_strategy);

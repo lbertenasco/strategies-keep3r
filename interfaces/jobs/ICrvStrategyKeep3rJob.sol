@@ -25,6 +25,9 @@ interface ICrvStrategyKeep3rJob {
 
     function calculateHarvest(address _strategy) external returns (uint256 _amount);
 
-    // Governor work bypass
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external;
+
+    // Mechanics keeper bypass
     function forceWork(address _strategy) external;
 }

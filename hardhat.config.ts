@@ -20,11 +20,11 @@ module.exports = {
         //   url: process.env.LOCAL_MAINNET_HTTPS_URL,
         //   accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
         // },
-        // mainnet: {
-        //   url: process.env.MAINNET_HTTPS_URL,
-        //   accounts: [process.env.MAINNET_PRIVATE_KEY],
-        //   gasPrice: 'auto',
-        // },
+        mainnet: {
+          url: process.env.MAINNET_HTTPS_URL,
+          accounts: [process.env.MAINNET_PRIVATE_KEY],
+          gasPrice: 30000000000, // 30 gwei
+        },
       },
   solidity: {
     compilers: [

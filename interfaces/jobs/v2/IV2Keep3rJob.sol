@@ -23,8 +23,6 @@ interface IV2Keep3rJob {
     // Setters
     function setWorkCooldown(uint256 _workCooldown) external;
 
-    function setMaxCredits(uint256 _maxCredits) external;
-
     function addStrategies(address[] calldata _strategy, uint256[] calldata _requiredAmount) external;
 
     function addStrategy(address _strategy, uint256 _requiredAmount) external;
@@ -33,6 +31,9 @@ interface IV2Keep3rJob {
 
     function removeStrategy(address _strategy) external;
 
-    // Governor work bypass
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external;
+
+    // Mechanics keeper bypass
     function forceWork(address _strategy) external;
 }

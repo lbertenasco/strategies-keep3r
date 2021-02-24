@@ -52,25 +52,25 @@ contract Keep3rProxyJob is UtilsReady, Keep3r, IKeep3rProxyJob {
     }
 
     // Keep3r-Job actions
-    function workable(address _job) external override returns (bool _workable) {
-        require(isValidJob(_job), "yearnKeep3rProxyJob::workable:invalid-job");
+    function workable(address _job) external override notPaused returns (bool _workable) {
+        require(isValidJob(_job), "Keep3rProxyJob::workable:invalid-job");
         return IKeep3rJob(_job).workable();
     }
 
-    function work(address _job, bytes calldata _workData) external override onlyKeeper paysKeeper {
-        require(isValidJob(_job), "yearnKeep3rProxyJob::work:invalid-job");
+    function work(address _job, bytes calldata _workData) external override notPaused onlyKeeper paysKeeper {
+        require(isValidJob(_job), "Keep3rProxyJob::work:invalid-job");
         IKeep3rJob(_job).work(_workData);
         emit Worked(_job, msg.sender);
     }
 
     // Governable
     function addValidJob(address _job) external onlyGovernor {
-        require(!_validJobs.contains(_job), "yearnKeep3rProxyJob::add-valid-job:job-already-added");
+        require(!_validJobs.contains(_job), "Keep3rProxyJob::add-valid-job:job-already-added");
         _validJobs.add(_job);
     }
 
     function removeValidJob(address _job) external onlyGovernor {
-        require(_validJobs.contains(_job), "yearnKeep3rProxyJob::remove-valid-job:job-not-found");
+        require(_validJobs.contains(_job), "Keep3rProxyJob::remove-valid-job:job-not-found");
         _validJobs.remove(_job);
     }
 

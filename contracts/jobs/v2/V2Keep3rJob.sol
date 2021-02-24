@@ -5,7 +5,6 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
-import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../../proxy-job/Keep3rJob.sol";
 import "../../../interfaces/jobs/v2/IV2Keeper.sol";
@@ -22,7 +21,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
     address public constant WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
     IV2Keeper public V2Keeper;
-    address public keep3r;
     address public keep3rHelper;
     address public slidingOracle;
 
@@ -32,9 +30,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
     mapping(address => uint256) public lastWorkAt;
 
     uint256 public workCooldown;
-
-    uint256 public usedCredits;
-    uint256 public maxCredits;
 
     enum WorkType {tend, harvest}
     WorkType public workType;
@@ -48,17 +43,16 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         address _slidingOracle,
         uint256 _workCooldown,
         uint256 _maxCredits
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, _maxCredits) {
         V2Keeper = IV2Keeper(_v2Keeper);
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
         _setWorkCooldown(_workCooldown);
-        _setMaxCredits(_maxCredits);
     }
 
     // Setters
-    function setWorkCooldown(uint256 _workCooldown) external override onlyGovernor {
+    function setWorkCooldown(uint256 _workCooldown) external override onlyGovernorOrMechanic {
         _setWorkCooldown(_workCooldown);
     }
 
@@ -68,14 +62,14 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
     }
 
     // Governor
-    function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernor {
+    function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernorOrMechanic {
         require(_strategies.length == _requiredAmounts.length, "V2Keep3rJob::add-strategies:strategies-required-works-different-length");
         for (uint256 i; i < _strategies.length; i++) {
             _addStrategy(_strategies[i], _requiredAmounts[i]);
         }
     }
 
-    function addStrategy(address _strategy, uint256 _requiredAmount) external override onlyGovernor {
+    function addStrategy(address _strategy, uint256 _requiredAmount) external override onlyGovernorOrMechanic {
         _addStrategy(_strategy, _requiredAmount);
     }
 
@@ -87,13 +81,13 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         _availableStrategies.add(_strategy);
     }
 
-    function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external override onlyGovernor {
+    function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external override onlyGovernorOrMechanic {
         require(requiredAmount[_strategy] > 0, "V2Keep3rJob::update-required-amount:strategy-not-added");
         _setRequiredAmount(_strategy, _requiredAmount);
         emit StrategyModified(_strategy, _requiredAmount);
     }
 
-    function removeStrategy(address _strategy) external override onlyGovernor {
+    function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
         require(requiredAmount[_strategy] > 0, "V2Keep3rJob::remove-strategy:strategy-not-added");
         delete requiredAmount[_strategy];
         _availableStrategies.remove(_strategy);
@@ -125,7 +119,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         return abi.decode(_workData, (address));
     }
 
-    function workable() public override returns (bool) {
+    function workable() public override notPaused returns (bool) {
         for (uint256 i; i < _availableStrategies.length(); i++) {
             if (_workable(_availableStrategies.at(i))) return true;
         }
@@ -157,11 +151,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         _setMaxCredits(_maxCredits);
     }
 
-    function _setMaxCredits(uint256 _maxCredits) internal {
-        usedCredits = 0;
-        maxCredits = _maxCredits;
-    }
-
     // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _work(_strategy);
@@ -172,13 +161,5 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         if (workType == WorkType.tend) V2Keeper.tend(_strategy);
         if (workType == WorkType.harvest) V2Keeper.harvest(_strategy);
         lastWorkAt[_strategy] = block.timestamp;
-    }
-
-    modifier updateCredits() {
-        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
-        _;
-        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
-        usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
-        require(usedCredits <= maxCredits, "V2Keep3rJob::update-credits:used-credits-exceed-max-credits");
     }
 }
