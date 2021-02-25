@@ -22,9 +22,12 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         address _mechanicsRegistry,
         address _keep3rProxyJob,
         uint256 _earnCooldown,
-        uint256 _maxCredits
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, _maxCredits) {
+        uint256 _maxCredits,
+        uint256 _maxGasPrice
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         _setEarnCooldown(_earnCooldown);
+        _setMaxCredits(_maxCredits);
+        _setMaxGasPrice(_maxGasPrice);
     }
 
     // Setters

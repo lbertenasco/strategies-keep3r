@@ -24,7 +24,9 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         address _mechanicsRegistry,
         address _keep3rProxyJob,
         uint256 _maxCredits
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, _maxCredits) {}
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+        _setMaxCredits(_maxCredits);
+    }
 
     // Setters
     function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external override onlyGovernorOrMechanic {

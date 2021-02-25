@@ -43,12 +43,13 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         address _slidingOracle,
         uint256 _workCooldown,
         uint256 _maxCredits
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob, _maxCredits) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         V2Keeper = IV2Keeper(_v2Keeper);
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
         _setWorkCooldown(_workCooldown);
+        _setMaxCredits(_maxCredits);
     }
 
     // Setters
