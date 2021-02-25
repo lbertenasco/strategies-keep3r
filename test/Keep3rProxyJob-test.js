@@ -46,10 +46,18 @@ describe('Keep3rProxyJob', function () {
     // impersonate lpWhale
     await hre.network.provider.request({
       method: 'hardhat_impersonateAccount',
-      params: ['0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd'],
+      params: ['0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44'],
     });
     const lpWhale = owner.provider.getUncheckedSigner(
-      '0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd'
+      '0x1ceb5cb57c4d4e2b2433641b95dd330a33185a44'
+    );
+    // impersonate ethWhale
+    await hre.network.provider.request({
+      method: 'hardhat_impersonateAccount',
+      params: ['0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'],
+    });
+    const ethWhale = owner.provider.getUncheckedSigner(
+      '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
     );
 
     const keep3r = await ethers.getContractAt(
@@ -75,9 +83,27 @@ describe('Keep3rProxyJob', function () {
     );
     // Add LPs to escrows [not sure why it wont force eth...]
     // (await ethers.getContractFactory('ForceETH')).deploy(lpWhale._address, { value: e18 });
-    // const lpContract = await ethers.getContractAt('ERC20Mock', escrowContracts.lpToken, lpWhale);
-    // await lpContract.transfer(escrowContracts.escrow1, e18.mul(100));
-    // await lpContract.transfer(escrowContracts.escrow2, e18.mul(100));
+    console.log(1);
+    await ethWhale.sendTransaction({
+      to: escrowContracts.escrow1,
+      value: e18.mul(100),
+    });
+
+    console.log(2);
+    const lpContract = await ethers.getContractAt(
+      'ERC20Mock',
+      escrowContracts.lpToken,
+      lpWhale
+    );
+    console.log(3);
+    await lpContract
+      .connect(lpWhale)
+      .transfer(escrowContracts.escrow1, e18.mul(100));
+    console.log(4);
+    await lpContract
+      .connect(lpWhale)
+      .transfer(escrowContracts.escrow2, e18.mul(100));
+    console.log(5);
     const oldKeep3rEscrowJob = await ethers.getContractAt(
       'Keep3rEscrowJob',
       '0x83A34a6469dbFd7654aE6D842d20977E89CcD73D',
