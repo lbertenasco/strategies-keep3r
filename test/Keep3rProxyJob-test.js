@@ -156,13 +156,17 @@ describe('Keep3rProxyJob', function () {
 
     console.log('--');
 
-    const jobs = await keep3rProxyJob.jobs();
+    // Important! use callStatic for all methods (even work) to avoid spending gas
+    // only send work transaction if callStatic.work succedded,
+    // even if workable is true, the job might not have credits to pay and the work tx will revert
+    const jobs = await keep3rProxyJob.callStatic.jobs();
     for (const job of jobs) {
       const workable = await keep3rProxyJob.callStatic.workable(job);
       const jobContract = await ethers.getContractAt('IKeep3rJob', job);
-      const workData = await jobContract.callStatic.getWorkData(); // TODO Change to just workData()
+      const workData = await jobContract.callStatic.getWorkData();
       console.log({ job, workable, workData });
       if (!workable) continue;
+      await keep3rProxyJob.connect(keeper).callStatic.work(job, workData);
       await keep3rProxyJob.connect(keeper).work(job, workData);
       console.log('worked!');
       console.log({ workable: await keep3rProxyJob.callStatic.workable(job) });
