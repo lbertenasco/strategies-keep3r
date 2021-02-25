@@ -31,9 +31,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
 
     uint256 public workCooldown;
 
-    enum WorkType {tend, harvest}
-    WorkType public workType;
-
     constructor(
         address _mechanicsRegistry,
         address _keep3rProxyJob,
@@ -127,14 +124,15 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         return false;
     }
 
-    function _workable(address _strategy) internal view returns (bool) {
+    function _workable(address _strategy) internal view virtual returns (bool) {
         require(requiredAmount[_strategy] > 0, "V2Keep3rJob::workable:strategy-not-added");
         if (block.timestamp > lastWorkAt[_strategy].add(workCooldown)) return false;
+    }
 
-        uint256 kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
-        uint256 ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, kp3rCallCost, WETH);
-        if (workType == WorkType.tend) return IBaseStrategy(_strategy).tendTrigger(ethCallCost);
-        if (workType == WorkType.harvest) return IBaseStrategy(_strategy).harvestTrigger(ethCallCost);
+    // Get eth costs
+    function _getCallCosts(address _strategy) internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
+        _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
+        _ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, _kp3rCallCost, WETH);
     }
 
     // Keep3r actions
@@ -158,9 +156,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         emit ForceWorked(_strategy);
     }
 
-    function _work(address _strategy) internal {
-        if (workType == WorkType.tend) V2Keeper.tend(_strategy);
-        if (workType == WorkType.harvest) V2Keeper.harvest(_strategy);
+    function _work(address _strategy) internal virtual {
         lastWorkAt[_strategy] = block.timestamp;
     }
 }
