@@ -18,11 +18,12 @@ async function main() {
 }
 
 function promptAndSubmit(MechanicsRegistry) {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
+    const [owner] = await ethers.getSigners();
+    console.log('using address:', owner.address);
     try {
       prompt.run().then(async (answer) => {
         if (answer) {
-          const [owner] = await ethers.getSigners();
           console.time('MechanicsRegistry deployed');
           // Setup MechanicsRegistry
           const mechanicsRegistry = await MechanicsRegistry.deploy(
