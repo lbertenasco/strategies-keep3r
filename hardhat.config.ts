@@ -7,25 +7,26 @@ import 'solidity-coverage';
 
 module.exports = {
   defaultNetwork: 'hardhat',
-  networks: process.env.TEST
-    ? {}
-    : {
-        hardhat: {
-          // enabled: process.env.FORK ? true : false,
-          forking: {
+  networks:
+    !process.env.FORK && process.env.TEST
+      ? {}
+      : {
+          hardhat: {
+            // enabled: process.env.FORK ? true : false,
+            forking: {
+              url: process.env.MAINNET_HTTPS_URL,
+            },
+          },
+          // localMainnet: {
+          //   url: process.env.LOCAL_MAINNET_HTTPS_URL,
+          //   accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
+          // },
+          mainnet: {
             url: process.env.MAINNET_HTTPS_URL,
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+            gasPrice: 30000000000, // 30 gwei
           },
         },
-        // localMainnet: {
-        //   url: process.env.LOCAL_MAINNET_HTTPS_URL,
-        //   accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
-        // },
-        mainnet: {
-          url: process.env.MAINNET_HTTPS_URL,
-          accounts: [process.env.MAINNET_PRIVATE_KEY],
-          gasPrice: 30000000000, // 30 gwei
-        },
-      },
   solidity: {
     compilers: [
       {

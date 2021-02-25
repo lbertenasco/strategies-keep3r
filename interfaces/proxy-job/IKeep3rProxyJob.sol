@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
+import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3r.sol";
 
-interface IKeep3rProxyJob {
+interface IKeep3rProxyJob is IKeep3r {
     event Worked(address _job, address _keeper);
 
     function jobs() external view returns (address[] memory validJobs);
