@@ -10,6 +10,8 @@ import "../proxy-job/Keep3rJob.sol";
 import "../../interfaces/jobs/ICrvStrategyKeep3rJob.sol";
 import "../../interfaces/keep3r/IKeep3rEscrow.sol";
 
+import "../../interfaces/yearn/IV1Controller.sol";
+import "../../interfaces/yearn/IV1Vault.sol";
 import "../../interfaces/crv/ICrvStrategy.sol";
 import "../../interfaces/crv/ICrvClaimable.sol";
 
@@ -20,12 +22,16 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
+    uint256 public override availableThreshold;
+
     constructor(
         address _mechanicsRegistry,
         address _keep3rProxyJob,
-        uint256 _maxCredits
+        uint256 _maxCredits,
+        uint256 _availableThreshold
     ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         _setMaxCredits(_maxCredits);
+        _setAvailableThreshold(_availableThreshold);
     }
 
     // Setters
@@ -122,6 +128,14 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         _setMaxCredits(_maxCredits);
     }
 
+    function setAvailableThreshold(uint256 _availableThreshold) external override onlyGovernorOrMechanic {
+        _setAvailableThreshold(_availableThreshold);
+    }
+
+    function _setAvailableThreshold(uint256 _availableThreshold) internal {
+        availableThreshold = _availableThreshold;
+    }
+
     // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _harvest(_strategy);
@@ -129,6 +143,13 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
     }
 
     function _harvest(address _strategy) internal {
-        IHarvestableStrategy(_strategy).harvest();
+        address controller = ICrvStrategy(_strategy).controller();
+        address want = ICrvStrategy(_strategy).want();
+        address vault = IV1Controller(controller).vaults(want);
+        uint256 available = IV1Vault(vault).available();
+        if (available >= availableThreshold) {
+            IV1Vault(vault).earn();
+        }
+        ICrvStrategy(_strategy).harvest();
     }
 }
