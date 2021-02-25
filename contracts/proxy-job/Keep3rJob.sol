@@ -26,7 +26,7 @@ abstract contract Keep3rJob is IKeep3rJob, IGovernable {
 
     constructor(address _keep3rProxyJob) public {
         Keep3rProxyJob = IKeep3rProxyJob(_keep3rProxyJob);
-        keep3r = Keep3rProxyJob.keep3r(); // TODO change keep3r to Keep3r on utils abstract
+        keep3r = Keep3rProxyJob.keep3r();
     }
 
     modifier onlyProxyJob() {
