@@ -5,10 +5,10 @@ pragma solidity >=0.6.8;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 
-import "../../interfaces/Keep3r/IStrategyKeep3r.sol";
-import "../../interfaces/yearn/IBaseStrategy.sol";
-import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
-import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
+import "../interfaces/Keep3r/IStrategyKeep3r.sol";
+import "../interfaces/yearn/IBaseStrategy.sol";
+import "../interfaces/keep3r/IKeep3rV1Helper.sol";
+import "../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 
 import "./Keep3rAbstract.sol";
 

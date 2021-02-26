@@ -8,8 +8,8 @@ import "@lbertenasco/contract-utils/contracts/utils/Governable.sol";
 import "@lbertenasco/contract-utils/contracts/utils/CollectableDust.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
-import "../../interfaces/keep3r/IVaultKeep3r.sol";
-import "../../interfaces/yearn/IEarnableVault.sol";
+import "../interfaces/keep3r/IVaultKeep3r.sol";
+import "../interfaces/yearn/IEarnableVault.sol";
 
 contract VaultKeep3r is Governable, CollectableDust, Keep3r, IVaultKeep3r {
     using SafeMath for uint256;

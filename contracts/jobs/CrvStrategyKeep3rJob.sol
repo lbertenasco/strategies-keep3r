@@ -7,13 +7,13 @@ import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
 import "../proxy-job/Keep3rJob.sol";
-import "../../interfaces/jobs/ICrvStrategyKeep3rJob.sol";
-import "../../interfaces/keep3r/IKeep3rEscrow.sol";
+import "../interfaces/jobs/ICrvStrategyKeep3rJob.sol";
+import "../interfaces/keep3r/IKeep3rEscrow.sol";
 
-import "../../interfaces/yearn/IV1Controller.sol";
-import "../../interfaces/yearn/IV1Vault.sol";
-import "../../interfaces/crv/ICrvStrategy.sol";
-import "../../interfaces/crv/ICrvClaimable.sol";
+import "../interfaces/yearn/IV1Controller.sol";
+import "../interfaces/yearn/IV1Vault.sol";
+import "../interfaces/crv/ICrvStrategy.sol";
+import "../interfaces/crv/ICrvClaimable.sol";
 
 contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJob {
     using SafeMath for uint256;
@@ -138,6 +138,15 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         address _strategy = decodeWorkData(_workData);
         require(_workable(_strategy), "CrvStrategyKeep3rJob::harvest:not-workable");
 
+        // Checks if vault has enough available amount to earn
+        address controller = ICrvStrategy(_strategy).controller();
+        address want = ICrvStrategy(_strategy).want();
+        address vault = IV1Controller(controller).vaults(want);
+        uint256 available = IV1Vault(vault).available();
+        if (available >= requiredEarn[_strategy]) {
+            IV1Vault(vault).earn();
+        }
+
         _harvest(_strategy);
 
         emit Worked(_strategy);
@@ -155,13 +164,6 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
     }
 
     function _harvest(address _strategy) internal {
-        address controller = ICrvStrategy(_strategy).controller();
-        address want = ICrvStrategy(_strategy).want();
-        address vault = IV1Controller(controller).vaults(want);
-        uint256 available = IV1Vault(vault).available();
-        if (available >= requiredEarn[_strategy]) {
-            IV1Vault(vault).earn();
-        }
         ICrvStrategy(_strategy).harvest();
     }
 }

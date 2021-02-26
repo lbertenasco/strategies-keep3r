@@ -9,6 +9,12 @@ const prompt = new Confirm({
   message: 'Do you wish to work on v2 harvests contract?',
 });
 
+const vaultAPIVersions = {
+  default: 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
+  '0.3.0': 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
+  '0.3.2': 'contracts/interfaces/yearn/IVaultAPI_0_3_2.sol:VaultAPI',
+};
+
 async function main() {
   await hre.run('compile');
   await promptAndSubmit();
@@ -101,10 +107,17 @@ function promptAndSubmit() {
             );
             strategy.decimals = await strategy.wantContract.callStatic.decimals();
             strategy.vaultContract = await ethers.getContractAt(
-              'VaultAPI',
+              vaultAPIVersions['default'],
               strategy.vault,
               strategy.keeperAccount
             );
+            strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
+            strategy.vaultContract = await ethers.getContractAt(
+              vaultAPIVersions[strategy.vaultAPIVersion],
+              strategy.vault,
+              strategy.keeperAccount
+            );
+
             strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
           }
 
@@ -139,19 +152,7 @@ function promptAndSubmit() {
           }
 
           for (const strategy of v2Strategies) {
-            const params = await strategy.vaultContract.callStatic.strategies(
-              strategy.address
-            );
-            strategy.paramsPre = {
-              performanceFee: params.performanceFee,
-              activation: params.activation,
-              debtRatio: params.debtRatio,
-              rateLimit: params.rateLimit,
-              lastReport: params.lastReport,
-              totalDebt: params.totalDebt,
-              totalGain: params.totalGain,
-              totalLoss: params.totalLoss,
-            };
+            strategy.paramsPre = await getStrategyParams(strategy);
           }
 
           for (const strategy of v2Strategies) {
@@ -162,16 +163,7 @@ function promptAndSubmit() {
             const params = await strategy.vaultContract.callStatic.strategies(
               strategy.address
             );
-            strategy.paramsPost = {
-              performanceFee: params.performanceFee,
-              activation: params.activation,
-              debtRatio: params.debtRatio,
-              rateLimit: params.rateLimit,
-              lastReport: params.lastReport,
-              totalDebt: params.totalDebt,
-              totalGain: params.totalGain,
-              totalLoss: params.totalLoss,
-            };
+            strategy.paramsPost = await getStrategyParams(strategy);
           }
 
           for (const strategy of v2Strategies) {
@@ -226,16 +218,61 @@ function logVaultData(strategy, params) {
   );
 }
 function logParams(strategy, params) {
-  console.log(
-    'rateLimit:',
-    bnToDecimal(params.rateLimit, strategy.decimals),
-    'totalDebt:',
-    bnToDecimal(params.totalDebt, strategy.decimals),
-    'totalGain:',
-    bnToDecimal(params.totalGain, strategy.decimals),
-    'totalLoss:',
-    bnToDecimal(params.totalLoss, strategy.decimals)
+  if (strategy.vaultAPIVersion === '0.3.2') {
+    console.log(
+      'minDebtPerHarvest:',
+      bnToDecimal(params.minDebtPerHarvest, strategy.decimals),
+      'maxDebtPerHarvest:',
+      params.maxDebtPerHarvest.gt(e18.mul(e18))
+        ? 'infinity'
+        : bnToDecimal(params.maxDebtPerHarvest, strategy.decimals),
+      'totalDebt:',
+      bnToDecimal(params.totalDebt, strategy.decimals),
+      'totalGain:',
+      bnToDecimal(params.totalGain, strategy.decimals),
+      'totalLoss:',
+      bnToDecimal(params.totalLoss, strategy.decimals)
+    );
+  } else {
+    console.log(
+      'rateLimit:',
+      bnToDecimal(params.rateLimit, strategy.decimals),
+      'totalDebt:',
+      bnToDecimal(params.totalDebt, strategy.decimals),
+      'totalGain:',
+      bnToDecimal(params.totalGain, strategy.decimals),
+      'totalLoss:',
+      bnToDecimal(params.totalLoss, strategy.decimals)
+    );
+  }
+}
+
+async function getStrategyParams(strategy) {
+  const params = await strategy.vaultContract.callStatic.strategies(
+    strategy.address
   );
+  if (strategy.vaultAPIVersion === '0.3.2')
+    return {
+      performanceFee: params.performanceFee,
+      activation: params.activation,
+      debtRatio: params.debtRatio,
+      minDebtPerHarvest: params.minDebtPerHarvest,
+      maxDebtPerHarvest: params.maxDebtPerHarvest,
+      lastReport: params.lastReport,
+      totalDebt: params.totalDebt,
+      totalGain: params.totalGain,
+      totalLoss: params.totalLoss,
+    };
+  return {
+    performanceFee: params.performanceFee,
+    activation: params.activation,
+    debtRatio: params.debtRatio,
+    rateLimit: params.rateLimit,
+    lastReport: params.lastReport,
+    totalDebt: params.totalDebt,
+    totalGain: params.totalGain,
+    totalLoss: params.totalLoss,
+  };
 }
 
 // We recommend this pattern to be able to use async/await everywhere
