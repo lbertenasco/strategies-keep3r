@@ -30,7 +30,7 @@
         "registry": "0xE8d5A85758FE98F7Dce251CAd552691D49b499Bb"
       },
       "proxyJobs": {
-        "crvStrategyKeep3rJob": ""
+        "crvStrategyKeep3rJob": "0xb990961d30A5fa10F7929851a76d8017Cf4a8eBb"
       },
       "genericV2Keep3rJob": {
         "keep3rHelper": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",
