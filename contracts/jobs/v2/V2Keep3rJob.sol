@@ -7,12 +7,12 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 
 import "../../proxy-job/Keep3rJob.sol";
-import "../../../interfaces/jobs/v2/IV2Keeper.sol";
+import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
-import "../../../interfaces/jobs/v2/IV2Keep3rJob.sol";
-import "../../../interfaces/keep3r/IKeep3rV1Helper.sol";
-import "../../../interfaces/yearn/IBaseStrategy.sol";
-import "../../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
+import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
+import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
+import "../../interfaces/yearn/IBaseStrategy.sol";
+import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 
 abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
     using SafeMath for uint256;

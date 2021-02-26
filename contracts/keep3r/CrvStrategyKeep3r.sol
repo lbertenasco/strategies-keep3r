@@ -8,10 +8,10 @@ import "@lbertenasco/contract-utils/contracts/utils/Governable.sol";
 import "@lbertenasco/contract-utils/contracts/utils/CollectableDust.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
-import "../../interfaces/keep3r/IStrategyKeep3r.sol";
-import "../../interfaces/keep3r/ICrvStrategyKeep3r.sol";
-import "../../interfaces/crv/ICrvStrategy.sol";
-import "../../interfaces/crv/ICrvClaimable.sol";
+import "../interfaces/keep3r/IStrategyKeep3r.sol";
+import "../interfaces/keep3r/ICrvStrategyKeep3r.sol";
+import "../interfaces/crv/ICrvStrategy.sol";
+import "../interfaces/crv/ICrvClaimable.sol";
 
 contract CrvStrategyKeep3r is Governable, CollectableDust, Keep3r, IStrategyKeep3r, ICrvStrategyKeep3r {
     using SafeMath for uint256;

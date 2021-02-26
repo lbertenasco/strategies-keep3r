@@ -7,9 +7,9 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/interfaces/utils/IGovernable.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
-import "../../interfaces/proxy-job/IKeep3rProxyJob.sol";
-import "../../interfaces/proxy-job/IKeep3rJob.sol";
-import "../../interfaces/keep3r/IChainLinkFeed.sol";
+import "../interfaces/proxy-job/IKeep3rProxyJob.sol";
+import "../interfaces/proxy-job/IKeep3rJob.sol";
+import "../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract Keep3rJob is IKeep3rJob, IGovernable {
     using SafeMath for uint256;

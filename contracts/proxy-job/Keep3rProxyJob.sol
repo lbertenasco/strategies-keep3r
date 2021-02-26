@@ -8,8 +8,8 @@ import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
-import "../../interfaces/proxy-job/IKeep3rProxyJob.sol";
-import "../../interfaces/proxy-job/IKeep3rJob.sol";
+import "../interfaces/proxy-job/IKeep3rProxyJob.sol";
+import "../interfaces/proxy-job/IKeep3rJob.sol";
 
 contract Keep3rProxyJob is UtilsReady, Keep3r, IKeep3rProxyJob {
     using SafeMath for uint256;

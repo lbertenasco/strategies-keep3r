@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 
 import "../proxy-job/Keep3rJob.sol";
-import "../../interfaces/jobs/IVaultKeep3rJob.sol";
+import "../interfaces/jobs/IVaultKeep3rJob.sol";
 
-import "../../interfaces/yearn/IEarnableVault.sol";
+import "../interfaces/yearn/IEarnableVault.sol";
 
 contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     using SafeMath for uint256;
