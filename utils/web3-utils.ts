@@ -11,7 +11,10 @@ const SIX_HOURS: number = 6 * 60 * 60;
 const P: number = 100000;
 const e18ToDecimal = (number: BigNumber): number =>
   number.mul(P).div(e18).toNumber() / P;
-const bnToDecimal = (number: BigNumber, decimals: BigNumber): number =>
-  number.mul(P).div(bn.from(10).pow(decimals)).toNumber() / P;
+const bnToDecimal = (number: BigNumber, decimals?: BigNumber): number =>
+  number
+    .mul(P)
+    .div(bn.from(10).pow(decimals || 18))
+    .toNumber() / P;
 
 export { gwei, e18, ZERO_ADDRESS, SIX_HOURS, e18ToDecimal, bnToDecimal };

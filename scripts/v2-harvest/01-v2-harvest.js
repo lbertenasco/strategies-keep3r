@@ -60,6 +60,7 @@ function promptAndSubmit() {
             { address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C' },
             { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
             { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
+            { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
           ];
           // const v2Strategies = endorsedVaults
           //   .map((vault) => vault.strategies)
