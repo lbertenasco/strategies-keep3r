@@ -18,48 +18,63 @@ import "../../interfaces/crv/ICrvClaimable.sol";
 contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJob {
     using SafeMath for uint256;
 
-    mapping(address => uint256) public requiredHarvest;
+    mapping(address => uint256) public override requiredHarvest;
+    mapping(address => uint256) public override requiredEarn;
 
     EnumerableSet.AddressSet internal _availableStrategies;
-
-    uint256 public override availableThreshold;
 
     constructor(
         address _mechanicsRegistry,
         address _keep3rProxyJob,
-        uint256 _maxCredits,
-        uint256 _availableThreshold
+        uint256 _maxCredits
     ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         _setMaxCredits(_maxCredits);
-        _setAvailableThreshold(_availableThreshold);
     }
 
     // Setters
-    function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredHarvests) external override onlyGovernorOrMechanic {
+    function addStrategies(
+        address[] calldata _strategies,
+        uint256[] calldata _requiredHarvests,
+        uint256[] calldata _requiredEarns
+    ) external override onlyGovernorOrMechanic {
         require(
-            _strategies.length == _requiredHarvests.length,
-            "CrvStrategyKeep3rJob::add-strategies:strategies-required-harvests-different-length"
+            _strategies.length == _requiredHarvests.length && _strategies.length == _requiredEarns.length,
+            "CrvStrategyKeep3rJob::add-strategies:strategies-required-harvests-and-earns-different-length"
         );
         for (uint256 i; i < _strategies.length; i++) {
-            _addStrategy(_strategies[i], _requiredHarvests[i]);
+            _addStrategy(_strategies[i], _requiredHarvests[i], _requiredEarns[i]);
         }
     }
 
-    function addStrategy(address _strategy, uint256 _requiredHarvest) external override onlyGovernorOrMechanic {
-        _addStrategy(_strategy, _requiredHarvest);
+    function addStrategy(
+        address _strategy,
+        uint256 _requiredHarvest,
+        uint256 _requiredEarn
+    ) external override onlyGovernorOrMechanic {
+        _addStrategy(_strategy, _requiredHarvest, _requiredEarn);
     }
 
-    function _addStrategy(address _strategy, uint256 _requiredHarvest) internal {
+    function _addStrategy(
+        address _strategy,
+        uint256 _requiredHarvest,
+        uint256 _requiredEarn
+    ) internal {
         require(requiredHarvest[_strategy] == 0, "CrvStrategyKeep3rJob::add-strategy:strategy-already-added");
         _setRequiredHarvest(_strategy, _requiredHarvest);
+        _setRequiredEarn(_strategy, _requiredEarn);
         _availableStrategies.add(_strategy);
-        emit StrategyAdded(_strategy, _requiredHarvest);
+        emit StrategyAdded(_strategy, _requiredHarvest, _requiredEarn);
     }
 
-    function updateRequiredHarvestAmount(address _strategy, uint256 _requiredHarvest) external override onlyGovernorOrMechanic {
+    function updateStrategy(
+        address _strategy,
+        uint256 _requiredHarvest,
+        uint256 _requiredEarn
+    ) external override onlyGovernorOrMechanic {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::update-required-harvest:strategy-not-added");
         _setRequiredHarvest(_strategy, _requiredHarvest);
-        emit StrategyModified(_strategy, _requiredHarvest);
+        _setRequiredEarn(_strategy, _requiredEarn);
+        emit StrategyModified(_strategy, _requiredHarvest, _requiredEarn);
     }
 
     function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
@@ -72,6 +87,11 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
     function _setRequiredHarvest(address _strategy, uint256 _requiredHarvest) internal {
         require(_requiredHarvest > 0, "CrvStrategyKeep3rJob::set-required-harvest:should-not-be-zero");
         requiredHarvest[_strategy] = _requiredHarvest;
+    }
+
+    function _setRequiredEarn(address _strategy, uint256 _requiredEarn) internal {
+        require(_requiredEarn > 0, "CrvStrategyKeep3rJob::set-required-earn:should-not-be-zero");
+        requiredEarn[_strategy] = _requiredEarn;
     }
 
     // Getters
@@ -128,14 +148,6 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         _setMaxCredits(_maxCredits);
     }
 
-    function setAvailableThreshold(uint256 _availableThreshold) external override onlyGovernorOrMechanic {
-        _setAvailableThreshold(_availableThreshold);
-    }
-
-    function _setAvailableThreshold(uint256 _availableThreshold) internal {
-        availableThreshold = _availableThreshold;
-    }
-
     // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _harvest(_strategy);
@@ -147,7 +159,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         address want = ICrvStrategy(_strategy).want();
         address vault = IV1Controller(controller).vaults(want);
         uint256 available = IV1Vault(vault).available();
-        if (available >= availableThreshold) {
+        if (available >= requiredEarn[_strategy]) {
             IV1Vault(vault).earn();
         }
         ICrvStrategy(_strategy).harvest();
