@@ -1,4 +1,5 @@
-const axios = require('axios');
+import axios from 'axios';
+
 const getGasPrice = async () => {
   try {
     const res = await axios.get('https://www.gasnow.org/api/v3/gas/price');
@@ -9,7 +10,7 @@ const getGasPrice = async () => {
   }
 };
 
-const sendPrivateTransaction = async (signedMessage) => {
+const sendPrivateTransaction = async (signedMessage: any) => {
   try {
     const res = await axios.post(
       'https://api.taichi.network:10001/rpc/public',
@@ -27,7 +28,7 @@ const sendPrivateTransaction = async (signedMessage) => {
   }
 };
 
-const queryPrivateTransaction = async (txHash) => {
+const queryPrivateTransaction = async (txHash: string) => {
   try {
     const res = await axios.get(
       'https://api.taichi.network:10001/txscan/priTx?txHash=' + txHash

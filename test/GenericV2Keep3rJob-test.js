@@ -105,7 +105,7 @@ describe('GenericV2Keep3rJob', function () {
         name: 'USDC AH Earn',
       },
       {
-        address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C',
+        address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
         harvest: 1_500_000,
         tend: 0,
         name: 'stETH Curve:',

@@ -1,7 +1,7 @@
 import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
-import { e18 } from '../../utils/web3-utils';
-import config from '../../.config.json';
+import { e18 } from '../../../utils/web3-utils';
+import config from '../../../.config.json';
 const escrowContracts = config.contracts.mainnet.escrow;
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 

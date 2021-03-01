@@ -1,13 +1,8 @@
 const axios = require('axios');
-const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
 const { gwei, e18, bnToDecimal } = require('../../utils/web3-utils');
-
-const prompt = new Confirm({
-  message: 'Do you wish to work on v2 harvests contract?',
-});
 
 const vaultAPIVersions = {
   default: 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
@@ -21,165 +16,159 @@ async function main() {
 }
 
 function promptAndSubmit() {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      prompt.run().then(async (answer) => {
-        if (answer) {
-          // Setup deployer
-          const [owner] = await ethers.getSigners();
-          let deployer;
-          if (owner.address == config.accounts.mainnet.deployer) {
-            deployer = owner;
-          } else {
-            await hre.network.provider.request({
-              method: 'hardhat_impersonateAccount',
-              params: [config.accounts.mainnet.deployer],
-            });
-            deployer = owner.provider.getUncheckedSigner(
-              config.accounts.mainnet.deployer
-            );
-          }
+      // Setup deployer
+      const [owner] = await ethers.getSigners();
+      let deployer;
+      if (owner.address == config.accounts.mainnet.deployer) {
+        deployer = owner;
+      } else {
+        await hre.network.provider.request({
+          method: 'hardhat_impersonateAccount',
+          params: [config.accounts.mainnet.deployer],
+        });
+        deployer = owner.provider.getUncheckedSigner(
+          config.accounts.mainnet.deployer
+        );
+      }
 
-          console.log('using vaults.finance/all API as registry');
-          const response = await axios.get('https://vaults.finance/all');
-          const vaults = response.data
-            .filter((vault) => vault.type === 'v2')
-            .map((vault) => ({
-              address: vault.address,
-              strategies: vault.strategies,
-              decimals: vault.decimals,
-              name: vault.name,
-              endorsed: vault.endorsed,
-              symbol: vault.symbol,
-              token: {
-                address: vault.token.address,
-                name: vault.token.name,
-                symbol: vault.token.symbol,
-                decimals: vault.token.decimals,
-              },
-            }));
-          const endorsedVaults = vaults.filter((vault) => vault.endorsed);
-          console.log(endorsedVaults.length, 'endorsed v2 vaults');
+      console.log('using vaults.finance/all API as registry');
+      const response = await axios.get('https://vaults.finance/all');
+      const vaults = response.data
+        .filter((vault) => vault.type === 'v2')
+        .map((vault) => ({
+          address: vault.address,
+          strategies: vault.strategies,
+          decimals: vault.decimals,
+          name: vault.name,
+          endorsed: vault.endorsed,
+          symbol: vault.symbol,
+          token: {
+            address: vault.token.address,
+            name: vault.token.name,
+            symbol: vault.token.symbol,
+            decimals: vault.token.decimals,
+          },
+        }));
+      const endorsedVaults = vaults.filter((vault) => vault.endorsed);
+      console.log(endorsedVaults.length, 'endorsed v2 vaults');
 
-          // HARDCODED v2 Strats
-          const v2Strategies = [
-            { address: '0xebfC9451d19E8dbf36AAf547855b4dC789CA793C' },
-            { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
-            { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
-            { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
-          ];
-          // const v2Strategies = endorsedVaults
-          //   .map((vault) => vault.strategies)
-          //   .flat();
+      // HARDCODED v2 Strats
+      const v2Strategies = [
+        { address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87' },
+        { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
+        { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
+        { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
+        { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
+      ];
+      // const v2Strategies = endorsedVaults
+      //   .map((vault) => vault.strategies)
+      //   .flat();
 
-          for (const strategy of v2Strategies) {
-            strategy.contract = await ethers.getContractAt(
-              'IBaseStrategy',
-              strategy.address,
-              deployer
-            );
+      for (const strategy of v2Strategies) {
+        strategy.contract = await ethers.getContractAt(
+          'IBaseStrategy',
+          strategy.address,
+          deployer
+        );
 
-            // keep3r setup and contract overwrite
-            strategy.keeper = await strategy.contract.callStatic.keeper();
-            await hre.network.provider.request({
-              method: 'hardhat_impersonateAccount',
-              params: [strategy.keeper],
-            });
-            strategy.keeperAccount = owner.provider.getUncheckedSigner(
-              strategy.keeper
-            );
-            strategy.contract = await ethers.getContractAt(
-              'IBaseStrategy',
-              strategy.address,
-              strategy.keeperAccount
-            );
-            (
-              await ethers.getContractFactory('ForceETH')
-            ).deploy(strategy.keeper, { value: e18.mul(100) });
+        // keep3r setup and contract overwrite
+        strategy.keeper = await strategy.contract.callStatic.keeper();
+        await hre.network.provider.request({
+          method: 'hardhat_impersonateAccount',
+          params: [strategy.keeper],
+        });
+        strategy.keeperAccount = owner.provider.getUncheckedSigner(
+          strategy.keeper
+        );
+        strategy.contract = await ethers.getContractAt(
+          'IBaseStrategy',
+          strategy.address,
+          strategy.keeperAccount
+        );
+        (await ethers.getContractFactory('ForceETH')).deploy(strategy.keeper, {
+          value: e18.mul(100),
+        });
 
-            strategy.vault = await strategy.contract.callStatic.vault();
-            strategy.want = await strategy.contract.callStatic.want();
-            strategy.name = await strategy.contract.callStatic.name();
-            strategy.wantContract = await ethers.getContractAt(
-              'ERC20Mock',
-              strategy.want,
-              strategy.keeperAccount
-            );
-            strategy.decimals = await strategy.wantContract.callStatic.decimals();
-            strategy.vaultContract = await ethers.getContractAt(
-              vaultAPIVersions['default'],
-              strategy.vault,
-              strategy.keeperAccount
-            );
-            strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
-            strategy.vaultContract = await ethers.getContractAt(
-              vaultAPIVersions[strategy.vaultAPIVersion],
-              strategy.vault,
-              strategy.keeperAccount
-            );
+        strategy.vault = await strategy.contract.callStatic.vault();
+        strategy.want = await strategy.contract.callStatic.want();
+        strategy.name = await strategy.contract.callStatic.name();
+        strategy.wantContract = await ethers.getContractAt(
+          'ERC20Mock',
+          strategy.want,
+          strategy.keeperAccount
+        );
+        strategy.decimals = await strategy.wantContract.callStatic.decimals();
+        strategy.vaultContract = await ethers.getContractAt(
+          vaultAPIVersions['default'],
+          strategy.vault,
+          strategy.keeperAccount
+        );
+        strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
+        strategy.vaultContract = await ethers.getContractAt(
+          vaultAPIVersions[strategy.vaultAPIVersion],
+          strategy.vault,
+          strategy.keeperAccount
+        );
 
-            strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
-          }
+        strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
+      }
 
-          // TODO get fast gas from api or LINK on-chain oracle (see Keep3rHelper)
-          const gasPrice = gwei.mul(200);
-          const gasLimit = 2_000_000;
-          for (const strategy of v2Strategies) {
-            const harvestable = await strategy.contract.callStatic.harvestTrigger(
-              gasPrice.mul(gasLimit)
-            );
-            const tendable = await strategy.contract.callStatic.tendTrigger(
-              gasPrice.mul(gasLimit)
-            );
+      // TODO get fast gas from api or LINK on-chain oracle (see Keep3rHelper)
+      const gasPrice = gwei.mul(200);
+      const gasLimit = 2_000_000;
+      for (const strategy of v2Strategies) {
+        const harvestable = await strategy.contract.callStatic.harvestTrigger(
+          gasPrice.mul(gasLimit)
+        );
+        const tendable = await strategy.contract.callStatic.tendTrigger(
+          gasPrice.mul(gasLimit)
+        );
 
-            console.log(
-              strategy.address,
-              'harvestable:',
-              harvestable,
-              'tendable:',
-              tendable
-            );
+        console.log(
+          strategy.address,
+          'harvestable:',
+          harvestable,
+          'tendable:',
+          tendable
+        );
 
-            if (harvestable)
-              console.log(
-                `harvest with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
-              );
-            if (tendable)
-              console.log(
-                `tend with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
-              );
-            console.log();
-          }
+        if (harvestable)
+          console.log(
+            `harvest with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
+          );
+        if (tendable)
+          console.log(
+            `tend with ${strategy.keeper} on: https://etherscan.io/address/${strategy.address}#writeContract`
+          );
+        console.log();
+      }
 
-          for (const strategy of v2Strategies) {
-            strategy.paramsPre = await getStrategyParams(strategy);
-          }
+      for (const strategy of v2Strategies) {
+        strategy.paramsPre = await getStrategyParams(strategy);
+      }
 
-          for (const strategy of v2Strategies) {
-            await strategy.contract.harvest();
-          }
+      for (const strategy of v2Strategies) {
+        await strategy.contract.harvest();
+      }
 
-          for (const strategy of v2Strategies) {
-            const params = await strategy.vaultContract.callStatic.strategies(
-              strategy.address
-            );
-            strategy.paramsPost = await getStrategyParams(strategy);
-          }
+      for (const strategy of v2Strategies) {
+        const params = await strategy.vaultContract.callStatic.strategies(
+          strategy.address
+        );
+        strategy.paramsPost = await getStrategyParams(strategy);
+      }
 
-          for (const strategy of v2Strategies) {
-            logData(strategy, strategy.paramsPre);
-            logVaultData(strategy, strategy.paramsPre);
-            logParams(strategy, strategy.paramsPre);
-            logParams(strategy, strategy.paramsPost);
-            logVaultData(strategy, strategy.paramsPost);
-          }
+      for (const strategy of v2Strategies) {
+        logData(strategy, strategy.paramsPre);
+        logVaultData(strategy, strategy.paramsPre);
+        logParams(strategy, strategy.paramsPre);
+        logParams(strategy, strategy.paramsPost);
+        logVaultData(strategy, strategy.paramsPost);
+      }
 
-          resolve();
-        } else {
-          console.error('Aborted!');
-          resolve();
-        }
-      });
+      resolve();
     } catch (err) {
       reject(err);
     }
