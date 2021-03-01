@@ -23,7 +23,17 @@ contract HarvestV2Keep3rJob is V2Keep3rJob {
     }
 
     function _work(address _strategy) internal override {
-        super._work(_strategy);
+        lastWorkAt[_strategy] = block.timestamp;
         V2Keeper.harvest(_strategy);
+    }
+
+    // Keep3r actions
+    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
+        _workInternal(_workData);
+    }
+
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
+        _setMaxCredits(_maxCredits);
     }
 }

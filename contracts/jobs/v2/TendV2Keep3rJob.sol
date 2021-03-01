@@ -11,10 +11,8 @@ contract TendV2Keep3rJob is V2Keep3rJob {
         address _v2Keeper,
         address _keep3r,
         address _keep3rHelper,
-        address _slidingOracle,
-        uint256 _workCooldown,
-        uint256 _maxCredits
-    ) public V2Keep3rJob(_mechanicsRegistry, _keep3rProxyJob, _v2Keeper, _keep3r, _keep3rHelper, _slidingOracle, _workCooldown, _maxCredits) {}
+        address _slidingOracle
+    ) public V2Keep3rJob(_mechanicsRegistry, _keep3rProxyJob, _v2Keeper, _keep3r, _keep3rHelper, _slidingOracle, 0, 0) {}
 
     function _workable(address _strategy) internal view override returns (bool) {
         if (!super._workable(_strategy)) return false;
@@ -23,7 +21,17 @@ contract TendV2Keep3rJob is V2Keep3rJob {
     }
 
     function _work(address _strategy) internal override {
-        super._work(_strategy);
         V2Keeper.tend(_strategy);
+    }
+
+    // Keep3r actions
+    function work(bytes memory _workData) external override notPaused onlyProxyJob {
+        _workInternal(_workData);
+    }
+
+    // Mechanics Setters
+    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
+        _maxCredits; // shh
+        revert("TendV2Keep3rJob::setMaxCredits:not-implemented");
     }
 }
