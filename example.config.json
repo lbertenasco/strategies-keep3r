@@ -66,6 +66,9 @@
       "musd": {
         "address": "0xBA0c07BBE9C22a1ee33FE988Ea3763f21D0909a0"
       },
+      "usdn": {
+        "address": "0x406813fF2143d178d1Ebccd2357C20A424208912"
+      },
       "crvStrategyKeep3r": {
         "address": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D"
       },

@@ -9,7 +9,16 @@ const registryData = require('../../utils/v1-registry-data.json');
 const selectStrategyPrompt = new Select({
   name: 'strategy',
   message: 'Select a crv strategy to stealth harvest',
-  choices: ['ycrv', 'busd', 'sbtc', 'pool3', 'comp', 'gusd3crv', 'musd'],
+  choices: [
+    'ycrv',
+    'busd',
+    'sbtc',
+    'pool3',
+    'comp',
+    'gusd3crv',
+    'musd',
+    'usdn',
+  ],
 });
 const earnVaultPrompt = new Toggle({
   message: 'Send vault.earn tx first?',
