@@ -45,8 +45,8 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
-        _setWorkCooldown(_workCooldown);
-        _setMaxCredits(_maxCredits);
+        if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
+        if (_maxCredits > 0) _setMaxCredits(_maxCredits);
     }
 
     // Setters
@@ -136,7 +136,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
+    function _workInternal(bytes memory _workData) internal {
         address _strategy = decodeWorkData(_workData);
         require(_workable(_strategy), "V2Keep3rJob::work:not-workable");
 
@@ -145,18 +145,11 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         emit Worked(_strategy);
     }
 
-    // Mechanics Setters
-    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
-        _setMaxCredits(_maxCredits);
-    }
-
     // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _work(_strategy);
         emit ForceWorked(_strategy);
     }
 
-    function _work(address _strategy) internal virtual {
-        lastWorkAt[_strategy] = block.timestamp;
-    }
+    function _work(address _strategy) internal virtual {}
 }

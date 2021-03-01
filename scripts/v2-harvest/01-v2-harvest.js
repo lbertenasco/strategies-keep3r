@@ -165,7 +165,9 @@ function promptAndSubmit() {
         logVaultData(strategy, strategy.paramsPre);
         logParams(strategy, strategy.paramsPre);
         logParams(strategy, strategy.paramsPost);
+        logCompare(strategy, strategy.paramsPre, strategy.paramsPost);
         logVaultData(strategy, strategy.paramsPost);
+        console.log();
       }
 
       resolve();
@@ -234,6 +236,19 @@ function logParams(strategy, params) {
       bnToDecimal(params.totalLoss, strategy.decimals)
     );
   }
+}
+function logCompare(strategy, paramsPre, paramsPost) {
+  const params = ['totalDebt', 'totalGain', 'totalLoss'];
+  let paramsCompare = '';
+  for (const param of params) {
+    if (Object.keys(paramsPre).indexOf(param) == -1) continue;
+    paramsCompare +=
+      param +
+      ': ' +
+      bnToDecimal(paramsPost[param].sub(paramsPre[param]), strategy.decimals) +
+      ' ';
+  }
+  console.log(paramsCompare);
 }
 
 async function getStrategyParams(strategy) {
