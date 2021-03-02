@@ -29,12 +29,13 @@ export const v1CrvStrategies = [
     address: '0x33F3f002b8f812f3E087E9245921C8355E777231',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x8e6741b456a074F0Bc45B8b82A755d4aF7E965dF',
-    earn: { amount: 100_000, decimals: 18 },
+    earn: { amount: 50_000, decimals: 18 },
   },
   {
     name: 'StrategyCurveEURVoterProxy',
     address: '0x22422825e2dFf23f645b04A3f89190B69f174659',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
+    earn: { amount: 100_000, decimals: 18 },
   },
   {
     name: 'StrategyCurveGUSDVoterProxy',
@@ -48,12 +49,13 @@ export const v1CrvStrategies = [
     address: '0xb21C4d2f7b2F29109FF6243309647A01bEB9950a',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x39546945695DCb1c037C836925B355262f551f55',
-    earn: { amount: 50_000, decimals: 18 },
+    earn: { amount: 10_000, decimals: 18 },
   },
   {
     name: 'StrategyCurvemUSDVoterProxy',
     address: '0xBA0c07BBE9C22a1ee33FE988Ea3763f21D0909a0',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
+    earn: { amount: 10_000, decimals: 18 },
   },
   {
     name: 'StrategyCurvesUSDVoterProxy',
@@ -75,7 +77,7 @@ export const v1CrvStrategies = [
     address: '0x3be2717DA725f43b7d6C598D8f76AeC43e231B99',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0xF6C9E9AF314982A4b38366f4AbfAa00595C5A6fC',
-    earn: { amount: 50_000, decimals: 18 },
+    earn: { amount: 10_000, decimals: 18 },
   },
   {
     name: 'StrategyCurveYVoterProxy',
@@ -103,21 +105,21 @@ export const v1CrvStrategies = [
     address: '0x15CfA851403aBFbbD6fDB1f6fe0d32F22ddc846a',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x7F83935EcFe4729c4Ea592Ab2bC1A32588409797',
-    earn: { amount: 3, decimals: 18 },
+    earn: { amount: 2, decimals: 18 },
   },
   {
     name: 'StrategyCurvePBTCVoterProxy',
     address: '0xD96041c5EC05735D965966bF51faEC40F3888f6e',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x123964EbE096A920dae00Fb795FFBfA0c9Ff4675',
-    earn: { amount: 3, decimals: 18 },
+    earn: { amount: 2, decimals: 18 },
   },
   {
     name: 'StrategyCurveRENVoterProxy',
     address: '0x76B29E824C183dBbE4b27fe5D8EdF0f926340750',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x5334e150B938dd2b6bd040D9c4a03Cff0cED3765',
-    earn: { amount: 3, decimals: 18 },
+    earn: { amount: 2, decimals: 18 },
   },
   {
     name: 'StrategyCurveBTCVoterProxy',
@@ -131,6 +133,6 @@ export const v1CrvStrategies = [
     address: '0x61A01a704665b3C0E6898C1B4dA54447f561889d',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x07FB4756f67bD46B748b16119E802F1f880fb2CC',
-    earn: { amount: 3, decimals: 18 },
+    earn: { amount: 2, decimals: 18 },
   },
 ];
