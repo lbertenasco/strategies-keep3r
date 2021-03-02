@@ -32,7 +32,7 @@ function promptAndSubmit(Keep3rEscrow) {
           console.timeEnd('Keep3rEscrow deployed');
           console.log('Keep3rEscrow address:', keep3rEscrow.address);
           console.log(
-            'TODO: change .config.json & example.config.json keep3rEscrow address to:',
+            'PLEASE: change .config.json & example.config.json keep3rEscrow address to:',
             keep3rEscrow.address
           );
           resolve();

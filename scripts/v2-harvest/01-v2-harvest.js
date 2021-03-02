@@ -99,6 +99,7 @@ function promptAndSubmit() {
           strategy.want,
           strategy.keeperAccount
         );
+        strategy.wantSymbol = await strategy.wantContract.callStatic.symbol();
         strategy.decimals = await strategy.wantContract.callStatic.decimals();
         strategy.vaultContract = await ethers.getContractAt(
           vaultAPIVersions['default'],
@@ -179,6 +180,7 @@ function promptAndSubmit() {
 
 function logData(strategy, params) {
   console.log(
+    strategy.wantSymbol,
     `strategy ${strategy.name}:`,
     strategy.address,
     'performanceFee:',

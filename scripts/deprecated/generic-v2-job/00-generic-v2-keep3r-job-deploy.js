@@ -43,7 +43,7 @@ function promptAndSubmit(GenericV2Keep3rJob) {
             genericV2Keep3rJob.address
           );
           console.log(
-            'TODO: change .config.json & example.config.json genericV2Keep3rJob address to:',
+            'PLEASE: change .config.json & example.config.json genericV2Keep3rJob address to:',
             genericV2Keep3rJob.address
           );
           resolve();

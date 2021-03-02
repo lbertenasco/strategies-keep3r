@@ -2,40 +2,39 @@ const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
-const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
+const { e18, ZERO_ADDRESS, SIX_HOURS } = require('../../utils/web3-utils');
 
 const prompt = new Confirm({
-  message: 'Do you wish to deploy keep3r escrow contract?',
+  message: 'Do you wish to deploy vault keep3r contract?',
 });
 
 async function main() {
   await hre.run('compile');
-  const Keep3rEscrowJob = await ethers.getContractFactory('Keep3rEscrowJob');
+  const VaultKeep3rJob = await ethers.getContractFactory('VaultKeep3rJob');
 
-  await promptAndSubmit(Keep3rEscrowJob);
+  await promptAndSubmit(VaultKeep3rJob);
 }
 
-function promptAndSubmit(Keep3rEscrowJob) {
+function promptAndSubmit(VaultKeep3rJob) {
   return new Promise((resolve) => {
     try {
       prompt.run().then(async (answer) => {
         if (answer) {
-          console.time('Keep3rEscrowJob deployed');
+          console.time('VaultKeep3rJob deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
-
-          const keep3rEscrowJob = await Keep3rEscrowJob.deploy(
-            escrowContracts.keep3r,
+          const vaultKeep3rJob = await VaultKeep3rJob.deploy(
             escrowContracts.sugarMommy,
-            escrowContracts.lpToken,
-            escrowContracts.escrow1,
-            escrowContracts.escrow2
+            SIX_HOURS
           );
-          console.timeEnd('Keep3rEscrowJob deployed');
-          console.log('Keep3rEscrowJob address:', keep3rEscrowJob.address);
+          console.timeEnd('VaultKeep3rJob deployed');
+
+          console.log('VaultKeep3rJob address:', vaultKeep3rJob.address);
+
           console.log(
-            'TODO: change .config.json & example.config.json keep3rEscrowJob address to:',
-            keep3rEscrowJob.address
+            'PLEASE: change .config.json & example.config.json vaultKeep3rJob address to:',
+            vaultKeep3rJob.address
           );
+
           resolve();
         } else {
           console.error('Aborted!');
