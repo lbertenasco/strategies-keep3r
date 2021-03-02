@@ -33,7 +33,7 @@ function promptAndSubmit(
           console.timeEnd('CrvStrategyKeep3r deployed');
           console.log('CrvStrategyKeep3r address:', crvStrategyKeep3r.address);
           console.log(
-            'TODO: change .config.json & example.config.json crvStrategyKeep3r address to:',
+            'PLEASE: change .config.json & example.config.json crvStrategyKeep3r address to:',
             crvStrategyKeep3r.address
           );
           resolve();

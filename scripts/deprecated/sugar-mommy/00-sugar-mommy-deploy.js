@@ -35,7 +35,7 @@ function promptAndSubmit(Keep3rSugarMommy) {
           console.timeEnd('Keep3rSugarMommy deployed');
           console.log('Keep3rSugarMommy address:', keep3rSugarMommy.address);
           console.log(
-            'TODO: change .config.json & example.config.json keep3rSugarMommy address to:',
+            'PLEASE: change .config.json & example.config.json keep3rSugarMommy address to:',
             keep3rSugarMommy.address
           );
           // Setup Keep3rSugarMommy as a keep3r job

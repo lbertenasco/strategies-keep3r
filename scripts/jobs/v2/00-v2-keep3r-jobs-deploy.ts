@@ -36,7 +36,7 @@ function promptAndSubmit(
           const v2Keeper = await V2Keeper.deploy(mechanicsContracts.registry);
           console.log('TendV2Keep3rJob address:', v2Keeper.address);
           console.log(
-            'TODO: change .config.json & example.config.json proxyJobs.v2Keeper address to:',
+            'PLEASE: change .config.json & example.config.json proxyJobs.v2Keeper address to:',
             v2Keeper.address
           );
 
@@ -50,7 +50,7 @@ function promptAndSubmit(
           );
           console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
           console.log(
-            'TODO: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
+            'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
             tendV2Keep3rJob.address
           );
 
@@ -69,7 +69,7 @@ function promptAndSubmit(
             harvestV2Keep3rJob.address
           );
           console.log(
-            'TODO: change .config.json & example.config.json proxyJobs.harvestV2Keep3rJob address to:',
+            'PLEASE: change .config.json & example.config.json proxyJobs.harvestV2Keep3rJob address to:',
             harvestV2Keep3rJob.address
           );
           resolve();

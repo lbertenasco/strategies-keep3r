@@ -5,39 +5,43 @@ const config = require('../../.config.json');
 const { e18, ZERO_ADDRESS } = require('../../utils/web3-utils');
 
 const prompt = new Confirm({
-  message: 'Do you wish to deploy CrvStrategyKeep3rJob contract?',
+  message: 'Do you wish to deploy dforce keep3r contract?',
 });
 
 async function main() {
   await hre.run('compile');
-  const CrvStrategyKeep3rJob = await ethers.getContractFactory(
-    'CrvStrategyKeep3rJob'
+  const DforceStrategyKeep3r = await ethers.getContractFactory(
+    'DforceStrategyKeep3r'
   );
 
-  await promptAndSubmit(CrvStrategyKeep3rJob);
+  await promptAndSubmit(DforceStrategyKeep3r);
 }
 
-function promptAndSubmit(CrvStrategyKeep3rJob) {
+function promptAndSubmit(DforceStrategyKeep3r) {
   return new Promise((resolve) => {
     try {
       prompt.run().then(async (answer) => {
         if (answer) {
-          console.time('CrvStrategyKeep3rJob deployed');
-          const escrowContracts = config.contracts.mainnet.escrow;
-
-          const crvStrategyKeep3rJob = await CrvStrategyKeep3rJob.deploy(
-            escrowContracts.sugarMommy
+          console.time('DforceStrategyKeep3r deployed');
+          const dforceStrategyKeep3r = await DforceStrategyKeep3r.deploy(
+            config.contracts.mainnet.keep3r.address,
+            ZERO_ADDRESS,
+            0,
+            0,
+            0,
+            true
           );
-
-          console.timeEnd('CrvStrategyKeep3rJob deployed');
+          console.timeEnd('DforceStrategyKeep3r deployed');
           console.log(
-            'CrvStrategyKeep3rJob address:',
-            crvStrategyKeep3rJob.address
+            'DforceStrategyKeep3r address:',
+            dforceStrategyKeep3r.address
           );
+
           console.log(
-            'TODO: change .config.json & example.config.json crvStrategyKeep3rJob address to:',
-            crvStrategyKeep3rJob.address
+            'PLEASE: change .config.json & example.config.json dforceStrategyKeep3r address to:',
+            dforceStrategyKeep3r.address
           );
+
           resolve();
         } else {
           console.error('Aborted!');

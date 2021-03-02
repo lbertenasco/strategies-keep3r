@@ -35,9 +35,10 @@ function promptAndSubmit() {
         const workData = await jobContract.callStatic.getWorkData();
         console.log({ job, workable, workData });
         if (!workable) continue;
-        // await keep3rProxyJob.connect(keeper).callStatic.work(job, workData);
-        // await keep3rProxyJob.connect(keeper).work(job, workData);
-        // console.log('worked!');
+        await keep3rProxyJob.connect(keeper).callStatic.work(job, workData);
+        await keep3rProxyJob.connect(keeper).work(job, workData);
+        console.log('worked!');
+        console.log('workable', await keep3rProxyJob.callStatic.workable(job));
       }
       resolve();
     } catch (err) {

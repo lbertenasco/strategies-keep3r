@@ -1,7 +1,7 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const config = require('../../.config.json');
-const { e18 } = require('../../utils/web3-utils');
+const config = require('../../../.config.json');
+const { e18 } = require('../../../utils/web3-utils');
 
 async function main() {
   await hre.run('compile');

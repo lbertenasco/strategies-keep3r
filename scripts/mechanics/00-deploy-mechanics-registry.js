@@ -32,7 +32,7 @@ function promptAndSubmit(MechanicsRegistry) {
           console.timeEnd('MechanicsRegistry deployed');
           console.log('MechanicsRegistry address:', mechanicsRegistry.address);
           console.log(
-            'TODO: change .config.json & example.config.json mechanics.registry address to:',
+            'PLEASE: change .config.json & example.config.json mechanics.registry address to:',
             mechanicsRegistry.address
           );
           resolve();

@@ -2,10 +2,10 @@ const { Confirm } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const config = require('../../.config.json');
-const { e18, ZERO_ADDRESS, SIX_HOURS } = require('../../utils/web3-utils');
+const { e18, SIX_HOURS } = require('../../utils/web3-utils');
 
 const prompt = new Confirm({
-  message: 'Do you wish to deploy vault keep3r contract?',
+  message: 'Do you wish to deploy VaultKeep3rJob contract?',
 });
 
 async function main() {
@@ -22,19 +22,18 @@ function promptAndSubmit(VaultKeep3rJob) {
         if (answer) {
           console.time('VaultKeep3rJob deployed');
           const escrowContracts = config.contracts.mainnet.escrow;
+
           const vaultKeep3rJob = await VaultKeep3rJob.deploy(
             escrowContracts.sugarMommy,
             SIX_HOURS
           );
+
           console.timeEnd('VaultKeep3rJob deployed');
-
           console.log('VaultKeep3rJob address:', vaultKeep3rJob.address);
-
           console.log(
-            'TODO: change .config.json & example.config.json vaultKeep3rJob address to:',
+            'PLEASE: change .config.json & example.config.json vaultKeep3rJob address to:',
             vaultKeep3rJob.address
           );
-
           resolve();
         } else {
           console.error('Aborted!');

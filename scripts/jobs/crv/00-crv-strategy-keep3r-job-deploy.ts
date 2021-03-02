@@ -37,7 +37,7 @@ function promptAndSubmit(
             crvStrategyKeep3rJob.address
           );
           console.log(
-            'TODO: change .config.json & example.config.json proxyJobs.crvStrategyKeep3rJob address to:',
+            'PLEASE: change .config.json & example.config.json proxyJobs.crvStrategyKeep3rJob address to:',
             crvStrategyKeep3rJob.address
           );
           resolve();
