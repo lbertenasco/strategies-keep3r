@@ -30,7 +30,10 @@
         "registry": "0xE8d5A85758FE98F7Dce251CAd552691D49b499Bb"
       },
       "proxyJobs": {
-        "crvStrategyKeep3rJob": "0xb990961d30A5fa10F7929851a76d8017Cf4a8eBb"
+        "crvStrategyKeep3rJob": "0xb990961d30A5fa10F7929851a76d8017Cf4a8eBb",
+        "v2Keeper": "0x736D7e3c5a6CB2CE3B764300140ABF476F6CFCCF",
+        "tendV2Keep3rJob ": "0xc1dc06e4534B64533898F642f6e7Bf664A35C243",
+        "harvestV2Keep3rJob": "0x5B60F5F14778fc5769b80046Bd8b6572e91E6b3F"
       },
       "genericV2Keep3rJob": {
         "keep3rHelper": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",

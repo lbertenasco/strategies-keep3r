@@ -33,13 +33,24 @@ function promptAndSubmit(
       if (answer) {
         try {
           // deploy V2Keeper
+          console.log('V2Keeper:', mechanicsContracts.registry);
           const v2Keeper = await V2Keeper.deploy(mechanicsContracts.registry);
-          console.log('TendV2Keep3rJob address:', v2Keeper.address);
+          console.log('v2Keeper address:', v2Keeper.address);
           console.log(
             'PLEASE: change .config.json & example.config.json proxyJobs.v2Keeper address to:',
             v2Keeper.address
           );
+          console.log();
 
+          console.log(
+            'TendV2Keep3rJob:',
+            mechanicsContracts.registry,
+            escrowContracts.proxyJob,
+            v2Keeper.address,
+            escrowContracts.keep3r,
+            genericV2Keep3rJobContracts.keep3rHelper,
+            genericV2Keep3rJobContracts.slidingOracle
+          );
           const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
             mechanicsContracts.registry,
             escrowContracts.proxyJob,
@@ -53,7 +64,19 @@ function promptAndSubmit(
             'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
             tendV2Keep3rJob.address
           );
+          console.log();
 
+          console.log(
+            'HarvestV2Keep3rJob:',
+            mechanicsContracts.registry,
+            escrowContracts.proxyJob,
+            v2Keeper.address,
+            escrowContracts.keep3r,
+            genericV2Keep3rJobContracts.keep3rHelper,
+            genericV2Keep3rJobContracts.slidingOracle,
+            6 * 60 * 60, // 6 hours
+            e18.mul(10).toString() // 10 credits
+          );
           const harvestV2Keep3rJob = await HarvestV2Keep3rJob.deploy(
             mechanicsContracts.registry,
             escrowContracts.proxyJob,
@@ -62,7 +85,7 @@ function promptAndSubmit(
             genericV2Keep3rJobContracts.keep3rHelper,
             genericV2Keep3rJobContracts.slidingOracle,
             6 * 60 * 60, // 6 hours
-            e18.mul(10) // 10 credits
+            e18.mul(10).toString() // 10 credits
           );
           console.log(
             'HarvestV2Keep3rJob address:',
