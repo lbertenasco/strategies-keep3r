@@ -124,6 +124,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurveBTCVoterProxy',
+    added: true,
     address: '0x6D6c1AD13A5000148Aa087E7CbFb53D402c81341',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6',
