@@ -1,12 +1,13 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const config = require('../../../.config.json');
 const {
   e18,
   e18ToDecimal,
   ZERO_ADDRESS,
 } = require('../../../utils/web3-utils');
 const { v1CrvStrategies } = require('../../../utils/v1-crv-strategies');
+const config = require('../../../.config.json');
+const proxyJobs = config.contracts.mainnet.proxyJobs;
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
@@ -18,12 +19,12 @@ async function main() {
 
 function run() {
   return new Promise(async (resolve) => {
-    const escrowContracts = config.contracts.mainnet.escrow;
     // Setup deployer
     const [owner] = await ethers.getSigners();
     let deployer;
     if (owner.address == config.accounts.mainnet.deployer) {
       deployer = owner;
+      deployer._address = owner.address;
     } else {
       await hre.network.provider.request({
         method: 'hardhat_impersonateAccount',
@@ -33,13 +34,26 @@ function run() {
         config.accounts.mainnet.deployer
       );
     }
-    console.log('using address:', deployer.address);
+    console.log('using address:', deployer._address);
 
     const crvStrategyKeep3rJob = await ethers.getContractAt(
       'CrvStrategyKeep3rJob',
-      escrowContracts.jobs.crvStrategyKeep3rJob,
+      proxyJobs.crvStrategyKeep3rJob,
       deployer
     );
+
+    // Checks if local data matches chain data
+    const addedStrategies = await crvStrategyKeep3rJob.strategies();
+    for (const strategy of v1CrvStrategies) {
+      const added = addedStrategies.indexOf(strategy.address) != -1;
+      if (added && strategy.added) continue;
+      if (!added && !strategy.added) continue;
+      console.log(strategy.name, strategy.address);
+      if (!added && strategy.added)
+        throw new Error('strategy set as added but not on job');
+      if (added && !strategy.added)
+        throw new Error('strategy set as not-added but added on job');
+    }
 
     const newV1CrvStrategies = v1CrvStrategies.filter(
       (strategy) => !strategy.added

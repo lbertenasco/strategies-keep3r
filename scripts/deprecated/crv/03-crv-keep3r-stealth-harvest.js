@@ -1,10 +1,10 @@
 const { Confirm, NumberPrompt, Select, Toggle } = require('enquirer');
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const config = require('../../.config.json');
-const { gwei, e18, bnToDecimal } = require('../../utils/web3-utils');
-const taichi = require('../../utils/taichi');
-const registryData = require('../../utils/v1-registry-data.json');
+const config = require('../../../.config.json');
+const { gwei, e18, bnToDecimal } = require('../../../utils/web3-utils');
+const taichi = require('../../../utils/taichi');
+const registryData = require('../../../utils/v1-registry-data.json');
 
 const selectStrategyPrompt = new Select({
   name: 'strategy',
@@ -19,6 +19,11 @@ const selectStrategyPrompt = new Select({
     'musd',
     'usdn',
   ],
+});
+const checkEarnVaultPrompt = new Toggle({
+  message: 'Check vault.earn tx first?',
+  enabled: 'Yes',
+  disabled: 'No',
 });
 const earnVaultPrompt = new Toggle({
   message: 'Send vault.earn tx first?',
@@ -92,39 +97,43 @@ function run() {
           .toString()
       );
 
-      // Setup vault
-      const vaultData = registryData.find(
-        (data) => data.strategy === strategyContract.address
-      );
-      const vault = {
-        contract: await ethers.getContractAt(
-          'IV1Vault',
-          vaultData.address,
-          owner
-        ),
-      };
-      vault.token = await vault.contract.token();
-      vault.tokenContract = await ethers.getContractAt(
-        'ERC20Mock',
-        vault.token
-      );
-      vault.tokenSymbol = await vault.tokenContract.symbol();
-      vault.tokenDecimals = await vault.tokenContract.decimals();
-      vault.available = await vault.contract.available();
-      vault.decimals = await vault.contract.decimals();
-      // TODO print available with token decimals and token name
-      console.log(
-        vault.tokenSymbol,
-        'available in vault:',
-        bnToDecimal(vault.available, vault.tokenDecimals)
-      );
-      await vault.contract.earn();
-      console.log(
-        'after earn:',
-        bnToDecimal(await vault.contract.available(), vault.tokenDecimals)
-      );
+      const checkVaultEarnTx = await checkEarnVaultPrompt.run();
+      let sendVaultEarnTx = false;
+      if (checkVaultEarnTx) {
+        // Setup vault
+        const vaultData = registryData.find(
+          (data) => data.strategy === strategyContract.address
+        );
+        const vault = {
+          contract: await ethers.getContractAt(
+            'IV1Vault',
+            vaultData.address,
+            owner
+          ),
+        };
+        vault.token = await vault.contract.token();
+        vault.tokenContract = await ethers.getContractAt(
+          'ERC20Mock',
+          vault.token
+        );
+        vault.tokenSymbol = await vault.tokenContract.symbol();
+        vault.tokenDecimals = await vault.tokenContract.decimals();
+        vault.available = await vault.contract.available();
+        vault.decimals = await vault.contract.decimals();
+        // TODO print available with token decimals and token name
+        console.log(
+          vault.tokenSymbol,
+          'available in vault:',
+          bnToDecimal(vault.available, vault.tokenDecimals)
+        );
+        await vault.contract.earn();
+        console.log(
+          'after earn:',
+          bnToDecimal(await vault.contract.available(), vault.tokenDecimals)
+        );
 
-      let sendVaultEarnTx = await earnVaultPrompt.run();
+        sendVaultEarnTx = await earnVaultPrompt.run();
+      }
 
       const gasResponse = await taichi.getGasPrice();
       console.log('taichi gasPrices:', {
@@ -176,6 +185,8 @@ function run() {
           }
         );
       }
+
+      console.log(rawMessage);
 
       const signedMessage = await signer.signTransaction(rawMessage);
 
