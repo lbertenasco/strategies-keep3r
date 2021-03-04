@@ -12,9 +12,8 @@ contract HarvestV2Keep3rJob is V2Keep3rJob {
         address _keep3r,
         address _keep3rHelper,
         address _slidingOracle,
-        uint256 _workCooldown,
-        uint256 _maxCredits
-    ) public V2Keep3rJob(_mechanicsRegistry, _keep3rProxyJob, _v2Keeper, _keep3r, _keep3rHelper, _slidingOracle, _workCooldown, _maxCredits) {}
+        uint256 _workCooldown
+    ) public V2Keep3rJob(_mechanicsRegistry, _keep3rProxyJob, _v2Keeper, _keep3r, _keep3rHelper, _slidingOracle, _workCooldown) {}
 
     function workableStrategy(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -32,12 +31,7 @@ contract HarvestV2Keep3rJob is V2Keep3rJob {
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
+    function work(bytes memory _workData) external override notPaused onlyProxyJob {
         _workInternal(_workData);
-    }
-
-    // Mechanics Setters
-    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
-        _setMaxCredits(_maxCredits);
     }
 }

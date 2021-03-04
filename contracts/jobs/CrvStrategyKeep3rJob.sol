@@ -23,13 +23,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
-    constructor(
-        address _mechanicsRegistry,
-        address _keep3rProxyJob,
-        uint256 _maxCredits
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
-        _setMaxCredits(_maxCredits);
-    }
+    constructor(address _mechanicsRegistry, address _keep3rProxyJob) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {}
 
     // Setters
     function addStrategies(
@@ -134,7 +128,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob updateCredits {
+    function work(bytes memory _workData) external override notPaused onlyProxyJob {
         address _strategy = decodeWorkData(_workData);
         require(_workable(_strategy), "CrvStrategyKeep3rJob::harvest:not-workable");
 
@@ -150,11 +144,6 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         _harvest(_strategy);
 
         emit Worked(_strategy);
-    }
-
-    // Mechanics Setters
-    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
-        _setMaxCredits(_maxCredits);
     }
 
     // Mechanics keeper bypass

@@ -22,11 +22,9 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         address _mechanicsRegistry,
         address _keep3rProxyJob,
         uint256 _earnCooldown,
-        uint256 _maxCredits,
         uint256 _maxGasPrice
     ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
         _setEarnCooldown(_earnCooldown);
-        _setMaxCredits(_maxCredits);
         _setMaxGasPrice(_maxGasPrice);
     }
 
@@ -114,7 +112,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob limitGasPrice updateCredits {
+    function work(bytes memory _workData) external override notPaused onlyProxyJob limitGasPrice {
         address _vault = decodeWorkData(_workData);
         require(_workable(_vault), "VaultKeep3rJob::earn:not-workable");
 
@@ -124,10 +122,6 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
     }
 
     // Mechanics Setters
-    function setMaxCredits(uint256 _maxCredits) external override onlyGovernorOrMechanic {
-        _setMaxCredits(_maxCredits);
-    }
-
     function setMaxGasPrice(uint256 _maxGasPrice) external override onlyGovernorOrMechanic {
         _setMaxGasPrice(_maxGasPrice);
     }

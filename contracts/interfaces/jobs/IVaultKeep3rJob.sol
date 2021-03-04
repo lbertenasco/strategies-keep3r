@@ -28,8 +28,6 @@ interface IVaultKeep3rJob {
     function calculateEarn(address _vault) external view returns (uint256 _amount);
 
     // Mechanics Setters
-    function setMaxCredits(uint256 _maxCredits) external;
-
     function setMaxGasPrice(uint256 _maxGasPrice) external;
 
     // Mechanics keeper bypass

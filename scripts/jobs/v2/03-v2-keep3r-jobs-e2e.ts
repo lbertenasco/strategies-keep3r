@@ -49,8 +49,7 @@ function promptAndSubmit(
         escrowContracts.keep3r,
         genericV2Keep3rJobContracts.keep3rHelper,
         genericV2Keep3rJobContracts.slidingOracle,
-        6 * 60 * 60, // 6 hours
-        e18.mul(10).toString() // 10 credits
+        6 * 60 * 60 // 6 hours
       );
 
       // Add harvest strategies
@@ -78,6 +77,8 @@ function promptAndSubmit(
         );
         console.log(strategy.address, 'workable:', workable);
       }
+
+      // TODO add work test
 
       resolve();
     } catch (err) {

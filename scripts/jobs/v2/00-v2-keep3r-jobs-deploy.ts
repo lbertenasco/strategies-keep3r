@@ -1,5 +1,5 @@
 import { ContractFactory } from 'ethers';
-import { run, ethers } from 'hardhat';
+import { run, ethers, network } from 'hardhat';
 import { e18 } from '../../../utils/web3-utils';
 import config from '../../../.config.json';
 const escrowContracts = config.contracts.mainnet.escrow;
@@ -32,15 +32,19 @@ function promptAndSubmit(
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
-          // deploy V2Keeper
-          console.log('V2Keeper:', mechanicsContracts.registry);
-          const v2Keeper = await V2Keeper.deploy(mechanicsContracts.registry);
-          console.log('v2Keeper address:', v2Keeper.address);
-          console.log(
-            'PLEASE: change .config.json & example.config.json proxyJobs.v2Keeper address to:',
-            v2Keeper.address
+          const v2Keeper = await ethers.getContractAt(
+            'V2Keeper',
+            config.contracts.mainnet.proxyJobs.v2Keeper
           );
-          console.log();
+          // // deploy V2Keeper // already deployed
+          // console.log('V2Keeper:', mechanicsContracts.registry);
+          // const v2Keeper = await V2Keeper.deploy(mechanicsContracts.registry);
+          // console.log('v2Keeper address:', v2Keeper.address);
+          // console.log(
+          //   'PLEASE: change .config.json & example.config.json proxyJobs.v2Keeper address to:',
+          //   v2Keeper.address
+          // );
+          // console.log();
 
           console.log(
             'TendV2Keep3rJob:',
@@ -74,8 +78,7 @@ function promptAndSubmit(
             escrowContracts.keep3r,
             genericV2Keep3rJobContracts.keep3rHelper,
             genericV2Keep3rJobContracts.slidingOracle,
-            6 * 60 * 60, // 6 hours
-            e18.mul(10).toString() // 10 credits
+            6 * 60 * 60 // 6 hours
           );
           const harvestV2Keep3rJob = await HarvestV2Keep3rJob.deploy(
             mechanicsContracts.registry,
@@ -84,8 +87,7 @@ function promptAndSubmit(
             escrowContracts.keep3r,
             genericV2Keep3rJobContracts.keep3rHelper,
             genericV2Keep3rJobContracts.slidingOracle,
-            6 * 60 * 60, // 6 hours
-            e18.mul(10).toString() // 10 credits
+            6 * 60 * 60 // 6 hours
           );
           console.log(
             'HarvestV2Keep3rJob address:',

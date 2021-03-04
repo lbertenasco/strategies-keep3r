@@ -83,7 +83,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurvemUSDVoterProxy',
-    added: true,
+    added: false,
     address: '0xBcC6abd115a32fC27f7B49F9e17D0BcefDd278aC',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF',
