@@ -1,6 +1,7 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
 const {
+  bn,
   e18,
   e18ToDecimal,
   ZERO_ADDRESS,
@@ -65,7 +66,9 @@ function run() {
     await crvStrategyKeep3rJob.addStrategies(
       newV1CrvStrategies.map((strategy) => strategy.address),
       newV1CrvStrategies.map((strategy) => strategy.requiredHarvestAmount),
-      newV1CrvStrategies.map((strategy) => strategy.earn.amount)
+      newV1CrvStrategies.map((strategy) =>
+        bn.from(10).pow(strategy.earn.decimals).mul(strategy.earn.amount)
+      )
     );
     console.timeEnd('addStrategies');
 

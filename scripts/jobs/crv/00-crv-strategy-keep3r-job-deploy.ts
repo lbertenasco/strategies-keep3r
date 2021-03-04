@@ -42,7 +42,7 @@ function promptAndSubmit(
           );
           resolve();
         } catch (err) {
-          reject(`Error while deploying crv strategy keeper: ${err.message}`);
+          reject(`Error while deploying crv keep3r contract: ${err.message}`);
         }
       } else {
         console.error('Aborted!');

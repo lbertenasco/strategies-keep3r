@@ -12,9 +12,7 @@ async function main() {
 
 function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
-    console.log(
-      'checking workable strategies on CrvStrategyKeep3rJob contract'
-    );
+    console.log('');
     try {
       // Setup CrvStrategyKeep3rJob
       const crvStrategyKeep3rJob = await ethers.getContractAt(
@@ -40,7 +38,9 @@ function promptAndSubmit(): Promise<void | Error> {
       }
       resolve();
     } catch (err) {
-      reject(`Error while deploying crv strategy keeper: ${err.message}`);
+      reject(
+        `Error while checking workable strategies on CrvStrategyKeep3rJob contract: ${err.message}`
+      );
     }
   });
 }

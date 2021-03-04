@@ -17,9 +17,19 @@ async function main() {
 }
 
 function promptAndSubmit() {
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve, reject) => {
     console.log('checking workable jobs on Keep3rProxyJob contract');
     try {
+      const [owner] = await ethers.getSigners();
+      // impersonate keeper
+      await hre.network.provider.request({
+        method: 'hardhat_impersonateAccount',
+        params: [config.accounts.mainnet.keeper],
+      });
+      const keeper = owner.provider.getUncheckedSigner(
+        config.accounts.mainnet.keeper
+      );
+
       // Setup Keep3rProxyJob
       const keep3rProxyJob = await ethers.getContractAt(
         'Keep3rProxyJob',

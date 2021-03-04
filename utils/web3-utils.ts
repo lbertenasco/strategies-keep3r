@@ -17,4 +17,4 @@ const bnToDecimal = (number: BigNumber, decimals?: BigNumber): number =>
     .div(bn.from(10).pow(decimals || 18))
     .toNumber() / P;
 
-export { gwei, e18, ZERO_ADDRESS, SIX_HOURS, e18ToDecimal, bnToDecimal };
+export { bn, gwei, e18, ZERO_ADDRESS, SIX_HOURS, e18ToDecimal, bnToDecimal };

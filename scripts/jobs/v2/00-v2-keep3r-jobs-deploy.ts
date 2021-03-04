@@ -97,7 +97,9 @@ function promptAndSubmit(
           );
           resolve();
         } catch (err) {
-          reject(`Error while deploying crv strategy keeper: ${err.message}`);
+          reject(
+            `Error while deploying v2 keep3r job contracts: ${err.message}`
+          );
         }
       } else {
         console.error('Aborted!');
