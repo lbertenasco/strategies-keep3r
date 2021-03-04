@@ -13,10 +13,10 @@ const prompt = new Confirm({
 async function main() {
   await hre.run('compile');
 
-  await promptAndSubmit();
+  await run();
 }
 
-function promptAndSubmit() {
+function run() {
   return new Promise(async (resolve, reject) => {
     console.log('checking workable jobs on Keep3rProxyJob contract');
     try {
@@ -40,15 +40,29 @@ function promptAndSubmit() {
       // even if workable is true, the job might not have credits to pay and the work tx will revert
       const jobs = await keep3rProxyJob.callStatic.jobs();
       for (const job of jobs) {
+        console.time('check workable:', job);
         const workable = await keep3rProxyJob.callStatic.workable(job);
+        console.timeEnd('check workable:', job);
+
         const jobContract = await ethers.getContractAt('IKeep3rJob', job);
+
+        console.time('check workData:', job);
         const workData = await jobContract.callStatic.getWorkData();
+        console.timeEnd('check workData:', job);
+
         console.log({ job, workable, workData });
         if (!workable) continue;
-        await keep3rProxyJob.connect(keeper).callStatic.work(job, workData);
-        await keep3rProxyJob.connect(keeper).work(job, workData);
-        console.log('worked!');
-        console.log('workable', await keep3rProxyJob.callStatic.workable(job));
+        try {
+          await keep3rProxyJob.connect(keeper).callStatic.work(job, workData);
+          await keep3rProxyJob.connect(keeper).work(job, workData);
+          console.log('worked!');
+          console.log(
+            'workable',
+            await keep3rProxyJob.callStatic.workable(job)
+          );
+        } catch (error) {
+          console.log('workable error:', error.message);
+        }
       }
       resolve();
     } catch (err) {

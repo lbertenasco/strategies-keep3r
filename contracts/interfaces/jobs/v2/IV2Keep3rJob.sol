@@ -33,9 +33,6 @@ interface IV2Keep3rJob {
 
     function removeStrategy(address _strategy) external;
 
-    // Mechanics Setters
-    function setMaxCredits(uint256 _maxCredits) external;
-
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
 }

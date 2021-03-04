@@ -18,8 +18,6 @@ abstract contract Keep3rJob is IKeep3rJob, IGovernable {
     IChainLinkFeed public constant FASTGAS = IChainLinkFeed(0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C);
 
     address public override keep3r;
-    uint256 public override usedCredits;
-    uint256 public override maxCredits;
     uint256 public override maxGasPrice;
 
     IKeep3rProxyJob internal Keep3rProxyJob;
@@ -37,20 +35,6 @@ abstract contract Keep3rJob is IKeep3rJob, IGovernable {
     // view
     function keep3rProxyJob() external view override returns (address _keep3rProxyJob) {
         return address(Keep3rProxyJob);
-    }
-
-    // Credits
-    function _setMaxCredits(uint256 _maxCredits) internal {
-        usedCredits = 0;
-        maxCredits = _maxCredits;
-    }
-
-    modifier updateCredits() {
-        uint256 _beforeCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
-        _;
-        uint256 _afterCredits = IKeep3rV1(keep3r).credits(address(Keep3rProxyJob), keep3r);
-        usedCredits = usedCredits.add(_beforeCredits.sub(_afterCredits));
-        require(usedCredits <= maxCredits, "Keep3rJob::update-credits:used-credits-exceed-max-credits");
     }
 
     // MaxGasPrice
