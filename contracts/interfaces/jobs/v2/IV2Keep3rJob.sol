@@ -14,6 +14,8 @@ interface IV2Keep3rJob {
     // Getters
     function strategies() external view returns (address[] memory);
 
+    function workableStrategy(address _strategy) external view returns (bool);
+
     event StrategyAdded(address _strategy, uint256 _requiredAmount);
 
     event StrategyModified(address _strategy, uint256 _requiredAmount);

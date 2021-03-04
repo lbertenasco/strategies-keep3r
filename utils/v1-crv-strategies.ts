@@ -35,10 +35,17 @@ export const v1CrvStrategies = [
     vault: '0x8e6741b456a074F0Bc45B8b82A755d4aF7E965dF',
     earn: { amount: 50_000, decimals: 18 },
   },
+  // { // DEPRECATED
+  //   name: 'StrategyCurveEURVoterProxy',
+  //   added: false,
+  //   address: '0x22422825e2dFf23f645b04A3f89190B69f174659',
+  //   requiredHarvestAmount: defaultRequiredHarvestAmount,
+  //   earn: { amount: 100_000, decimals: 18 },
+  // },
   {
     name: 'StrategyCurveEURVoterProxy',
     added: true,
-    address: '0x22422825e2dFf23f645b04A3f89190B69f174659',
+    address: '0x08553D7BE4fBa2b186A60738301a7E613349c053',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     earn: { amount: 100_000, decimals: 18 },
   },

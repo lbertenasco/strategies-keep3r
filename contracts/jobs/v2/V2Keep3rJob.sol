@@ -126,7 +126,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
 
     function _workable(address _strategy) internal view virtual returns (bool) {
         require(requiredAmount[_strategy] > 0, "V2Keep3rJob::workable:strategy-not-added");
-        if (block.timestamp > lastWorkAt[_strategy].add(workCooldown)) return false;
+        if (block.timestamp > lastWorkAt[_strategy].add(workCooldown)) return true;
     }
 
     // Get eth costs
