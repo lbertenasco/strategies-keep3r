@@ -38,12 +38,18 @@ interface ICrvStrategyKeep3rJob {
 
     function removeStrategy(address _strategy) external;
 
+    function setMaxHarvestPeriod(uint256 _maxHarvestPeriod) external;
+
     // Getters
     function strategies() external view returns (address[] memory _strategies);
 
     function requiredHarvest(address _strategy) external view returns (uint256 _requiredHarvest);
 
     function requiredEarn(address _strategy) external view returns (uint256 _requiredEarn);
+
+    function lastWorkAt(address _strategy) external view returns (uint256 _lastWorkAt);
+
+    function maxHarvestPeriod() external view returns (uint256 _maxHarvestPeriod);
 
     function calculateHarvest(address _strategy) external returns (uint256 _amount);
 
