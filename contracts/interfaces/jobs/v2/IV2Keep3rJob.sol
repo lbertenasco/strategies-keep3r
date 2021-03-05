@@ -29,6 +29,8 @@ interface IV2Keep3rJob {
 
     function addStrategy(address _strategy, uint256 _requiredAmount) external;
 
+    function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external;
+
     function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external;
 
     function removeStrategy(address _strategy) external;

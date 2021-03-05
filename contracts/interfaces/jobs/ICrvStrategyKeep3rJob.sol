@@ -24,6 +24,12 @@ interface ICrvStrategyKeep3rJob {
         uint256 _requiredEarn
     ) external;
 
+    function updateStrategies(
+        address[] calldata _strategies,
+        uint256[] calldata _requiredHarvests,
+        uint256[] calldata _requiredEarns
+    ) external;
+
     function updateStrategy(
         address _strategy,
         uint256 _requiredHarvest,

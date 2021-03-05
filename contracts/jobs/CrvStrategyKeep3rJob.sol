@@ -60,11 +60,36 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         emit StrategyAdded(_strategy, _requiredHarvest, _requiredEarn);
     }
 
+    // TODO
+    // workable with maxHarvestPeriod (make workable if a week went by without harvest)
+
+    function updateStrategies(
+        address[] calldata _strategies,
+        uint256[] calldata _requiredHarvests,
+        uint256[] calldata _requiredEarns
+    ) external override onlyGovernorOrMechanic {
+        require(
+            _strategies.length == _requiredHarvests.length && _strategies.length == _requiredEarns.length,
+            "CrvStrategyKeep3rJob::update-strategies:strategies-required-harvests-and-earns-different-length"
+        );
+        for (uint256 i; i < _strategies.length; i++) {
+            _updateStrategy(_strategies[i], _requiredHarvests[i], _requiredEarns[i]);
+        }
+    }
+
     function updateStrategy(
         address _strategy,
         uint256 _requiredHarvest,
         uint256 _requiredEarn
     ) external override onlyGovernorOrMechanic {
+        _updateStrategy(_strategy, _requiredHarvest, _requiredEarn);
+    }
+
+    function _updateStrategy(
+        address _strategy,
+        uint256 _requiredHarvest,
+        uint256 _requiredEarn
+    ) internal {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::update-required-harvest:strategy-not-added");
         _setRequiredHarvest(_strategy, _requiredHarvest);
         _setRequiredEarn(_strategy, _requiredEarn);

@@ -16,7 +16,9 @@ interface IVaultKeep3rJob {
 
     function addVault(address _vault, uint256 _requiredEarn) external;
 
-    function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external;
+    function updateVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external;
+
+    function updateVault(address _vault, uint256 _requiredEarn) external;
 
     function removeVault(address _vault) external;
 
