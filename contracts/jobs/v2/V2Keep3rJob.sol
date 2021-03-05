@@ -59,7 +59,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
 
     // Governor
     function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernorOrMechanic {
-        require(_strategies.length == _requiredAmounts.length, "V2Keep3rJob::add-strategies:strategies-required-works-different-length");
+        require(_strategies.length == _requiredAmounts.length, "V2Keep3rJob::add-strategies:strategies-required-amounts-different-length");
         for (uint256 i; i < _strategies.length; i++) {
             _addStrategy(_strategies[i], _requiredAmounts[i]);
         }
@@ -77,7 +77,22 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         _availableStrategies.add(_strategy);
     }
 
+    function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts)
+        external
+        override
+        onlyGovernorOrMechanic
+    {
+        require(_strategies.length == _requiredAmounts.length, "V2Keep3rJob::update-strategies:strategies-required-amounts-different-length");
+        for (uint256 i; i < _strategies.length; i++) {
+            _updateRequiredAmount(_strategies[i], _requiredAmounts[i]);
+        }
+    }
+
     function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external override onlyGovernorOrMechanic {
+        _updateRequiredAmount(_strategy, _requiredAmount);
+    }
+
+    function _updateRequiredAmount(address _strategy, uint256 _requiredAmount) internal {
         require(requiredAmount[_strategy] > 0, "V2Keep3rJob::update-required-amount:strategy-not-added");
         _setRequiredAmount(_strategy, _requiredAmount);
         emit StrategyModified(_strategy, _requiredAmount);

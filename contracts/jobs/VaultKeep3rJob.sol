@@ -47,7 +47,18 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         emit VaultAdded(_vault, _requiredEarn);
     }
 
-    function updateRequiredEarnAmount(address _vault, uint256 _requiredEarn) external override onlyGovernorOrMechanic {
+    function updateVaults(address[] calldata _vaults, uint256[] calldata _requiredEarns) external override onlyGovernorOrMechanic {
+        require(_vaults.length == _requiredEarns.length, "VaultKeep3rJob::update-vaults:vaults-required-earns-different-length");
+        for (uint256 i; i < _vaults.length; i++) {
+            _updateVault(_vaults[i], _requiredEarns[i]);
+        }
+    }
+
+    function updateVault(address _vault, uint256 _requiredEarn) external override onlyGovernorOrMechanic {
+        _updateVault(_vault, _requiredEarn);
+    }
+
+    function _updateVault(address _vault, uint256 _requiredEarn) internal {
         require(requiredEarn[_vault] > 0, "VaultKeep3rJob::update-required-earn:vault-not-added");
         _setRequiredEarn(_vault, _requiredEarn);
         emit VaultModified(_vault, _requiredEarn);
