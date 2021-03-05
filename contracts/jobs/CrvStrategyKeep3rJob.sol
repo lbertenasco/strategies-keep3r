@@ -20,10 +20,19 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     mapping(address => uint256) public override requiredHarvest;
     mapping(address => uint256) public override requiredEarn;
+    mapping(address => uint256) public override lastWorkAt;
+
+    uint256 public override maxHarvestPeriod;
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
-    constructor(address _mechanicsRegistry, address _keep3rProxyJob) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {}
+    constructor(
+        address _mechanicsRegistry,
+        address _keep3rProxyJob,
+        uint256 _maxHarvestPeriod
+    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+        _setMaxHarvestPeriod(_maxHarvestPeriod);
+    }
 
     // Setters
     function addStrategies(
@@ -59,9 +68,6 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         _availableStrategies.add(_strategy);
         emit StrategyAdded(_strategy, _requiredHarvest, _requiredEarn);
     }
-
-    // TODO
-    // workable with maxHarvestPeriod (make workable if a week went by without harvest)
 
     function updateStrategies(
         address[] calldata _strategies,
@@ -113,6 +119,15 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         requiredEarn[_strategy] = _requiredEarn;
     }
 
+    function setMaxHarvestPeriod(uint256 _maxHarvestPeriod) external override onlyGovernorOrMechanic {
+        _setMaxHarvestPeriod(_maxHarvestPeriod);
+    }
+
+    function _setMaxHarvestPeriod(uint256 _maxHarvestPeriod) internal {
+        require(_maxHarvestPeriod > 0, "CrvStrategyKeep3rJob::set-max-harvest-period:should-not-be-zero");
+        maxHarvestPeriod = _maxHarvestPeriod;
+    }
+
     // Getters
     function strategies() public view override returns (address[] memory _strategies) {
         _strategies = new address[](_availableStrategies.length());
@@ -149,6 +164,8 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     function _workable(address _strategy) internal returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
+        // if strategy has exceeded maxHarvestPeriod, force workable true
+        if (block.timestamp > lastWorkAt[_strategy].add(maxHarvestPeriod)) return true;
         return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
     }
 
@@ -179,5 +196,6 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
 
     function _harvest(address _strategy) internal {
         ICrvStrategy(_strategy).harvest();
+        lastWorkAt[_strategy] = block.timestamp;
     }
 }
