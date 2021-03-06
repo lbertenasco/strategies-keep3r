@@ -162,6 +162,10 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         return false;
     }
 
+    function workableStrategy(address _strategy) external override returns (bool) {
+        return _workable(_strategy);
+    }
+
     function _workable(address _strategy) internal returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
         // if strategy has exceeded maxHarvestPeriod, force workable true

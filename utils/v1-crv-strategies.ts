@@ -13,7 +13,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurvea3CRVVoterProxy',
-    added: false,
+    added: true,
     address: '0x7A10bE29c4d9073E6B3B6b7D1fB5bCDBecA2AA1F',
     requiredHarvestAmount: e18.mul(5_000),
     vault: '0x03403154afc09Ce8e44C3B185C82C6aD5f86b9ab',
@@ -21,7 +21,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurveAnkrVoterProxy',
-    added: false,
+    added: true,
     address: '0xBdCeae91e10A80dbD7ad5e884c86EAe56b075Caa',
     requiredHarvestAmount: e18.mul(2_000),
     vault: '0xE625F5923303f1CE7A43ACFEFd11fd12f30DbcA4',
@@ -83,7 +83,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurvemUSDVoterProxy',
-    added: false,
+    added: true,
     address: '0xBcC6abd115a32fC27f7B49F9e17D0BcefDd278aC',
     requiredHarvestAmount: e18.mul(1_000),
     vault: '0x0FCDAeDFb8A7DfDa2e9838564c5A1665d856AFDF',
@@ -107,7 +107,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurveUSDPVoterProxy',
-    added: false,
+    added: true,
     address: '0x8c151a8F106Bad20A501DC758c19Fab28a040759',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x1B5eb1173D2Bf770e50F10410C9a96F7a8eB6e75',
@@ -115,7 +115,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurvesaCRVVoterProxy',
-    added: false,
+    added: true,
     address: '0x8e2057b8fe8e680B48858cDD525EBc9510620621',
     requiredHarvestAmount: e18.mul(5_000),
     vault: '0xBacB69571323575C6a5A3b4F9EEde1DC7D31FBc1',
@@ -195,7 +195,7 @@ export const v1CrvStrategies = [
   },
   {
     name: 'StrategyCurveLINKVoterProxy',
-    added: false,
+    added: true,
     address: '0x153Fe8894a76f14bC8c8B02Dd81eFBB6d24E909f',
     requiredHarvestAmount: e18.mul(2_000),
     vault: '0x96Ea6AF74Af09522fCB4c28C269C26F59a31ced6',
