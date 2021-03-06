@@ -43,6 +43,8 @@ interface ICrvStrategyKeep3rJob {
     // Getters
     function strategies() external view returns (address[] memory _strategies);
 
+    function workableStrategy(address _strategy) external returns (bool);
+
     function requiredHarvest(address _strategy) external view returns (uint256 _requiredHarvest);
 
     function requiredEarn(address _strategy) external view returns (uint256 _requiredEarn);

@@ -11,7 +11,7 @@ const config = require('../../../.config.json');
 const proxyJobs = config.contracts.mainnet.proxyJobs;
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
+const confirm = new Confirm('Do you want to add strategies to crv keep3r job?');
 
 async function main() {
   await hre.run('compile');
@@ -35,7 +35,6 @@ function run() {
         config.accounts.mainnet.deployer
       );
     }
-    console.log('using address:', deployer._address);
 
     const crvStrategyKeep3rJob = await ethers.getContractAt(
       'CrvStrategyKeep3rJob',
@@ -61,7 +60,11 @@ function run() {
     );
     console.log('adding', newV1CrvStrategies.length, 'new v1CrvStrategies');
     console.log(newV1CrvStrategies.map((strategy) => strategy.name).join(', '));
+
+    if (newV1CrvStrategies.length == 0) return;
     // Add crv strategies to crv keep3r
+    if (!(await confirm.run())) return;
+
     console.time('addStrategies');
     await crvStrategyKeep3rJob.addStrategies(
       newV1CrvStrategies.map((strategy) => strategy.address),
@@ -76,8 +79,6 @@ function run() {
   });
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {

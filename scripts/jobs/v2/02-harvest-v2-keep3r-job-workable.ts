@@ -1,9 +1,5 @@
-// function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernorOrMechanic {
-import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
-import { bnToDecimal } from '../../../utils/web3-utils';
 import config from '../../../.config.json';
-import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
 const mainnetContracts = config.contracts.mainnet;
 
 async function main() {
@@ -42,8 +38,6 @@ function promptAndSubmit(): Promise<void | Error> {
   });
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {

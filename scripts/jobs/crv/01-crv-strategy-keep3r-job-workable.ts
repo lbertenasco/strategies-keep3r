@@ -21,7 +21,11 @@ function promptAndSubmit(): Promise<void | Error> {
       );
 
       const strategies = await crvStrategyKeep3rJob.callStatic.strategies();
+
       for (const strategy of strategies) {
+        const requiredHarvest = await crvStrategyKeep3rJob.callStatic.requiredHarvest(
+          strategy
+        );
         const harvest = await crvStrategyKeep3rJob.callStatic.calculateHarvest(
           strategy
         );
@@ -29,12 +33,17 @@ function promptAndSubmit(): Promise<void | Error> {
           (strategyData: any) => strategyData.address == strategy
         );
         if (!strategyData) continue;
+        // const workable = maxHarvestPeriod.add(lastWorkAt).lt()
         console.log(
           'strategy',
           strategyData.name,
+          'requiredHarvest:',
+          bnToDecimal(requiredHarvest),
           'harvests:',
           bnToDecimal(harvest)
         );
+        const workable = harvest.gte(requiredHarvest);
+        console.log('workable:', workable, workable ? strategy : '');
       }
       resolve();
     } catch (err) {
