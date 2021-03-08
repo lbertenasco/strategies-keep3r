@@ -5,8 +5,10 @@ import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3r.sol";
 interface IKeep3rProxyJob is IKeep3r {
     event Worked(address _job, address _keeper);
 
+    // view
     function jobs() external view returns (address[] memory validJobs);
 
+    // keeper
     function work(address _job, bytes calldata _workData) external;
 
     // use callStatic
