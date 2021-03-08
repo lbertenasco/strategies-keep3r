@@ -12,6 +12,11 @@ const scripts = [
     path: 'scripts/jobs/crv/02-crv-strategy-keep3r-job-add-strategies.js',
     networks: ['hardhat', 'mainnet'],
   },
+  {
+    name: 'proxy:: workable: fast',
+    path: 'scripts/proxy-job/01-workable-keep3r-proxy-job-fast.js',
+    networks: ['staticMainnet'],
+  },
 ];
 const selectScriptPrompt = new Select({
   message: 'Select a script to run',

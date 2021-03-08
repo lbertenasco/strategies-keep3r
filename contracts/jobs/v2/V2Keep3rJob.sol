@@ -5,12 +5,12 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
+import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1Helper.sol";
 
 import "../../proxy-job/Keep3rJob.sol";
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
-import "../../interfaces/keep3r/IKeep3rV1Helper.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 
