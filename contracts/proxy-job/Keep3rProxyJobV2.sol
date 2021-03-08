@@ -17,11 +17,8 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
 
     EnumerableSet.AddressSet internal _validJobs;
 
-    // TODO This should be job mappings
     mapping(address => uint256) public override usedCredits;
     mapping(address => uint256) public override maxCredits;
-
-    // Add work for direct KP3Rs
 
     constructor(
         address _mechanicsRegistry,
