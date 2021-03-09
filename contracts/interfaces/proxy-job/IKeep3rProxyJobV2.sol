@@ -9,11 +9,17 @@ interface IKeep3rProxyJobV2 is IKeep3r {
     event Worked(address _job, address _keeper);
 
     // setters
-    function addValidJob(address _job, uint256 _maxCredits) external;
+    function addValidJob(
+        address _job,
+        uint256 _maxCredits,
+        uint256 _rewardMultiplier
+    ) external;
 
     function removeValidJob(address _job) external;
 
     function setJobMaxCredits(address _job, uint256 _maxCredits) external;
+
+    function setJobRewardMultiplier(address _job, uint256 _rewardMultiplier) external;
 
     // view
     function jobs() external view returns (address[] memory validJobs);
@@ -22,12 +28,14 @@ interface IKeep3rProxyJobV2 is IKeep3r {
 
     function maxCredits(address _job) external view returns (uint256 _maxCredits);
 
+    function rewardMultiplier(address _job) external view returns (uint256 _rewardMultiplier);
+
     // keeper
-    function work(address _job, bytes calldata _workData) external;
+    function work(address _job, bytes calldata _workData) external returns (uint256 _credits);
 
-    function workForBond(address _job, bytes calldata _workData) external;
+    function workForBond(address _job, bytes calldata _workData) external returns (uint256 _credits);
 
-    function workForTokens(address _job, bytes calldata _workData) external;
+    function workForTokens(address _job, bytes calldata _workData) external returns (uint256 _credits);
 
     // use callStatic
     function workable(address _job) external returns (bool _workable);

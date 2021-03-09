@@ -17,8 +17,12 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
 
     EnumerableSet.AddressSet internal _validJobs;
 
+    uint256 public constant PRECISION = 1_000;
+    uint256 public constant MAX_REWARD_MULTIPLIER = 1_500; // 1.5x max reward multiplier
+
     mapping(address => uint256) public override usedCredits;
     mapping(address => uint256) public override maxCredits;
+    mapping(address => uint256) public override rewardMultiplier;
 
     constructor(
         address _mechanicsRegistry,
@@ -48,10 +52,15 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
     }
 
     // Setters
-    function addValidJob(address _job, uint256 _maxCredits) external override onlyGovernorOrMechanic {
+    function addValidJob(
+        address _job,
+        uint256 _maxCredits,
+        uint256 _rewardMultiplier
+    ) external override onlyGovernorOrMechanic {
         require(!_validJobs.contains(_job), "Keep3rProxyJob::add-valid-job:job-already-added");
         _validJobs.add(_job);
         _setJobMaxCredits(_job, _maxCredits);
+        _setJobRewardMultiplier(_job, _rewardMultiplier);
         emit AddValidJob(_job, _maxCredits);
     }
 
@@ -76,6 +85,16 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
         maxCredits[_job] = _maxCredits;
     }
 
+    function setJobRewardMultiplier(address _job, uint256 _rewardMultiplier) external override onlyGovernorOrMechanic {
+        _setJobRewardMultiplier(_job, _rewardMultiplier);
+        emit SetJobMaxCredits(_job, _rewardMultiplier);
+    }
+
+    function _setJobRewardMultiplier(address _job, uint256 _rewardMultiplier) internal {
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "Keep3rProxyJob::set-reward-multiplier:multiplier-exceeds-max");
+        rewardMultiplier[_job] = _rewardMultiplier;
+    }
+
     // Getters
     function jobs() public view override returns (address[] memory validJobs) {
         validJobs = new address[](_validJobs.length());
@@ -90,29 +109,38 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
         return IKeep3rJob(_job).workable();
     }
 
-    function work(address _job, bytes calldata _workData) external override {
-        workForBond(_job, _workData);
+    function work(address _job, bytes calldata _workData) external override returns (uint256 _credits) {
+        return workForBond(_job, _workData);
     }
 
-    function workForBond(address _job, bytes calldata _workData) public override notPaused updateCredits(_job) onlyKeeper paysKeeper {
-        _work(_job, _workData);
+    function workForBond(address _job, bytes calldata _workData) public override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _work(_job, _workData);
+        _paysKeeperAmount(msg.sender, _credits);
     }
 
-    function workForTokens(address _job, bytes calldata _workData)
-        external
-        override
-        notPaused
-        updateCredits(_job)
-        onlyKeeper
-        paysKeeperInTokens
-    {
-        _work(_job, _workData);
+    function workForTokens(address _job, bytes calldata _workData) external override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _work(_job, _workData);
+        _paysKeeperInTokens(msg.sender, _credits);
     }
 
-    function _work(address _job, bytes calldata _workData) internal {
+    function _work(address _job, bytes calldata _workData) internal returns (uint256 _credits) {
         require(isValidJob(_job), "Keep3rProxyJob::work:invalid-job");
+
+        uint256 _gasUsed = gasleft();
+
         IKeep3rJob(_job).work(_workData);
+
+        _credits = _calculateCredits(_job, _gasUsed);
+
+        _updateCredits(_job, _credits);
         emit Worked(_job, msg.sender);
+    }
+
+    function _updateCredits(address _job, uint256 _credits) internal {
+        // skip check if job's maxCredits is 0 (not limited)
+        if (maxCredits[_job] == 0) return;
+        usedCredits[_job] = usedCredits[_job].add(_credits);
+        require(usedCredits[_job] <= maxCredits[_job], "Keep3rProxyJob::update-credits:used-credits-exceed-max-credits");
     }
 
     // View helpers
@@ -120,14 +148,8 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
         return _validJobs.contains(_job);
     }
 
-    // Modifiers
-    modifier updateCredits(address _job) {
-        // skip check if job's maxCredits is 0 (not limited)
-        if (maxCredits[_job] == 0) return;
-        uint256 _beforeCredits = _Keep3r.credits(address(this), address(_Keep3r));
-        _;
-        uint256 _afterCredits = _Keep3r.credits(address(this), address(_Keep3r));
-        usedCredits[_job] = usedCredits[_job].add(_beforeCredits.sub(_afterCredits));
-        require(usedCredits[_job] <= maxCredits[_job], "Keep3rProxyJob::update-credits:used-credits-exceed-max-credits");
+    function _calculateCredits(address _job, uint256 _gasUsed) internal view returns (uint256 _credits) {
+        // Gets default credits from KP3R_Helper and applies job reward multiplier
+        return _getQuoteLimit(_gasUsed).mul(rewardMultiplier[_job]).div(PRECISION);
     }
 }

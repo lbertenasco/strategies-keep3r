@@ -66,6 +66,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3rJob, ICrvStrategyKeep3rJo
         _setRequiredHarvest(_strategy, _requiredHarvest);
         _setRequiredEarn(_strategy, _requiredEarn);
         _availableStrategies.add(_strategy);
+        lastWorkAt[_strategy] = now;
         emit StrategyAdded(_strategy, _requiredHarvest, _requiredEarn);
     }
 
