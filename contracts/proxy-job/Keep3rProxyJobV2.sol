@@ -18,7 +18,7 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
     EnumerableSet.AddressSet internal _validJobs;
 
     uint256 public constant PRECISION = 1_000;
-    uint256 public constant MAX_REWARD_MULTIPLIER = 1_500; // 1.5x max reward multiplier
+    uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
 
     mapping(address => uint256) public override usedCredits;
     mapping(address => uint256) public override maxCredits;
@@ -126,11 +126,11 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
     function _work(address _job, bytes calldata _workData) internal returns (uint256 _credits) {
         require(isValidJob(_job), "Keep3rProxyJob::work:invalid-job");
 
-        uint256 _gasUsed = gasleft();
+        uint256 _initialGas = gasleft();
 
         IKeep3rJob(_job).work(_workData);
 
-        _credits = _calculateCredits(_job, _gasUsed);
+        _credits = _calculateCredits(_job, _initialGas);
 
         _updateCredits(_job, _credits);
         emit Worked(_job, msg.sender);
@@ -148,8 +148,8 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
         return _validJobs.contains(_job);
     }
 
-    function _calculateCredits(address _job, uint256 _gasUsed) internal view returns (uint256 _credits) {
+    function _calculateCredits(address _job, uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimit(_gasUsed).mul(rewardMultiplier[_job]).div(PRECISION);
+        return _getQuoteLimit(_initialGas).mul(rewardMultiplier[_job]).div(PRECISION);
     }
 }
