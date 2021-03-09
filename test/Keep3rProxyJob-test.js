@@ -77,6 +77,9 @@ describe('Keep3rProxyJob', function () {
       'contracts/keep3r/Keep3rEscrow.sol:Keep3rEscrow'
     );
     const Keep3rProxyJob = await ethers.getContractFactory('Keep3rProxyJob');
+    const Keep3rProxyJobV2 = await ethers.getContractFactory(
+      'Keep3rProxyJobV2'
+    );
     const Keep3rEscrowJob = await ethers.getContractFactory('Keep3rEscrowJob');
 
     const keep3rEscrow1 = await ethers.getContractAt(
@@ -108,10 +111,19 @@ describe('Keep3rProxyJob', function () {
       deployer
     );
 
-    const keep3rProxyJob = await ethers.getContractAt(
-      'Keep3rProxyJob',
-      escrowContracts.proxyJob,
-      deployer
+    // const keep3rProxyJob = await ethers.getContractAt(
+    //   'Keep3rProxyJob',
+    //   escrowContracts.proxyJob,
+    //   deployer
+    // );
+    const keep3rProxyJob = await Keep3rProxyJobV2.deploy(
+      mechanicsContracts.registry,
+      escrowContracts.keep3r,
+      ZERO_ADDRESS, // // KP3R bond
+      e18.mul('50'), // 50 KP3Rs bond requirement
+      0,
+      0,
+      true
     );
 
     // Deploy mechanics registry
@@ -119,26 +131,26 @@ describe('Keep3rProxyJob', function () {
     // const mechanicsRegistry = await MechanicsRegistry.deploy(owner.address);
     // await mechanicsRegistry.addMechanic(deployer._address);
 
-    const keep3rEscrowJob = await Keep3rEscrowJob.deploy(
-      mechanicsContracts.registry,
-      escrowContracts.keep3r,
-      escrowContracts.proxyJob,
-      escrowContracts.lpToken,
-      escrowContracts.escrow1,
-      escrowContracts.escrow2
-    );
+    // const keep3rEscrowJob = await Keep3rEscrowJob.deploy(
+    //   mechanicsContracts.registry,
+    //   escrowContracts.keep3r,
+    //   escrowContracts.proxyJob,
+    //   escrowContracts.lpToken,
+    //   escrowContracts.escrow1,
+    //   escrowContracts.escrow2
+    // );
 
     // Setup keep3rEscrowJob as governor of escrows
-    await keep3rEscrow1.setPendingGovernor(keep3rEscrowJob.address);
-    await keep3rEscrow2.setPendingGovernor(keep3rEscrowJob.address);
-    await keep3rEscrowJob.acceptGovernorOnEscrow(keep3rEscrow1.address);
-    await keep3rEscrowJob.acceptGovernorOnEscrow(keep3rEscrow2.address);
+    // await keep3rEscrow1.setPendingGovernor(keep3rEscrowJob.address);
+    // await keep3rEscrow2.setPendingGovernor(keep3rEscrowJob.address);
+    // await keep3rEscrowJob.acceptGovernorOnEscrow(keep3rEscrow1.address);
+    // await keep3rEscrowJob.acceptGovernorOnEscrow(keep3rEscrow2.address);
     // ADD escrowJob as valid job
     // await keep3rProxyJob.addValidJob(keep3rEscrowJob.address);
 
     // Setup ProxyJob as a keep3r job
-    // await keep3r.addJob(keep3rProxyJob.address);
-    // await keep3r.addKPRCredit(keep3rProxyJob.address, e18.mul(100));
+    await keep3r.addJob(keep3rProxyJob.address);
+    await keep3r.addKPRCredit(keep3rProxyJob.address, e18.mul(100));
 
     // // Deploy Vault Job
     // const VaultKeep3rJob = await ethers.getContractFactory('VaultKeep3rJob');
@@ -172,7 +184,7 @@ describe('Keep3rProxyJob', function () {
       await CrvStrategyKeep3rJob.deploy(
         mechanicsContracts.registry,
         escrowContracts.proxyJob,
-        e18.mul(10) // 10 credits
+        1
       )
     ).connect(keeper);
     await keep3rProxyJob.addValidJob(crvStrategyKeep3rJob.address);
