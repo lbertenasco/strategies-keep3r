@@ -197,7 +197,7 @@ export const v1CrvStrategies = [
     name: 'StrategyCurveLINKVoterProxy',
     added: true,
     address: '0x153Fe8894a76f14bC8c8B02Dd81eFBB6d24E909f',
-    requiredHarvestAmount: e18.mul(2_000),
+    requiredHarvestAmount: defaultRequiredHarvestAmount,
     vault: '0x96Ea6AF74Af09522fCB4c28C269C26F59a31ced6',
     earn: { amount: 2_000, decimals: 18 },
   },
