@@ -30,7 +30,7 @@ contract MockStrategy is StrategyCurveYVoterProxy {
             path[1] = weth;
             path[2] = dai;
 
-            Uni(uni).swapExactTokensForTokens(_crv, uint256(0), path, address(this), now.add(1800));
+            Uni(uni).swapExactTokensForTokens(_crv, uint256(0), path, address(this), block.timestamp.add(1800));
         }
     }
 }

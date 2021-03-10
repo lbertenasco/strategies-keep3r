@@ -134,7 +134,7 @@ describe('Keep3rProxyJob', function () {
     // const keep3rEscrowJob = await Keep3rEscrowJob.deploy(
     //   mechanicsContracts.registry,
     //   escrowContracts.keep3r,
-    //   escrowContracts.proxyJob,
+    //   keep3rProxyJob.address,
     //   escrowContracts.lpToken,
     //   escrowContracts.escrow1,
     //   escrowContracts.escrow2
@@ -157,7 +157,7 @@ describe('Keep3rProxyJob', function () {
     // const vaultKeep3rJob = (
     //   await VaultKeep3rJob.deploy(
     //     mechanicsContracts.registry,
-    //     escrowContracts.proxyJob,
+    //     keep3rProxyJob.address,
     //     12 * 60 * 60, // 12 hours
     //     e18.mul(10), // 10 credits
     //     gwei.mul(250) // 150 max gwei
@@ -183,11 +183,17 @@ describe('Keep3rProxyJob', function () {
     const crvStrategyKeep3rJob = (
       await CrvStrategyKeep3rJob.deploy(
         mechanicsContracts.registry,
-        escrowContracts.proxyJob,
+        keep3rProxyJob.address,
         1
       )
     ).connect(keeper);
-    await keep3rProxyJob.addValidJob(crvStrategyKeep3rJob.address);
+
+    await keep3rProxyJob.addValidJob(
+      crvStrategyKeep3rJob.address,
+      e18.mul(10), // _maxCredits
+      1_000 // _rewardMultiplier 1x
+    );
+
     const ycrvStrategyAddress = '0x07DB4B9b3951094B9E278D336aDf46a036295DE7';
     const ycrvStrategy = await ethers.getContractAt(
       'StrategyCurveYVoterProxy',
