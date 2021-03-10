@@ -53,13 +53,13 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
         // The escrow with liquidityAmount is the one to call applyCreditToJob, the other should call unbondLiquidityFromJob
         if (
             Keep3rV1.liquidityAmount(address(Escrow1), address(Liquidity), address(Keep3rProxyJob)) > 0 &&
-            Keep3rV1.liquidityApplied(address(Escrow1), address(Liquidity), address(Keep3rProxyJob)) < now
+            Keep3rV1.liquidityApplied(address(Escrow1), address(Liquidity), address(Keep3rProxyJob)) < block.timestamp
         ) {
             return (Escrow1, Actions.applyCreditToJob);
         }
         if (
             Keep3rV1.liquidityAmount(address(Escrow2), address(Liquidity), address(Keep3rProxyJob)) > 0 &&
-            Keep3rV1.liquidityApplied(address(Escrow2), address(Liquidity), address(Keep3rProxyJob)) < now
+            Keep3rV1.liquidityApplied(address(Escrow2), address(Liquidity), address(Keep3rProxyJob)) < block.timestamp
         ) {
             return (Escrow2, Actions.applyCreditToJob);
         }
@@ -67,12 +67,12 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
         // Check if we can removeLiquidityFromJob & instantly addLiquidityToJob
         uint256 liquidityAmountsUnbonding1 = Keep3rV1.liquidityAmountsUnbonding(address(Escrow1), address(Liquidity), address(Keep3rProxyJob));
         uint256 liquidityUnbonding1 = Keep3rV1.liquidityUnbonding(address(Escrow1), address(Liquidity), address(Keep3rProxyJob));
-        if (liquidityAmountsUnbonding1 > 0 && liquidityUnbonding1 < now) {
+        if (liquidityAmountsUnbonding1 > 0 && liquidityUnbonding1 < block.timestamp) {
             return (Escrow1, Actions.removeLiquidityFromJob);
         }
         uint256 liquidityAmountsUnbonding2 = Keep3rV1.liquidityAmountsUnbonding(address(Escrow2), address(Liquidity), address(Keep3rProxyJob));
         uint256 liquidityUnbonding2 = Keep3rV1.liquidityUnbonding(address(Escrow2), address(Liquidity), address(Keep3rProxyJob));
-        if (liquidityAmountsUnbonding2 > 0 && liquidityUnbonding2 < now) {
+        if (liquidityAmountsUnbonding2 > 0 && liquidityUnbonding2 < block.timestamp) {
             return (Escrow2, Actions.removeLiquidityFromJob);
         }
 
@@ -140,7 +140,7 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
                     uint256 _liquidityAmountsUnbonding =
                         Keep3rV1.liquidityAmountsUnbonding(address(OtherEscrow), address(Liquidity), address(Keep3rProxyJob));
                     uint256 _liquidityUnbonding = Keep3rV1.liquidityUnbonding(address(OtherEscrow), address(Liquidity), address(Keep3rProxyJob));
-                    if (_liquidityAmountsUnbonding > 0 && _liquidityUnbonding < now) {
+                    if (_liquidityAmountsUnbonding > 0 && _liquidityUnbonding < block.timestamp) {
                         OtherEscrow.removeLiquidityFromJob(address(Liquidity), address(Keep3rProxyJob));
                         _amount = Liquidity.balanceOf(address(OtherEscrow));
                         OtherEscrow.addLiquidityToJob(address(Liquidity), address(Keep3rProxyJob), _amount);
