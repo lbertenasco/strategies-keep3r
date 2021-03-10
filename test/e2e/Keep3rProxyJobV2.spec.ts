@@ -5,6 +5,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { Contract, ContractFactory, utils } from 'ethers';
 import { expect } from 'chai';
 import { JsonRpcSigner } from '@ethersproject/providers';
+import { evm } from '../utils';
 
 const escrowContracts = config.contracts.mainnet.escrow;
 const mechanicsContracts = config.contracts.mainnet.mechanics;
@@ -31,16 +32,9 @@ describe('Keep3rProxyJobV2', () => {
   });
 
   beforeEach(async () => {
-    await network.provider.request({
-      method: 'hardhat_reset',
-      params: [
-        {
-          forking: {
-            jsonRpcUrl: process.env.MAINNET_HTTPS_URL,
-            blockNumber: 12010939,
-          },
-        },
-      ],
+    await evm.reset({
+      jsonRpcUrl: process.env.MAINNET_HTTPS_URL,
+      blockNumber: 12010939,
     });
     // impersonate keep3rGovernance
     await network.provider.request({
@@ -89,44 +83,157 @@ describe('Keep3rProxyJobV2', () => {
   });
 
   describe('setKeep3r', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('setKeep3rRequirements', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('addValidJob', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('removeValidJob', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('setJobMaxCredits', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('setJobRewardMultiplier', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('jobs', () => {
-    it('passess');
+    it('TODO');
   });
 
   describe('workable', () => {
-    it('passess');
+    it('TODO');
   });
+
+  const shouldBehaveLikeWorkRevertsWhenNotFromWorker = async (
+    workData: any
+  ) => {
+    await expect(
+      keep3rProxyJobV2.workForBond(keep3rJob.address, workData)
+    ).to.be.revertedWith('keep3r::isKeeper:keeper-not-min-requirements');
+  };
+
+  const shouldBehaveLikeWorkedForBonds = async (workData: any) => {
+    const initialBonded = await keep3rV1Helper.callStatic.bonds(
+      await keeper.getAddress()
+    );
+    await keep3rProxyJobV2
+      .connect(keeper)
+      .workForBond(keep3rJob.address, workData);
+    expect(
+      await keep3rV1Helper.callStatic.bonds(await keeper.getAddress())
+    ).to.be.gt(initialBonded);
+  };
+
+  const shouldBehaveLikeWorkWorked = async (workData: any) => {
+    const initialTimesWorked = await keep3rJob.timesWorked();
+    await keep3rProxyJobV2
+      .connect(keeper)
+      .workForBond(keep3rJob.address, workData);
+    expect(await keep3rJob.timesWorked()).to.equal(initialTimesWorked.add(1));
+  };
+
+  const shouldBehaveLikeWorkUpdatedCredits = async (workData: any) => {
+    const initialUsedCredits = await keep3rProxyJobV2.usedCredits(
+      keep3rJob.address
+    );
+    await keep3rProxyJobV2
+      .connect(keeper)
+      .workForTokens(keep3rJob.address, workData);
+    expect(await keep3rProxyJobV2.usedCredits(keep3rJob.address)).to.be.gt(
+      initialUsedCredits
+    );
+  };
+
+  const shouldBehaveLikeWorkEmittedEvent = async (workData: any) => {
+    await expect(
+      keep3rProxyJobV2.connect(keeper).workForBond(keep3rJob.address, workData)
+    )
+      .to.emit(keep3rProxyJobV2, 'Worked')
+      .withArgs(keep3rJob.address, await keeper.getAddress);
+  };
+
+  const shouldBehaveLikeWorkHitMaxCredits = async () => {
+    const newKeep3rJob = await keep3rJobContract.deploy(
+      keep3rProxyJobV2.address,
+      utils.parseUnits('150', 'gwei')
+    );
+    await keep3rProxyJobV2.addValidJob(
+      newKeep3rJob.address,
+      utils.parseUnits('0.2', 'ether'), // _maxCredits
+      1_000 // _rewardMultiplier 1x
+    );
+    const workData = await newKeep3rJob.callStatic.getWorkData();
+    let tested = false;
+    while (!tested) {
+      try {
+        await keep3rProxyJobV2
+          .connect(keeper)
+          .workForBond(newKeep3rJob.address, workData);
+      } catch (err) {
+        expect(err.message).to.equal(
+          'VM Exception while processing transaction: revert Keep3rProxyJob::update-credits:used-credits-exceed-max-credits'
+        );
+        tested = true;
+      }
+    }
+  };
+
+  const shouldBehaveLikeRewardMultiplierMatters = async (workData: any) => {
+    const newKeep3rJob = await keep3rJobContract.deploy(
+      keep3rProxyJobV2.address,
+      utils.parseUnits('150', 'gwei')
+    );
+    await keep3rProxyJobV2.addValidJob(
+      newKeep3rJob.address,
+      utils.parseUnits('0.2', 'ether'), // _maxCredits
+      0_005 // _rewardMultiplier 0.5x
+    );
+    const initial1XKeep3r = await keep3rProxyJobV2.usedCredits(
+      keep3rJob.address
+    );
+    await keep3rProxyJobV2
+      .connect(keeper)
+      .workForBond(keep3rJob.address, workData);
+    const consumedWith1X = (
+      await keep3rProxyJobV2.usedCredits(keep3rJob.address)
+    ).sub(initial1XKeep3r);
+
+    const newWorkData = await newKeep3rJob.callStatic.getWorkData();
+    const initial0500XKeep3r = await keep3rProxyJobV2.usedCredits(
+      newKeep3rJob.address
+    );
+    await keep3rProxyJobV2
+      .connect(keeper)
+      .workForBond(newKeep3rJob.address, newWorkData);
+    const consumedWith0500X = (
+      await keep3rProxyJobV2.usedCredits(newKeep3rJob.address)
+    ).sub(initial0500XKeep3r);
+    expect(consumedWith1X).to.be.gt(consumedWith0500X.mul(2));
+  };
 
   describe('work', () => {
-    it('passess');
-  });
-
-  describe('workForBond', () => {
+    let workData: any;
+    beforeEach(async () => {
+      workData = await keep3rJob.callStatic.getWorkData();
+    });
     context('when not working from a keeper', () => {
-      it('reverts with message');
+      let workData: any;
+      beforeEach(async () => {
+        workData = await keep3rJob.callStatic.getWorkData();
+      });
+      it('reverts with message', async () => {
+        await shouldBehaveLikeWorkRevertsWhenNotFromWorker(workData);
+      });
     });
     context('when working from a keeper', () => {
       let workData: any;
@@ -134,44 +241,66 @@ describe('Keep3rProxyJobV2', () => {
         workData = await keep3rJob.callStatic.getWorkData();
       });
       it('works', async () => {
-        const initialTimesWorked = await keep3rJob.timesWorked();
-        await keep3rProxyJobV2
-          .connect(keeper)
-          .workForBond(keep3rJob.address, workData);
-        expect(await keep3rJob.timesWorked()).to.equal(
-          initialTimesWorked.add(1)
-        );
+        await shouldBehaveLikeWorkWorked(workData);
       });
-      it('pays keeper with bonded keep3r', async () => {
-        const initialBonded = await keep3rV1Helper.callStatic.bonds(
-          await keeper.getAddress()
-        );
-        await keep3rProxyJobV2
-          .connect(keeper)
-          .workForBond(keep3rJob.address, workData);
-        expect(
-          await keep3rV1Helper.callStatic.bonds(await keeper.getAddress())
-        ).to.be.gt(initialBonded);
+      it('defaults to work for bonded keep3rs', async () => {
+        await shouldBehaveLikeWorkedForBonds(workData);
       });
       it('updates jobs used credits', async () => {
-        const initialUsedCredits = await keep3rProxyJobV2.usedCredits(
-          keep3rJob.address
-        );
-        await keep3rProxyJobV2
-          .connect(keeper)
-          .workForBond(keep3rJob.address, workData);
-        expect(await keep3rProxyJobV2.usedCredits(keep3rJob.address)).to.be.gt(
-          initialUsedCredits
-        );
+        await shouldBehaveLikeWorkUpdatedCredits(workData);
       });
       it('emits event', async () => {
-        await expect(
-          keep3rProxyJobV2
-            .connect(keeper)
-            .workForBond(keep3rJob.address, workData)
-        )
-          .to.emit(keep3rProxyJobV2, 'Worked')
-          .withArgs(keep3rJob.address, await keeper.getAddress);
+        await shouldBehaveLikeWorkEmittedEvent(workData);
+      });
+      context('when working and hitting max credits', () => {
+        it('reverts with message', async () => {
+          await shouldBehaveLikeWorkHitMaxCredits();
+        });
+      });
+      context('when working a job with reward multiplier', () => {
+        it('applies reward multiplier correctly to reward', async () => {
+          await shouldBehaveLikeRewardMultiplierMatters(workData);
+        });
+      });
+    });
+  });
+
+  describe('workForBond', () => {
+    context('when not working from a keeper', () => {
+      let workData: any;
+      beforeEach(async () => {
+        workData = await keep3rJob.callStatic.getWorkData();
+      });
+      it('reverts with message', async () => {
+        await shouldBehaveLikeWorkRevertsWhenNotFromWorker(workData);
+      });
+    });
+    context('when working from a keeper', () => {
+      let workData: any;
+      beforeEach(async () => {
+        workData = await keep3rJob.callStatic.getWorkData();
+      });
+      it('works', async () => {
+        await shouldBehaveLikeWorkWorked(workData);
+      });
+      it('pays keeper with bonded keep3r', async () => {
+        await shouldBehaveLikeWorkedForBonds(workData);
+      });
+      it('updates jobs used credits', async () => {
+        await shouldBehaveLikeWorkUpdatedCredits(workData);
+      });
+      it('emits event', async () => {
+        await shouldBehaveLikeWorkEmittedEvent(workData);
+      });
+      context('when working and hitting max credits', () => {
+        it('reverts with message', async () => {
+          await shouldBehaveLikeWorkHitMaxCredits();
+        });
+      });
+      context('when working a job with reward multiplier', () => {
+        it('applies reward multiplier correctly to reward', async () => {
+          await shouldBehaveLikeRewardMultiplierMatters(workData);
+        });
       });
     });
   });
@@ -181,45 +310,56 @@ describe('Keep3rProxyJobV2', () => {
     beforeEach(async () => {
       workData = await keep3rJob.callStatic.getWorkData();
     });
-    it('works', async () => {
-      const initialTimesWorked = await keep3rJob.timesWorked();
-      await keep3rProxyJobV2
-        .connect(keeper)
-        .workForTokens(keep3rJob.address, workData);
-      expect(await keep3rJob.timesWorked()).to.equal(initialTimesWorked.add(1));
+    context('when not working from a keeper', () => {
+      let workData: any;
+      beforeEach(async () => {
+        workData = await keep3rJob.callStatic.getWorkData();
+      });
+      it('reverts with message', async () => {
+        await shouldBehaveLikeWorkRevertsWhenNotFromWorker(workData);
+      });
     });
-    it('pays keeper with keep3r tokens', async () => {
-      const initialBalance = await keep3r.balanceOf(await keeper.getAddress());
-      await keep3rProxyJobV2
-        .connect(keeper)
-        .workForTokens(keep3rJob.address, workData);
-      expect(await keep3r.balanceOf(await keeper.getAddress())).to.be.gt(
-        initialBalance
-      );
-    });
-    it('updates jobs used credits', async () => {
-      const initialUsedCredits = await keep3rProxyJobV2.usedCredits(
-        keep3rJob.address
-      );
-      await keep3rProxyJobV2
-        .connect(keeper)
-        .workForTokens(keep3rJob.address, workData);
-      expect(await keep3rProxyJobV2.usedCredits(keep3rJob.address)).to.be.gt(
-        initialUsedCredits
-      );
-    });
-    it('emits event', async () => {
-      await expect(
-        keep3rProxyJobV2
+    context('when working from a keeper', () => {
+      it('works', async () => {
+        await shouldBehaveLikeWorkWorked(workData);
+      });
+      it('pays keeper with keep3r tokens', async () => {
+        const initialBonded = await keep3rV1Helper.callStatic.bonds(
+          await keeper.getAddress()
+        );
+        const initialBalance = await keep3r.balanceOf(
+          await keeper.getAddress()
+        );
+        await keep3rProxyJobV2
           .connect(keeper)
-          .workForTokens(keep3rJob.address, workData)
-      )
-        .to.emit(keep3rProxyJobV2, 'Worked')
-        .withArgs(keep3rJob.address, await keeper.getAddress);
+          .workForTokens(keep3rJob.address, workData);
+        expect(await keep3r.balanceOf(await keeper.getAddress())).to.be.gt(
+          initialBalance
+        );
+        expect(
+          await keep3rV1Helper.callStatic.bonds(await keeper.getAddress())
+        ).to.be.equal(initialBonded);
+      });
+      it('updates jobs used credits', async () => {
+        await shouldBehaveLikeWorkUpdatedCredits(workData);
+      });
+      it('emits event', async () => {
+        await shouldBehaveLikeWorkEmittedEvent(workData);
+      });
+      context('when working and hitting max credits', () => {
+        it('reverts with message', async () => {
+          await shouldBehaveLikeWorkHitMaxCredits();
+        });
+      });
+      context('when working a job with reward multiplier', () => {
+        it('applies reward multiplier correctly to reward', async () => {
+          await shouldBehaveLikeRewardMultiplierMatters(workData);
+        });
+      });
     });
   });
 
   describe('isValidJob', () => {
-    it('passess');
+    it('TODO');
   });
 });

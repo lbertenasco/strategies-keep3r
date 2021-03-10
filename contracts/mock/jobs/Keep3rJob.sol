@@ -26,8 +26,8 @@ contract Keep3rJobMock is Keep3rJob {
         return true;
     }
 
-    function workable(address _sth) public view returns (bool) {
-        return _sth == address(this); 
+    function workable(address _contractAddress) public view returns (bool) {
+        return _contractAddress == address(this); 
     } 
 
     // Keep3r actions
