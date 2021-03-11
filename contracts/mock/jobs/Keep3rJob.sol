@@ -48,6 +48,7 @@ contract Keep3rJobMock is Keep3rJob {
         return msg.sender;
     }
     function isGovernor(address _account) external override view returns (bool _isGovernor) {
+        _account; // shh
         return true;
     }
     function pendingGovernor() external override view returns (address _pendingGovernor) {}

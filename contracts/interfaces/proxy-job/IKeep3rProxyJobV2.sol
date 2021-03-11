@@ -6,7 +6,8 @@ interface IKeep3rProxyJobV2 is IKeep3r {
     event AddValidJob(address _job, uint256 _maxCredits);
     event RemoveValidJob(address _job);
     event SetJobMaxCredits(address _job, uint256 _maxCredits);
-    event Worked(address _job, address _keeper);
+    event SetJobRewardMultiplier(address _job, uint256 _rewardMultiplier);
+    event Worked(address _job, address _keeper, uint256 _credits, bool _workForTokens);
 
     // setters
     function addValidJob(
