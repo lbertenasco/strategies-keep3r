@@ -87,7 +87,7 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
 
     function setJobRewardMultiplier(address _job, uint256 _rewardMultiplier) external override onlyGovernorOrMechanic {
         _setJobRewardMultiplier(_job, _rewardMultiplier);
-        emit SetJobMaxCredits(_job, _rewardMultiplier);
+        emit SetJobRewardMultiplier(_job, _rewardMultiplier);
     }
 
     function _setJobRewardMultiplier(address _job, uint256 _rewardMultiplier) internal {
@@ -114,16 +114,20 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
     }
 
     function workForBond(address _job, bytes calldata _workData) public override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_job, _workData);
+        _credits = _work(_job, _workData, false);
         _paysKeeperAmount(msg.sender, _credits);
     }
 
     function workForTokens(address _job, bytes calldata _workData) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_job, _workData);
+        _credits = _work(_job, _workData, true);
         _paysKeeperInTokens(msg.sender, _credits);
     }
 
-    function _work(address _job, bytes calldata _workData) internal returns (uint256 _credits) {
+    function _work(
+        address _job,
+        bytes calldata _workData,
+        bool _workForTokens
+    ) internal returns (uint256 _credits) {
         require(isValidJob(_job), "Keep3rProxyJob::work:invalid-job");
 
         uint256 _initialGas = gasleft();
@@ -133,7 +137,7 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
         _credits = _calculateCredits(_job, _initialGas);
 
         _updateCredits(_job, _credits);
-        emit Worked(_job, msg.sender);
+        emit Worked(_job, msg.sender, _credits, _workForTokens);
     }
 
     function _updateCredits(address _job, uint256 _credits) internal {
