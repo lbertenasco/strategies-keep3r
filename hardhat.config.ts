@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-etherscan';
 import { removeConsoleLog } from 'hardhat-preprocessor';
@@ -12,8 +13,8 @@ module.exports = {
       ? {}
       : {
           hardhat: {
-            // enabled: process.env.FORK ? true : false,
             forking: {
+              enabled: process.env.FORK ? true : false,
               url: process.env.MAINNET_HTTPS_URL,
             },
           },
