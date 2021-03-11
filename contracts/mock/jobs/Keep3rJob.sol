@@ -5,6 +5,7 @@ import "../../proxy-job/Keep3rJob.sol";
 
 contract Keep3rJobMock is Keep3rJob {
     uint256 public timesWorked = 0;
+    bool public workableReturn = true;
 
     constructor(
         address _keep3rProxyJob,
@@ -23,12 +24,12 @@ contract Keep3rJobMock is Keep3rJob {
     }
 
     function workable() public override returns (bool) {
-        return true;
+        return workableReturn;
     }
 
     function workable(address _contractAddress) public view returns (bool) {
         return _contractAddress == address(this); 
-    } 
+    }
 
     // Keep3r actions
     function work(bytes memory _workData) external override onlyProxyJob limitGasPrice {
@@ -54,4 +55,8 @@ contract Keep3rJobMock is Keep3rJob {
     function pendingGovernor() external override view returns (address _pendingGovernor) {}
     function setPendingGovernor(address _pendingGovernor) external override { }
 
+    // Setter for test
+    function setWorkableReturn(bool _workableReturn) external {
+        workableReturn = _workableReturn;
+    } 
 }

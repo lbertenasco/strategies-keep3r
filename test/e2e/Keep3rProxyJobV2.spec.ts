@@ -111,7 +111,21 @@ describe('Keep3rProxyJobV2', () => {
   });
 
   describe('workable', () => {
-    it('TODO');
+    context('when is workable', () => {
+      it('returns true', async () => {
+        expect(await keep3rProxyJobV2.callStatic.workable(keep3rJob.address)).to
+          .be.true;
+      });
+    });
+    context('when is not workable', () => {
+      beforeEach(async () => {
+        await keep3rJob.setWorkableReturn(false);
+      });
+      it('returns false', async () => {
+        expect(await keep3rProxyJobV2.callStatic.workable(keep3rJob.address)).to
+          .be.false;
+      });
+    });
   });
 
   const shouldBehaveLikeWorkRevertsWhenNotFromWorker = async (
@@ -157,9 +171,7 @@ describe('Keep3rProxyJobV2', () => {
   const shouldBehaveLikeWorkEmittedEvent = async (workData: any) => {
     await expect(
       keep3rProxyJobV2.connect(keeper).workForBond(keep3rJob.address, workData)
-    )
-      .to.emit(keep3rProxyJobV2, 'Worked')
-      .withArgs(keep3rJob.address, await keeper.getAddress);
+    ).to.emit(keep3rProxyJobV2, 'Worked');
   };
 
   const shouldBehaveLikeWorkHitMaxCredits = async () => {
@@ -222,10 +234,6 @@ describe('Keep3rProxyJobV2', () => {
   };
 
   describe('work', () => {
-    let workData: any;
-    beforeEach(async () => {
-      workData = await keep3rJob.callStatic.getWorkData();
-    });
     context('when not working from a keeper', () => {
       let workData: any;
       beforeEach(async () => {
