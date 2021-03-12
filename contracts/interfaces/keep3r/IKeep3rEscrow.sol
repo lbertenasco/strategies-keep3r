@@ -4,8 +4,6 @@ pragma solidity 0.6.12;
 import "@lbertenasco/contract-utils/interfaces/abstract/IUtilsReady.sol";
 
 interface IKeep3rEscrow is IUtilsReady {
-    function isKeep3rEscrow() external pure returns (bool);
-
     function returnLPsToGovernance() external;
 
     function addLiquidityToJob(

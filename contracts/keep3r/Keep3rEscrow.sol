@@ -27,10 +27,6 @@ contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
         _addProtocolToken(_lpToken);
     }
 
-    function isKeep3rEscrow() external pure override returns (bool) {
-        return true;
-    }
-
     function returnLPsToGovernance() external override onlyGovernor {
         IERC20(lpToken).transfer(governance, IERC20(lpToken).balanceOf(address(this)));
     }

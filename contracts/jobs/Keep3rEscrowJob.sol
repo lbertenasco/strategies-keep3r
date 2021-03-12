@@ -33,8 +33,6 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
         Liquidity = IERC20(_liquidity);
         Escrow1 = IKeep3rEscrow(_escrow1);
         Escrow2 = IKeep3rEscrow(_escrow2);
-        require(Escrow1.isKeep3rEscrow(), "escrow1-is-no-Keep3rEscrowJob");
-        require(Escrow2.isKeep3rEscrow(), "escrow2-is-no-Keep3rEscrowJob");
     }
 
     // Keep3rV1 Escrow helper
