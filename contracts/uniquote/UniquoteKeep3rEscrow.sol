@@ -12,11 +12,11 @@ import "../interfaces/keep3r/IUniquoteKeep3rEscrow.sol";
 contract UniquoteKeep3rEscrow is UtilsReady, IUniquoteKeep3rEscrow {
     using SafeMath for uint256;
 
-    address public override governance;
-    address public override keep3rV1;
-    address public override lpToken;
-    address public override job;
-    address public override keeper;
+    address public immutable override governance;
+    address public immutable override keep3rV1;
+    address public immutable override lpToken;
+    address public immutable override job;
+    address public immutable override keeper;
 
     constructor(
         address _governance,
