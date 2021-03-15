@@ -17,6 +17,11 @@ const scripts = [
     path: 'scripts/proxy-job/01-workable-keep3r-proxy-job-fast.js',
     networks: ['staticMainnet'],
   },
+  {
+    name: 'taichi:: crv: stealth-harvest',
+    path: 'scripts/taichi/crv-stealth-harvest.js',
+    networks: ['hardhat'],
+  },
 ];
 const selectScriptPrompt = new Select({
   message: 'Select a script to run',

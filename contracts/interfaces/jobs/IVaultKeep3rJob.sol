@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-interface IVaultKeep3rJob {
+import "./IKeep3rJob.sol";
+
+interface IVaultKeep3rJob is IKeep3rJob {
     event VaultAdded(address _vault, uint256 _requiredEarn);
     event VaultModified(address _vault, uint256 _requiredEarn);
     event VaultRemoved(address _vault);
 
     // Actions by Keeper
-    event Worked(address _vault);
+    event Worked(address _vault, address _keeper, uint256 _credits, bool _workForTokens);
+
     // Actions forced by Governor
     event ForceWorked(address _vault);
 
@@ -25,12 +28,18 @@ interface IVaultKeep3rJob {
     function setEarnCooldown(uint256 _earnCooldown) external;
 
     // Getters
+    function workable(address _vault) external returns (bool);
+
     function vaults() external view returns (address[] memory _vaults);
 
     function calculateEarn(address _vault) external view returns (uint256 _amount);
 
-    // Mechanics Setters
-    function setMaxGasPrice(uint256 _maxGasPrice) external;
+    // Keeper actions
+    function work(address _vault) external returns (uint256 _credits);
+
+    function workForBond(address _vault) external returns (uint256 _credits);
+
+    function workForTokens(address _vault) external returns (uint256 _credits);
 
     // Mechanics keeper bypass
     function forceWork(address _vault) external;

@@ -4,14 +4,18 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
+import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
+import "../utils/GasPriceLimited.sol";
 
-import "../proxy-job/Keep3rJob.sol";
 import "../interfaces/jobs/IVaultKeep3rJob.sol";
-
 import "../interfaces/yearn/IEarnableVault.sol";
 
-contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
+contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3rJob {
     using SafeMath for uint256;
+
+    uint256 public constant PRECISION = 1_000;
+    uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
+    uint256 public override rewardMultiplier;
 
     mapping(address => uint256) public requiredEarn;
     mapping(address => uint256) public lastEarnAt;
@@ -20,12 +24,43 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
 
     constructor(
         address _mechanicsRegistry,
-        address _keep3rProxyJob,
+        address _keep3r,
+        address _bond,
+        uint256 _minBond,
+        uint256 _earned,
+        uint256 _age,
+        bool _onlyEOA,
         uint256 _earnCooldown,
         uint256 _maxGasPrice
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+        _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setEarnCooldown(_earnCooldown);
         _setMaxGasPrice(_maxGasPrice);
+    }
+
+    // Keep3r Setters
+    function setKeep3r(address _keep3r) external override onlyGovernor {
+        _setKeep3r(_keep3r);
+    }
+
+    function setKeep3rRequirements(
+        address _bond,
+        uint256 _minBond,
+        uint256 _earned,
+        uint256 _age,
+        bool _onlyEOA
+    ) external override onlyGovernor {
+        _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
+    }
+
+    function setRewardMultiplier(uint256 _rewardMultiplier) external override onlyGovernorOrMechanic {
+        _setRewardMultiplier(_rewardMultiplier);
+        emit SetRewardMultiplier(_rewardMultiplier);
+    }
+
+    function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "CrvStrategyKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
+        rewardMultiplier = _rewardMultiplier;
     }
 
     // Setters
@@ -93,28 +128,14 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         }
     }
 
-    // Job actions
-    function getWorkData() public override returns (bytes memory _workData) {
-        for (uint256 i; i < _availableVaults.length(); i++) {
-            address _vault = _availableVaults.at(i);
-            if (_workable(_vault)) return abi.encode(_vault);
-        }
-    }
-
-    function decodeWorkData(bytes memory _workData) public pure returns (address _vault) {
-        return abi.decode(_workData, (address));
-    }
-
+    // Keeper view actions
     function calculateEarn(address _vault) public view override returns (uint256 _amount) {
         require(requiredEarn[_vault] > 0, "VaultKeep3rJob::calculate-earn:vault-not-added");
         return IEarnableVault(_vault).available();
     }
 
-    function workable() public override notPaused returns (bool) {
-        for (uint256 i; i < _availableVaults.length(); i++) {
-            if (_workable(_availableVaults.at(i))) return true;
-        }
-        return false;
+    function workable(address _vault) external override notPaused returns (bool) {
+        return _workable(_vault);
     }
 
     function _workable(address _vault) internal view returns (bool) {
@@ -122,14 +143,36 @@ contract VaultKeep3rJob is MachineryReady, Keep3rJob, IVaultKeep3rJob {
         return (calculateEarn(_vault) >= requiredEarn[_vault] && block.timestamp > lastEarnAt[_vault].add(earnCooldown));
     }
 
-    // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob limitGasPrice {
-        address _vault = decodeWorkData(_workData);
+    // Keeper actions
+    function _work(address _vault, bool _workForTokens) internal returns (uint256 _credits) {
+        uint256 _initialGas = gasleft();
+
         require(_workable(_vault), "VaultKeep3rJob::earn:not-workable");
 
         _earn(_vault);
 
-        emit Worked(_vault);
+        _credits = _calculateCredits(_initialGas);
+
+        emit Worked(_vault, msg.sender, _credits, _workForTokens);
+    }
+
+    function work(address _vault) external override returns (uint256 _credits) {
+        return workForBond(_vault);
+    }
+
+    function workForBond(address _vault) public override notPaused onlyKeeper limitGasPrice returns (uint256 _credits) {
+        _credits = _work(_vault, false);
+        _paysKeeperAmount(msg.sender, _credits);
+    }
+
+    function workForTokens(address _vault) external override notPaused onlyKeeper limitGasPrice returns (uint256 _credits) {
+        _credits = _work(_vault, true);
+        _paysKeeperInTokens(msg.sender, _credits);
+    }
+
+    function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
+        // Gets default credits from KP3R_Helper and applies job reward multiplier
+        return _getQuoteLimit(_initialGas).mul(rewardMultiplier).div(PRECISION);
     }
 
     // Mechanics Setters

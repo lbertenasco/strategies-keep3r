@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-interface ICrvStrategyKeep3rJob {
+import "./IKeep3rJob.sol";
+
+interface ICrvStrategyKeep3rJob is IKeep3rJob {
     event StrategyAdded(address _strategy, uint256 _requiredHarvest, uint256 _requiredEarn);
     event StrategyModified(address _strategy, uint256 _requiredHarvest, uint256 _requiredEarn);
     event StrategyRemoved(address _strategy);
 
     // Actions by Keeper
-    event Worked(address _strategy);
+    event Worked(address _strategy, address _keeper, uint256 _credits, bool _workForTokens);
+
     // Actions forced by governor
     event ForceWorked(address _strategy);
 
@@ -43,7 +46,7 @@ interface ICrvStrategyKeep3rJob {
     // Getters
     function strategies() external view returns (address[] memory _strategies);
 
-    function workableStrategy(address _strategy) external returns (bool);
+    function workable(address _strategy) external returns (bool);
 
     function requiredHarvest(address _strategy) external view returns (uint256 _requiredHarvest);
 
@@ -54,6 +57,13 @@ interface ICrvStrategyKeep3rJob {
     function maxHarvestPeriod() external view returns (uint256 _maxHarvestPeriod);
 
     function calculateHarvest(address _strategy) external returns (uint256 _amount);
+
+    // Keeper actions
+    function work(address _strategy) external returns (uint256 _credits);
+
+    function workForBond(address _strategy) external returns (uint256 _credits);
+
+    function workForTokens(address _strategy) external returns (uint256 _credits);
 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
