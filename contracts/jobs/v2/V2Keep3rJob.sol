@@ -6,19 +6,22 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1Helper.sol";
+import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
-import "../../proxy-job/Keep3rJob.sol";
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 
-abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
+abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     using SafeMath for uint256;
 
-    address public constant KP3R = address(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44);
     address public constant WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+
+    uint256 public constant PRECISION = 1_000;
+    uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
+    uint256 public override rewardMultiplier;
 
     IV2Keeper public V2Keeper;
     address public keep3rHelper;
@@ -33,18 +36,47 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
 
     constructor(
         address _mechanicsRegistry,
-        address _keep3rProxyJob,
-        address _v2Keeper,
         address _keep3r,
+        address _bond,
+        uint256 _minBond,
+        uint256 _earned,
+        uint256 _age,
+        bool _onlyEOA,
         address _keep3rHelper,
         address _slidingOracle,
+        address _v2Keeper,
         uint256 _workCooldown
-    ) public MachineryReady(_mechanicsRegistry) Keep3rJob(_keep3rProxyJob) {
+    ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+        _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         V2Keeper = IV2Keeper(_v2Keeper);
-        keep3r = _keep3r;
         keep3rHelper = _keep3rHelper;
         slidingOracle = _slidingOracle;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
+    }
+
+    // Keep3r Setters
+    function setKeep3r(address _keep3r) external override onlyGovernor {
+        _setKeep3r(_keep3r);
+    }
+
+    function setKeep3rRequirements(
+        address _bond,
+        uint256 _minBond,
+        uint256 _earned,
+        uint256 _age,
+        bool _onlyEOA
+    ) external override onlyGovernor {
+        _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
+    }
+
+    function setRewardMultiplier(uint256 _rewardMultiplier) external override onlyGovernorOrMechanic {
+        _setRewardMultiplier(_rewardMultiplier);
+        emit SetRewardMultiplier(_rewardMultiplier);
+    }
+
+    function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "CrvStrategyKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
+        rewardMultiplier = _rewardMultiplier;
     }
 
     // Setters
@@ -118,25 +150,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
         }
     }
 
-    // Job actions
-    function getWorkData() public override returns (bytes memory _workData) {
-        for (uint256 i; i < _availableStrategies.length(); i++) {
-            address _strategy = _availableStrategies.at(i);
-            if (_workable(_strategy)) return abi.encode(_strategy);
-        }
-    }
-
-    function decodeWorkData(bytes memory _workData) public pure returns (address _strategy) {
-        return abi.decode(_workData, (address));
-    }
-
-    function workable() public override notPaused returns (bool) {
-        for (uint256 i; i < _availableStrategies.length(); i++) {
-            if (_workable(_availableStrategies.at(i))) return true;
-        }
-        return false;
-    }
-
+    // Keeper view actions (internal)
     function _workable(address _strategy) internal view virtual returns (bool) {
         require(requiredAmount[_strategy] > 0, "V2Keep3rJob::workable:strategy-not-added");
         if (workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown)) return true;
@@ -146,17 +160,24 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3rJob, IV2Keep3rJob {
     // Get eth costs
     function _getCallCosts(address _strategy) internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
         _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
-        _ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(KP3R, _kp3rCallCost, WETH);
+        _ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(address(_Keep3r), _kp3rCallCost, WETH);
     }
 
     // Keep3r actions
-    function _workInternal(bytes memory _workData) internal {
-        address _strategy = decodeWorkData(_workData);
+    function _workInternal(address _strategy, bool _workForTokens) internal returns (uint256 _credits) {
+        uint256 _initialGas = gasleft();
         require(_workable(_strategy), "V2Keep3rJob::work:not-workable");
 
         _work(_strategy);
 
-        emit Worked(_strategy);
+        _credits = _calculateCredits(_initialGas);
+
+        emit Worked(_strategy, msg.sender, _credits, _workForTokens);
+    }
+
+    function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
+        // Gets default credits from KP3R_Helper and applies job reward multiplier
+        return _getQuoteLimit(_initialGas).mul(rewardMultiplier).div(PRECISION);
     }
 
     // Mechanics keeper bypass

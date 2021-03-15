@@ -7,15 +7,34 @@ import "./V2Keep3rJob.sol";
 contract HarvestV2Keep3rJob is V2Keep3rJob {
     constructor(
         address _mechanicsRegistry,
-        address _keep3rProxyJob,
-        address _v2Keeper,
         address _keep3r,
+        address _bond,
+        uint256 _minBond,
+        uint256 _earned,
+        uint256 _age,
+        bool _onlyEOA,
         address _keep3rHelper,
+        address _v2Keeper,
         address _slidingOracle,
         uint256 _workCooldown
-    ) public V2Keep3rJob(_mechanicsRegistry, _keep3rProxyJob, _v2Keeper, _keep3r, _keep3rHelper, _slidingOracle, _workCooldown) {}
+    )
+        public
+        V2Keep3rJob(
+            _mechanicsRegistry,
+            _keep3r,
+            _bond,
+            _minBond,
+            _earned,
+            _age,
+            _onlyEOA,
+            _keep3rHelper,
+            _slidingOracle,
+            _v2Keeper,
+            _workCooldown
+        )
+    {}
 
-    function workableStrategy(address _strategy) external view override returns (bool) {
+    function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
     }
 
@@ -31,7 +50,17 @@ contract HarvestV2Keep3rJob is V2Keep3rJob {
     }
 
     // Keep3r actions
-    function work(bytes memory _workData) external override notPaused onlyProxyJob {
-        _workInternal(_workData);
+    function work(address _strategy) external override returns (uint256 _credits) {
+        return workForBond(_strategy);
+    }
+
+    function workForBond(address _strategy) public override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _workInternal(_strategy, false);
+        _paysKeeperAmount(msg.sender, _credits);
+    }
+
+    function workForTokens(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _workInternal(_strategy, true);
+        _paysKeeperInTokens(msg.sender, _credits);
     }
 }
