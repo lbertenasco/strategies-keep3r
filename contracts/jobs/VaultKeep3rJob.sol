@@ -59,7 +59,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
     }
 
     function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
-        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "CrvStrategyKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "VaultKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
         rewardMultiplier = _rewardMultiplier;
     }
 
