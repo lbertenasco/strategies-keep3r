@@ -102,8 +102,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     }
 
     function _addStrategy(address _strategy, uint256 _requiredAmount) internal {
-        require(_requiredAmount > 0, "V2Keep3rJob::add-strategy:required-amount-not-0");
-        require(requiredAmount[_strategy] == 0, "V2Keep3rJob::add-strategy:strategy-already-added");
+        require(!_availableStrategies.contains(_strategy), "V2Keep3rJob::add-strategy:strategy-already-added");
         _setRequiredAmount(_strategy, _requiredAmount);
         emit StrategyAdded(_strategy, _requiredAmount);
         _availableStrategies.add(_strategy);
@@ -125,20 +124,19 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     }
 
     function _updateRequiredAmount(address _strategy, uint256 _requiredAmount) internal {
-        require(requiredAmount[_strategy] > 0, "V2Keep3rJob::update-required-amount:strategy-not-added");
+        require(_availableStrategies.contains(_strategy), "V2Keep3rJob::update-required-amount:strategy-not-added");
         _setRequiredAmount(_strategy, _requiredAmount);
         emit StrategyModified(_strategy, _requiredAmount);
     }
 
     function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
-        require(requiredAmount[_strategy] > 0, "V2Keep3rJob::remove-strategy:strategy-not-added");
+        require(_availableStrategies.contains(_strategy), "V2Keep3rJob::remove-strategy:strategy-not-added");
         delete requiredAmount[_strategy];
         _availableStrategies.remove(_strategy);
         emit StrategyRemoved(_strategy);
     }
 
     function _setRequiredAmount(address _strategy, uint256 _requiredAmount) internal {
-        require(_requiredAmount > 0, "V2Keep3rJob::set-required-work:should-not-be-zero");
         requiredAmount[_strategy] = _requiredAmount;
     }
 
@@ -152,13 +150,14 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     // Keeper view actions (internal)
     function _workable(address _strategy) internal view virtual returns (bool) {
-        require(requiredAmount[_strategy] > 0, "V2Keep3rJob::workable:strategy-not-added");
+        require(_availableStrategies.contains(_strategy), "V2Keep3rJob::workable:strategy-not-added");
         if (workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown)) return true;
         return false;
     }
 
     // Get eth costs
     function _getCallCosts(address _strategy) internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
+        if (requiredAmount[_strategy] == 0) return (0, 0);
         _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
         _ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(address(_Keep3r), _kp3rCallCost, WETH);
     }

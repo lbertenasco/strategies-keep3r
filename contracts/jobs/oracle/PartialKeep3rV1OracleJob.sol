@@ -18,8 +18,6 @@ contract PartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1OracleJ
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
     uint256 public override rewardMultiplier;
 
-    mapping(address => uint256) public lastEarnAt;
-    uint256 public earnCooldown;
     EnumerableSet.AddressSet internal _availablePairs;
 
     address public immutable override oracleBondedKeeper;
