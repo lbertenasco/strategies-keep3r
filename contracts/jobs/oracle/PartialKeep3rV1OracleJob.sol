@@ -7,45 +7,11 @@ import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 import "../../utils/GasPriceLimited.sol";
 
-import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
 import "../../interfaces/jobs/IKeep3rJob.sol";
+import "../../interfaces/oracle/IOracleBondedKeeper.sol";
+import "../../interfaces/oracle/IPartialKeep3rV1OracleJob.sol";
 
-interface IReducedKeep3rV1OracleJob is IKeep3rJob {
-    event PairAdded(address _pair);
-    event PairRemoved(address _pair);
-
-    // Actions by Keeper
-    event Worked(address _pair, address _keeper, uint256 _credits, bool _workForTokens);
-
-    // Actions forced by Governor
-    event ForceWorked(address _pair);
-
-    // Setters
-    function addPairs(address[] calldata _pairs) external;
-
-    function addPair(address _pair) external;
-
-    function removePair(address _pair) external;
-
-    // Getters
-    function keep3rV1Oracle() external returns (address _keep3rV1Oracle);
-
-    function workable(address _pair) external returns (bool);
-
-    function pairs() external view returns (address[] memory _pairs);
-
-    // Keeper actions
-    function work(address _pair) external returns (uint256 _credits);
-
-    function workForBond(address _pair) external returns (uint256 _credits);
-
-    function workForTokens(address _pair) external returns (uint256 _credits);
-
-    // Mechanics keeper bypass
-    function forceWork(address _pair) external;
-}
-
-contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJob {
+contract PartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1OracleJob {
     using SafeMath for uint256;
 
     uint256 public constant PRECISION = 1_000;
@@ -56,7 +22,7 @@ contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJ
     uint256 public earnCooldown;
     EnumerableSet.AddressSet internal _availablePairs;
 
-    address public immutable override keep3rV1Oracle;
+    address public immutable override oracleBondedKeeper;
 
     constructor(
         address _keep3r,
@@ -65,10 +31,10 @@ contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJ
         uint256 _earned,
         uint256 _age,
         bool _onlyEOA,
-        address _keep3rV1Oracle
+        address _oracleBondedKeeper
     ) public UtilsReady() Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
-        keep3rV1Oracle = _keep3rV1Oracle;
+        oracleBondedKeeper = _oracleBondedKeeper;
     }
 
     // Keep3r Setters
@@ -92,7 +58,7 @@ contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJ
     }
 
     function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
-        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "ReducedKeep3rV1OracleJob::set-reward-multiplier:multiplier-exceeds-max");
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "PartialKeep3rV1OracleJob::set-reward-multiplier:multiplier-exceeds-max");
         rewardMultiplier = _rewardMultiplier;
     }
 
@@ -108,13 +74,13 @@ contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJ
     }
 
     function _addPair(address _pair) internal {
-        require(!_availablePairs.contains(_pair), "ReducedKeep3rV1OracleJob::add-pair:pair-already-added");
+        require(!_availablePairs.contains(_pair), "PartialKeep3rV1OracleJob::add-pair:pair-already-added");
         _availablePairs.add(_pair);
         emit PairAdded(_pair);
     }
 
     function removePair(address _pair) external override onlyGovernor {
-        require(_availablePairs.contains(_pair), "ReducedKeep3rV1OracleJob::remove-pair:pair-not-found");
+        require(_availablePairs.contains(_pair), "PartialKeep3rV1OracleJob::remove-pair:pair-not-found");
         _availablePairs.remove(_pair);
         emit PairRemoved(_pair);
     }
@@ -133,15 +99,15 @@ contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJ
     }
 
     function _workable(address _pair) internal view returns (bool) {
-        require(_availablePairs.contains(_pair), "ReducedKeep3rV1OracleJob::workable:pair-not-found");
-        return IUniswapV2SlidingOracle(keep3rV1Oracle).workable(_pair);
+        require(_availablePairs.contains(_pair), "PartialKeep3rV1OracleJob::workable:pair-not-found");
+        return IOracleBondedKeeper(oracleBondedKeeper).workable(_pair);
     }
 
     // Keeper actions
     function _work(address _pair, bool _workForTokens) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
 
-        require(_workable(_pair), "ReducedKeep3rV1OracleJob::earn:not-workable");
+        require(_workable(_pair), "PartialKeep3rV1OracleJob::earn:not-workable");
 
         _updatePair(_pair);
 
@@ -176,6 +142,6 @@ contract ReducedKeep3rV1OracleJob is UtilsReady, Keep3r, IReducedKeep3rV1OracleJ
     }
 
     function _updatePair(address _pair) internal {
-        IUniswapV2SlidingOracle(keep3rV1Oracle).updatePair(_pair);
+        IOracleBondedKeeper(oracleBondedKeeper).updatePair(_pair);
     }
 }
