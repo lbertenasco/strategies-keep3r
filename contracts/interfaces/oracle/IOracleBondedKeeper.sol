@@ -23,7 +23,7 @@ interface IOracleBondedKeeper {
     // Jobs actions
     function workable(address _pair) external view returns (bool);
 
-    function updatePair(address _pair) external;
+    function updatePair(address _pair) external returns (bool);
 
     // Governor Keeper Bond
     function bond(address bonding, uint256 amount) external;

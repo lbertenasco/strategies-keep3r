@@ -9,7 +9,7 @@ interface IPartialKeep3rV1OracleJob is IKeep3rJob {
     event PairRemoved(address _pair);
 
     // Actions by Keeper
-    event Worked(address _pair, address _keeper, uint256 _credits, bool _workForTokens);
+    event Worked(address _pair, address _keeper, uint256 _credits);
 
     // Actions forced by Governor
     event ForceWorked(address _pair);
@@ -30,10 +30,6 @@ interface IPartialKeep3rV1OracleJob is IKeep3rJob {
 
     // Keeper actions
     function work(address _pair) external returns (uint256 _credits);
-
-    function workForBond(address _pair) external returns (uint256 _credits);
-
-    function workForTokens(address _pair) external returns (uint256 _credits);
 
     // Mechanics keeper bypass
     function forceWork(address _pair) external;
