@@ -56,8 +56,8 @@ contract OracleBondedKeeper is UtilsReady, IOracleBondedKeeper {
         return IUniswapV2SlidingOracle(keep3rV1Oracle).workable(_pair);
     }
 
-    function updatePair(address _pair) external override onlyValidJob {
-        IUniswapV2SlidingOracle(keep3rV1Oracle).updatePair(_pair);
+    function updatePair(address _pair) external override onlyValidJob returns (bool _updated) {
+        return IUniswapV2SlidingOracle(keep3rV1Oracle).updatePair(_pair);
     }
 
     modifier onlyValidJob() {

@@ -16,7 +16,7 @@ contract PartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1OracleJ
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
-    uint256 public override rewardMultiplier;
+    uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;
 
     EnumerableSet.AddressSet internal _availablePairs;
 
@@ -102,29 +102,20 @@ contract PartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1OracleJ
     }
 
     // Keeper actions
-    function _work(address _pair, bool _workForTokens) internal returns (uint256 _credits) {
+    function _work(address _pair) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
 
-        require(_workable(_pair), "PartialKeep3rV1OracleJob::earn:not-workable");
+        require(_workable(_pair), "PartialKeep3rV1OracleJob::work:not-workable");
 
-        _updatePair(_pair);
+        require(_updatePair(_pair), "PartialKeep3rV1OracleJob::work:pair-not-updated");
 
         _credits = _calculateCredits(_initialGas);
 
-        emit Worked(_pair, msg.sender, _credits, _workForTokens);
+        emit Worked(_pair, msg.sender, _credits);
     }
 
-    function work(address _pair) external override returns (uint256 _credits) {
-        return workForBond(_pair);
-    }
-
-    function workForBond(address _pair) public override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_pair, false);
-        _paysKeeperAmount(msg.sender, _credits);
-    }
-
-    function workForTokens(address _pair) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_pair, true);
+    function work(address _pair) public override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _work(_pair);
         _paysKeeperInTokens(msg.sender, _credits);
     }
 
@@ -135,11 +126,11 @@ contract PartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1OracleJ
 
     // Mechanics keeper bypass
     function forceWork(address _pair) external override onlyGovernor {
-        _updatePair(_pair);
+        require(_updatePair(_pair), "PartialKeep3rV1OracleJob::force-work:pair-not-updated");
         emit ForceWorked(_pair);
     }
 
-    function _updatePair(address _pair) internal {
-        IOracleBondedKeeper(oracleBondedKeeper).updatePair(_pair);
+    function _updatePair(address _pair) internal returns (bool _updated) {
+        return IOracleBondedKeeper(oracleBondedKeeper).updatePair(_pair);
     }
 }

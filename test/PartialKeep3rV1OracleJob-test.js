@@ -104,11 +104,9 @@ describe('PartialKeep3rV1OracleJob', function () {
     for (const pair in pairs) {
       console.log(
         `partialKeep3rV1OracleJob.addPair(${pair})`,
-        config.contracts.mainnet[pair].address
+        pairs[pair].address
       );
-      await partialKeep3rV1OracleJob.addPair(
-        config.contracts.mainnet[pair].address
-      );
+      await partialKeep3rV1OracleJob.addPair(pairs[pair].address);
     }
     console.timeEnd('partialKeep3rV1OracleJob addPair');
 
@@ -126,73 +124,49 @@ describe('PartialKeep3rV1OracleJob', function () {
     await partialKeep3rV1OracleJob.removePair(KP3R_ETHPairContract.address);
     await expect(
       partialKeep3rV1OracleJob.removePair(KP3R_ETHPairContract.address)
-    ).to.be.revertedWith('pair-keep3r::remove-pair:pair-not-added');
-    await expect(
-      partialKeep3rV1OracleJob.updateRequiredEarnAmount(
-        KP3R_ETHPairContract.address,
-        requiredEarnAmount
-      )
-    ).to.be.revertedWith('pair-keep3r::update-required-earn:pair-not-added');
+    ).to.be.revertedWith(
+      'PartialKeep3rV1OracleJob::remove-pair:pair-not-found'
+    );
+
     await expect(
       partialKeep3rV1OracleJob.callStatic.workable(KP3R_ETHPairContract.address)
-    ).to.be.revertedWith('pair-keep3r::workable:pair-not-added');
+    ).to.be.revertedWith('PartialKeep3rV1OracleJob::workable:pair-not-found');
     console.timeEnd('removePair');
 
     console.time('addPair');
+    await partialKeep3rV1OracleJob.addPair(KP3R_ETHPairContract.address);
     await expect(
-      partialKeep3rV1OracleJob.addPair(KP3R_ETHPairContract.address, 0)
-    ).to.be.revertedWith('pair-keep3r::set-required-earn:should-not-be-zero');
-    await partialKeep3rV1OracleJob.addPair(
-      KP3R_ETHPairContract.address,
-      requiredEarnAmount
+      partialKeep3rV1OracleJob.addPair(KP3R_ETHPairContract.address)
+    ).to.be.revertedWith(
+      'PartialKeep3rV1OracleJob::add-pair:pair-already-added'
     );
-    await expect(
-      partialKeep3rV1OracleJob.addPair(
-        KP3R_ETHPairContract.address,
-        requiredEarnAmount
-      )
-    ).to.be.revertedWith('pair-keep3r::add-pair:pair-already-added');
     console.timeEnd('addPair');
 
-    console.time('calculateEarn');
-    console.log(
-      'calculateEarn(KP3R_ETHPair)',
-      (
-        await partialKeep3rV1OracleJob.callStatic.calculateEarn(
-          KP3R_ETHPairContract.address
-        )
-      ).toString()
-    );
-    console.log(
-      'calculateEarn(YFI_ETHPair)',
-      (
-        await partialKeep3rV1OracleJob.callStatic.calculateEarn(
-          YFI_ETHPairContract.address
-        )
-      ).toString()
-    );
-    console.timeEnd('calculateEarn');
+    // Advance time to make job workable
+    await network.provider.request({
+      method: 'evm_increaseTime',
+      params: [2000],
+    });
+    await network.provider.request({ method: 'evm_mine', params: [] });
 
     console.time('workable');
-    console.log(
-      'workable(KP3R_ETHPair)',
+    expect(
       await partialKeep3rV1OracleJob.callStatic.workable(
         KP3R_ETHPairContract.address
       )
-    );
-    console.log(
-      'workable(YFI_ETHPair)',
+    ).to.be.true;
+    expect(
       await partialKeep3rV1OracleJob.callStatic.workable(
         YFI_ETHPairContract.address
       )
-    );
+    ).to.be.true;
     console.timeEnd('workable');
 
-    console.time('earn should revert on KP3R_ETHPair');
+    console.time('work should revert on KP3R_ETHPair');
     await expect(
-      partialKeep3rV1OracleJob.earn(KP3R_ETHPairContract.address)
-    ).to.be.revertedWith('keep3r::isKeeper:keeper-is-not-registered');
-    console.timeEnd('earn should revert on KP3R_ETHPair');
+      partialKeep3rV1OracleJob.work(KP3R_ETHPairContract.address)
+    ).to.be.revertedWith('keep3r::isKeeper:keeper-not-min-requirements');
+    console.timeEnd('work should revert on KP3R_ETHPair');
 
     console.time('add partialKeep3rV1OracleJob as a job on keep3r');
     const keep3r = await ethers.getContractAt(
@@ -201,41 +175,56 @@ describe('PartialKeep3rV1OracleJob', function () {
       keep3rGovernance
     );
     await keep3r.addJob(partialKeep3rV1OracleJob.address);
-    await keep3r.addKPRCredit(partialKeep3rV1OracleJob.address, e18.mul(10));
+    await keep3r.addKPRCredit(partialKeep3rV1OracleJob.address, e18.mul(100));
     console.timeEnd('add partialKeep3rV1OracleJob as a job on keep3r');
 
-    const lastEarnAtBefore = await partialKeep3rV1OracleJob.callStatic.lastEarnAt(
-      KP3R_ETHPairContract.address
-    );
-    expect(lastEarnAtBefore).to.eq(0);
-
-    console.time('earn YFI_ETHPair');
-    console.log('earn(YFI_ETHPair)');
-    await partialKeep3rV1OracleJob
-      .connect(keeper)
-      .earn(YFI_ETHPairContract.address);
-    console.timeEnd('earn YFI_ETHPair');
-
-    console.time('forceEarn KP3R_ETHPair makes workable false');
-    await partialKeep3rV1OracleJob.forceEarn(KP3R_ETHPairContract.address);
-    expect(
-      await partialKeep3rV1OracleJob.callStatic.workable(
-        KP3R_ETHPairContract.address
-      )
-    ).to.be.false;
-    console.timeEnd('forceEarn KP3R_ETHPair makes workable false');
-
-    console.time('keeper earn reverts with not-workable');
     await expect(
       partialKeep3rV1OracleJob
         .connect(keeper)
-        .earn(KP3R_ETHPairContract.address)
-    ).to.be.revertedWith('pair-keep3r::earn:not-workable');
-    console.timeEnd('keeper earn reverts with not-workable');
-
-    const lastEarnAtAfter = await partialKeep3rV1OracleJob.callStatic.lastEarnAt(
-      KP3R_ETHPairContract.address
+        .work(KP3R_ETHPairContract.address)
+    ).to.be.revertedWith(
+      'OracleBondedKeeper::onlyValidJob:msg-sender-not-valid-job'
     );
-    expect(lastEarnAtBefore).to.be.lt(lastEarnAtAfter);
+
+    await oracleBondedKeeper.addJob(partialKeep3rV1OracleJob.address);
+
+    await expect(
+      partialKeep3rV1OracleJob
+        .connect(keeper)
+        .work(KP3R_ETHPairContract.address)
+    ).to.be.revertedWith('::isKeeper: keeper is not registered');
+
+    await keep3r.addVotes(oracleBondedKeeper.address, e18.mul(200));
+
+    // // Updates oracle :)
+    // console.log('forceWork update KP3R_ETH pair')
+    // await partialKeep3rV1OracleJob.forceWork(KP3R_ETHPairContract.address);
+
+    console.time('work YFI_ETHPair');
+    console.log('work(YFI_ETHPair)');
+    await partialKeep3rV1OracleJob
+      .connect(keeper)
+      .work(YFI_ETHPairContract.address);
+    console.timeEnd('work YFI_ETHPair');
+
+    console.time('forceWork KP3R_ETHPair makes workable false');
+    await expect(
+      partialKeep3rV1OracleJob.forceWork(YFI_ETHPairContract.address)
+    ).to.be.revertedWith(
+      'PartialKeep3rV1OracleJob::force-work:pair-not-updated'
+    );
+
+    expect(
+      await partialKeep3rV1OracleJob.callStatic.workable(
+        YFI_ETHPairContract.address
+      )
+    ).to.be.false;
+    console.timeEnd('forceWork KP3R_ETHPair makes workable false');
+
+    console.time('keeper work reverts with not-workable');
+    await expect(
+      partialKeep3rV1OracleJob.connect(keeper).work(YFI_ETHPairContract.address)
+    ).to.be.revertedWith('PartialKeep3rV1OracleJob::work:not-workable');
+    console.timeEnd('keeper work reverts with not-workable');
   });
 });

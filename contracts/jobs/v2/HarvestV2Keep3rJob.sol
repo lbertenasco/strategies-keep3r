@@ -14,8 +14,8 @@ contract HarvestV2Keep3rJob is V2Keep3rJob {
         uint256 _age,
         bool _onlyEOA,
         address _keep3rHelper,
-        address _v2Keeper,
         address _slidingOracle,
+        address _v2Keeper,
         uint256 _workCooldown
     )
         public
