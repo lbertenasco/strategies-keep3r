@@ -29,7 +29,10 @@ function run() {
         const workable = await keep3rProxyJob.callStatic.workable(job);
         console.timeEnd('check workable:', job);
 
-        const jobContract = await ethers.getContractAt('IKeep3rJob', job);
+        const jobContract = await ethers.getContractAt(
+          'contracts/interfaces/proxy-job/IKeep3rJob.sol:IKeep3rJob',
+          job
+        );
 
         console.time('check workData:', job);
         const workData = await jobContract.callStatic.getWorkData();
