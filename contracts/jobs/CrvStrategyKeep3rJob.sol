@@ -19,7 +19,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
-    uint256 public override rewardMultiplier;
+    uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;
 
     mapping(address => uint256) public override requiredHarvest;
     mapping(address => uint256) public override requiredEarn;
