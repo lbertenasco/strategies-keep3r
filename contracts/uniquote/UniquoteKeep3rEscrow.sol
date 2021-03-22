@@ -9,6 +9,7 @@ import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
 import "../interfaces/keep3r/IUniquoteKeep3rEscrow.sol";
 
+// DEPRECATED
 contract UniquoteKeep3rEscrow is UtilsReady, IUniquoteKeep3rEscrow {
     using SafeMath for uint256;
 
