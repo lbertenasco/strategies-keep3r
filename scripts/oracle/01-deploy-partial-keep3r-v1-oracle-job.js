@@ -43,7 +43,8 @@ function promptAndSubmit() {
             0,
             0,
             false, // only EOA disabled
-            mainnetContracts.oracle.oracleBondedKeeper
+            mainnetContracts.oracle.oracleBondedKeeper,
+            { nonce: 887 }
           );
           console.timeEnd('PartialKeep3rV1OracleJob deployed');
           console.log(
