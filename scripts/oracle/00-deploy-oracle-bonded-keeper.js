@@ -33,7 +33,8 @@ function promptAndSubmit() {
           );
           const oracleBondedKeeper = await OracleBondedKeeper.deploy(
             mainnetContracts.keep3r.address,
-            mainnetContracts.keep3rV1Oracle.address
+            mainnetContracts.keep3rV1Oracle.address,
+            { nonce: 886 }
           );
 
           console.timeEnd('OracleBondedKeeper deployed');

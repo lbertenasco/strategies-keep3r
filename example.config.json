@@ -46,8 +46,8 @@
         "slidingOracle": "0x73353801921417F465377c8d898c6f4C0270282C"
       },
       "oracle": {
-        "oracleBondedKeeper": "",
-        "partialKeep3rV1OracleJob": ""
+        "oracleBondedKeeper": "0xA8646cE5d983E996EbA22eb39e5956653ec63762",
+        "partialKeep3rV1OracleJob": "0x5efD850044Ba76b8ffE49437CB301be3568bA696"
       },
       "v1registry": {
         "address": "0x3eE41C098f9666ed2eA246f4D2558010e59d63A0"
