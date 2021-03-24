@@ -1,6 +1,7 @@
 {
   "name": "strategies-keep3r",
   "version": "0.0.0",
+  "private": true,
   "description": "Strategies Keep3r",
   "keywords": [
     "ethereum",
