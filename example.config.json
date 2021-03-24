@@ -85,6 +85,9 @@
       "usdn": {
         "address": "0x406813fF2143d178d1Ebccd2357C20A424208912"
       },
+      "susd": {
+        "address": "0xd7F641697ca4e0e19F6C9cF84989ABc293D24f84"
+      },
       "crvStrategyKeep3r": {
         "address": "0xd0aC37E3524F295D141d3839d5ed5F26A40b589D"
       },

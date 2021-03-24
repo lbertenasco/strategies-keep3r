@@ -18,6 +18,7 @@ const selectStrategyPrompt = new Select({
     'gusd3crv',
     'musd',
     'usdn',
+    'susd',
   ],
 });
 const checkEarnVaultPrompt = new Toggle({
