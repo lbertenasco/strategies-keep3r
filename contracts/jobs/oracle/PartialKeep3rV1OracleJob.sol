@@ -92,7 +92,7 @@ contract PartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1OracleJ
     }
 
     // Keeper view actions
-    function workable(address _pair) external override notPaused returns (bool) {
+    function workable(address _pair) external view override notPaused returns (bool) {
         return _workable(_pair);
     }
 
