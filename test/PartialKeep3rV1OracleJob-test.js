@@ -196,7 +196,7 @@ describe('PartialKeep3rV1OracleJob', function () {
 
     await keep3r.addVotes(oracleBondedKeeper.address, e18.mul(200));
 
-    // // Updates oracle :)
+    // Updates oracle :)
     // console.log('forceWork update KP3R_ETH pair')
     // await partialKeep3rV1OracleJob.forceWork(KP3R_ETHPairContract.address);
 

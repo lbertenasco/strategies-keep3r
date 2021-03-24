@@ -22,9 +22,9 @@ interface IPartialKeep3rV1OracleJob is IKeep3rJob {
     function removePair(address _pair) external;
 
     // Getters
-    function oracleBondedKeeper() external returns (address _oracleBondedKeeper);
+    function oracleBondedKeeper() external view returns (address _oracleBondedKeeper);
 
-    function workable(address _pair) external returns (bool);
+    function workable(address _pair) external view returns (bool);
 
     function pairs() external view returns (address[] memory _pairs);
 
