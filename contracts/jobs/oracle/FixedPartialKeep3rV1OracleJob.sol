@@ -20,11 +20,12 @@ contract FixedPartialKeep3rV1OracleJob is UtilsReady, Keep3r, IPartialKeep3rV1Or
 
     EnumerableSet.AddressSet internal _availablePairs;
 
-    address public immutable override oracleBondedKeeper;
+    address public immutable override oracleBondedKeeper = 0xA8646cE5d983E996EbA22eb39e5956653ec63762;
 
-    constructor(address _partialKeep3rV1OracleJob) public UtilsReady() Keep3r(IKeep3r(_partialKeep3rV1OracleJob).keep3r()) {
-        _setKeep3rRequirements(IKeep3r(_partialKeep3rV1OracleJob).keep3r(), 200 ether, 0, 0, false);
-        oracleBondedKeeper = IPartialKeep3rV1OracleJob(_partialKeep3rV1OracleJob).oracleBondedKeeper();
+    // 0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44 = Keep3rV1
+
+    constructor() public UtilsReady() Keep3r(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44) {
+        _setKeep3rRequirements(0x1cEB5cB57C4D4E2b2433641b95Dd330A33185A44, 200 ether, 0, 0, false);
     }
 
     // Keep3r Setters
