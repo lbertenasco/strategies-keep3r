@@ -26,6 +26,8 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
     mapping(address => uint256) public override lastWorkAt;
 
     uint256 public override maxHarvestPeriod;
+    uint256 public override lastHarvest;
+    uint256 public override harvestCooldown;
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
@@ -37,10 +39,12 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
         uint256 _earned,
         uint256 _age,
         bool _onlyEOA,
-        uint256 _maxHarvestPeriod
+        uint256 _maxHarvestPeriod,
+        uint256 _harvestCooldown
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
+        _setHarvestCooldown(_harvestCooldown);
     }
 
     // Keep3r Setters
@@ -163,6 +167,14 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
         maxHarvestPeriod = _maxHarvestPeriod;
     }
 
+    function setHarvestCooldown(uint256 _harvestCooldown) external override onlyGovernorOrMechanic {
+        _setHarvestCooldown(_harvestCooldown);
+    }
+
+    function _setHarvestCooldown(uint256 _harvestCooldown) internal {
+        harvestCooldown = _harvestCooldown;
+    }
+
     // Getters
     function strategies() public view override returns (address[] memory _strategies) {
         _strategies = new address[](_availableStrategies.length());
@@ -185,6 +197,8 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
 
     function _workable(address _strategy) internal returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
+        // ensures no other strategy has been harvested for at least the harvestCooldown
+        if (block.timestamp < lastHarvest.add(harvestCooldown)) return false;
         // if strategy has exceeded maxHarvestPeriod, force workable true
         if (block.timestamp > lastWorkAt[_strategy].add(maxHarvestPeriod)) return true;
         return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
@@ -239,5 +253,6 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
     function _harvest(address _strategy) internal {
         ICrvStrategy(_strategy).harvest();
         lastWorkAt[_strategy] = block.timestamp;
+        lastHarvest = block.timestamp;
     }
 }
