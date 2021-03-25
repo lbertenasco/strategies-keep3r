@@ -46,65 +46,73 @@ function promptAndSubmit(
           // );
           // console.log();
 
+          // console.log(
+          //   'TendV2Keep3rJob:',
+          //   mechanicsContracts.registry,
+          //   config.contracts.mainnet.keep3r.address,
+          //   ZERO_ADDRESS,
+          //   e18.mul(50).toString(), // 50 KP3R required
+          //   0,
+          //   0,
+          //   false,
+          //   genericV2Keep3rJobContracts.keep3rHelper,
+          //   genericV2Keep3rJobContracts.slidingOracle,
+          //   v2Keeper.address
+          // );
+          // const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
+          //   mechanicsContracts.registry,
+          //   config.contracts.mainnet.keep3r.address,
+          //   ZERO_ADDRESS,
+          //   e18.mul(50), // 50 KP3R required
+          //   0,
+          //   0,
+          //   false,
+          //   genericV2Keep3rJobContracts.keep3rHelper,
+          //   genericV2Keep3rJobContracts.slidingOracle,
+          //   v2Keeper.address
+          // );
+          // console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
+          // console.log(
+          //   'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
+          //   tendV2Keep3rJob.address
+          // );
+          // console.log();
+
           console.log(
-            'TendV2Keep3rJob:',
-            mechanicsContracts.registry,
-            config.contracts.mainnet.keep3r.address,
-            ZERO_ADDRESS,
-            e18.mul(50).toString(), // 50 KP3R required
-            0,
-            0,
-            false,
-            genericV2Keep3rJobContracts.keep3rHelper,
-            genericV2Keep3rJobContracts.slidingOracle,
-            v2Keeper.address
+            'HarvestV2Keep3rJob:',
+            mechanicsContracts.registry, // address _mechanicsRegistry,
+            config.contracts.mainnet.keep3r.address, // address _keep3r,
+            ZERO_ADDRESS, // address _bond,
+            e18.mul(50).toString(), // 50 KP3R required // uint256 _minBond,
+            0, // uint256 _earned,
+            0, // uint256 _age,
+            true, // bool _onlyEOA,
+            genericV2Keep3rJobContracts.keep3rHelper, // address _keep3rHelper,
+            genericV2Keep3rJobContracts.slidingOracle, // address _slidingOracle,
+            v2Keeper.address, // address _v2Keeper,
+            6 * 60 * 60 // 6 hours // uint256 _workCooldown
           );
-          const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
+          const harvestV2Keep3rJob = await HarvestV2Keep3rJob.deploy(
             mechanicsContracts.registry,
             config.contracts.mainnet.keep3r.address,
             ZERO_ADDRESS,
             e18.mul(50), // 50 KP3R required
             0,
             0,
-            false,
+            true,
             genericV2Keep3rJobContracts.keep3rHelper,
             genericV2Keep3rJobContracts.slidingOracle,
-            v2Keeper.address
+            v2Keeper.address,
+            6 * 60 * 60 // 6 hours
           );
-          console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
           console.log(
-            'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
-            tendV2Keep3rJob.address
+            'HarvestV2Keep3rJob address:',
+            harvestV2Keep3rJob.address
           );
-          console.log();
-
-          // console.log(
-          //   'HarvestV2Keep3rJob:',
-          //   mechanicsContracts.registry,
-          //   escrowContracts.proxyJob,
-          //   v2Keeper.address,
-          //   escrowContracts.keep3r,
-          //   genericV2Keep3rJobContracts.keep3rHelper,
-          //   genericV2Keep3rJobContracts.slidingOracle,
-          //   6 * 60 * 60 // 6 hours
-          // );
-          // const harvestV2Keep3rJob = await HarvestV2Keep3rJob.deploy(
-          //   mechanicsContracts.registry,
-          //   escrowContracts.proxyJob,
-          //   v2Keeper.address,
-          //   escrowContracts.keep3r,
-          //   genericV2Keep3rJobContracts.keep3rHelper,
-          //   genericV2Keep3rJobContracts.slidingOracle,
-          //   6 * 60 * 60 // 6 hours
-          // );
-          // console.log(
-          //   'HarvestV2Keep3rJob address:',
-          //   harvestV2Keep3rJob.address
-          // );
-          // console.log(
-          //   'PLEASE: change .config.json & example.config.json proxyJobs.harvestV2Keep3rJob address to:',
-          //   harvestV2Keep3rJob.address
-          // );
+          console.log(
+            'PLEASE: change .config.json & example.config.json proxyJobs.harvestV2Keep3rJob address to:',
+            harvestV2Keep3rJob.address
+          );
           resolve();
         } catch (err) {
           reject(

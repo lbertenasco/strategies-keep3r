@@ -56,11 +56,21 @@ function promptAndSubmit() {
 
       // HARDCODED v2 Strats
       const v2Strategies = [
-        { address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87' },
-        { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
-        { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
-        { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
-        { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
+        // { address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87' },
+        // { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
+        // { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
+        // { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
+        // { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
+
+        { address: '0x979843b8eea56e0bea971445200e0ec3398cdb87' },
+        { address: '0x4d7d4485fd600c61d840ccbec328bfd76a050f87' },
+        { address: '0x4031afd3b0f71bace9181e554a9e680ee4abe7df' },
+        { address: '0xee697232df2226c9fb3f02a57062c4208f287851' },
+        { address: '0x32b8c26d0439e1959cea6262cbabc12320b384c4' },
+        { address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079' },
+        { address: '0x6a97fc93e39b3f792f1fd6e01565ff412b002d20' },
+        // { address: '0x9528b97e7495a78325517744b2edbe0150310311' }, // DEPRECATED
+        { address: '0xe2a130825ffb7773b8a13157c6a13f482097aa99' },
       ];
       // const v2Strategies = endorsedVaults
       //   .map((vault) => vault.strategies)
@@ -127,6 +137,9 @@ function promptAndSubmit() {
           gasPrice.mul(gasLimit)
         );
 
+        strategy.harvestable = harvestable;
+        strategy.tendable = tendable;
+
         console.log(
           strategy.address,
           'harvestable:',
@@ -162,6 +175,12 @@ function promptAndSubmit() {
       }
 
       for (const strategy of v2Strategies) {
+        console.log(
+          'harvestable:',
+          strategy.harvestable,
+          'tendable:',
+          strategy.tendable
+        );
         logData(strategy, strategy.paramsPre);
         logVaultData(strategy, strategy.paramsPre);
         logParams(strategy, strategy.paramsPre);
