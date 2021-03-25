@@ -13,6 +13,11 @@ const scripts = [
     networks: ['hardhat', 'mainnet'],
   },
   {
+    name: 'old_v2:: workable',
+    path: 'scripts/v2-harvest/01-v2-harvest.js',
+    networks: ['hardhat'],
+  },
+  {
     name: 'proxy:: workable: fast',
     path: 'scripts/proxy-job/01-workable-keep3r-proxy-job-fast.js',
     networks: ['staticMainnet'],

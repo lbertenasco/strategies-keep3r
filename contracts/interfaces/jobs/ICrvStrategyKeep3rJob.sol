@@ -43,6 +43,8 @@ interface ICrvStrategyKeep3rJob is IKeep3rJob {
 
     function setMaxHarvestPeriod(uint256 _maxHarvestPeriod) external;
 
+    function setHarvestCooldown(uint256 _harvestCooldown) external;
+
     // Getters
     function strategies() external view returns (address[] memory _strategies);
 
@@ -55,6 +57,10 @@ interface ICrvStrategyKeep3rJob is IKeep3rJob {
     function lastWorkAt(address _strategy) external view returns (uint256 _lastWorkAt);
 
     function maxHarvestPeriod() external view returns (uint256 _maxHarvestPeriod);
+
+    function lastHarvest() external view returns (uint256 _lastHarvest);
+
+    function harvestCooldown() external view returns (uint256 _harvestCooldown);
 
     function calculateHarvest(address _strategy) external returns (uint256 _amount);
 
