@@ -1,10 +1,11 @@
-// function addStrategies(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external override onlyGovernorOrMechanic {
-import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
-import { bnToDecimal } from '../../../utils/web3-utils';
 import config from '../../../.config.json';
-import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
 const mainnetContracts = config.contracts.mainnet;
+
+const { Confirm } = require('enquirer');
+const confirm = new Confirm({
+  message: 'Do you want to add strategies to v2-harvest keep3r job?',
+});
 
 async function main() {
   await run('compile');
@@ -16,28 +17,64 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('adding strategies on HarvestV2Keep3rJob contract');
     try {
       // Setup HarvestV2Keep3rJob
-      const harvestV2Keep3rJob = await ethers.getContractAt(
+      const oldHarvestV2Keep3rJob = await ethers.getContractAt(
         'HarvestV2Keep3rJob',
         mainnetContracts.proxyJobs.harvestV2Keep3rJob
       );
+      const strategies = [
+        {
+          address: '0x979843b8eea56e0bea971445200e0ec3398cdb87',
+          requiredAmount: null,
+        },
+        {
+          address: '0x4d7d4485fd600c61d840ccbec328bfd76a050f87',
+          requiredAmount: null,
+        },
+        {
+          address: '0x4031afd3b0f71bace9181e554a9e680ee4abe7df',
+          requiredAmount: null,
+        },
+        {
+          address: '0xee697232df2226c9fb3f02a57062c4208f287851',
+          requiredAmount: null,
+        },
+        {
+          address: '0x32b8c26d0439e1959cea6262cbabc12320b384c4',
+          requiredAmount: null,
+        },
+        {
+          address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079',
+          requiredAmount: null,
+        },
+        {
+          address: '0x6a97fc93e39b3f792f1fd6e01565ff412b002d20',
+          requiredAmount: null,
+        },
+      ];
+
+      for (const strategy of strategies) {
+        strategy.requiredAmount = await oldHarvestV2Keep3rJob.requiredAmount(
+          strategy.address
+        );
+      }
+
+      const harvestV2Keep3rJob = await ethers.getContractAt(
+        'HarvestV2Keep3rJob',
+        mainnetContracts.jobs.harvestV2Keep3rJob
+      );
+
+      console.log(
+        strategies.map((strategy) => strategy.address),
+        strategies.map((strategies) =>
+          (strategies.requiredAmount as any).toString()
+        )
+      );
+      if (!(await confirm.run())) return;
 
       // Add harvest strategies
-      const defaultHarvestAmount = 2_000_000; // 2m gas (no extra decimals)
-      const v2Strategies = [
-        {
-          address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
-          harvestAmount: defaultHarvestAmount,
-        },
-        { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
-        { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
-        { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
-        { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
-      ];
       await harvestV2Keep3rJob.addStrategies(
-        v2Strategies.map((v2Strategies) => v2Strategies.address),
-        v2Strategies.map(
-          (v2Strategies) => v2Strategies.harvestAmount || defaultHarvestAmount
-        )
+        strategies.map((strategy) => strategy.address),
+        strategies.map((strategies) => strategies.requiredAmount)
       );
 
       resolve();
