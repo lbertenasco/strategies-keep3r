@@ -70,7 +70,7 @@ function promptAndSubmit() {
         { address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079' },
         { address: '0x6a97fc93e39b3f792f1fd6e01565ff412b002d20' },
         // { address: '0x9528b97e7495a78325517744b2edbe0150310311' }, // DEPRECATED
-        { address: '0xe2a130825ffb7773b8a13157c6a13f482097aa99' },
+        // { address: '0xe2a130825Ffb7773B8a13157c6A13f482097AA99' }, // DEPRECATED
       ];
       // const v2Strategies = endorsedVaults
       //   .map((vault) => vault.strategies)
@@ -110,6 +110,9 @@ function promptAndSubmit() {
           strategy.keeperAccount
         );
         strategy.wantSymbol = await strategy.wantContract.callStatic.symbol();
+        strategy.wantBalancePre = await strategy.wantContract.callStatic.balanceOf(
+          strategy.address
+        );
         strategy.decimals = await strategy.wantContract.callStatic.decimals();
         strategy.vaultContract = await ethers.getContractAt(
           vaultAPIVersions['default'],
@@ -172,6 +175,9 @@ function promptAndSubmit() {
           strategy.address
         );
         strategy.paramsPost = await getStrategyParams(strategy);
+        strategy.wantBalancePost = await strategy.wantContract.callStatic.balanceOf(
+          strategy.address
+        );
       }
 
       for (const strategy of v2Strategies) {
@@ -269,6 +275,12 @@ function logCompare(strategy, paramsPre, paramsPost) {
       bnToDecimal(paramsPost[param].sub(paramsPre[param]), strategy.decimals) +
       ' ';
   }
+  paramsCompare +=
+    'wantBalance: ' +
+    bnToDecimal(
+      strategy.wantBalancePost.sub(strategy.wantBalancePre),
+      strategy.decimals
+    );
   console.log(paramsCompare);
 }
 

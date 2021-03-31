@@ -8,10 +8,12 @@ const {
 } = require('../../../utils/web3-utils');
 const { v1CrvStrategies } = require('../../../utils/v1-crv-strategies');
 const config = require('../../../.config.json');
-const proxyJobs = config.contracts.mainnet.proxyJobs;
+const mainnetContracts = config.contracts.mainnet;
 
 const { Confirm } = require('enquirer');
-const confirm = new Confirm('Do you want to add strategies to crv keep3r job?');
+const confirm = new Confirm({
+  message: 'Do you want to add strategies to crv keep3r job?',
+});
 
 async function main() {
   await hre.run('compile');
@@ -38,7 +40,7 @@ function run() {
 
     const crvStrategyKeep3rJob = await ethers.getContractAt(
       'CrvStrategyKeep3rJob',
-      proxyJobs.crvStrategyKeep3rJob,
+      mainnetContracts.jobs.crvStrategyKeep3rJob,
       deployer
     );
 
@@ -74,6 +76,15 @@ function run() {
       )
     );
     console.timeEnd('addStrategies');
+
+    console.log(
+      'set keeper or strategist role to',
+      crvStrategyKeep3rJob.address,
+      'on the following strats:'
+    );
+    for (const strategy of newV1CrvStrategies) {
+      console.log(strategy.address);
+    }
 
     resolve();
   });
