@@ -1,8 +1,9 @@
 const axios = require('axios');
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const config = require('../../.config.json');
 const { gwei, e18, bnToDecimal } = require('../../utils/web3-utils');
+const config = require('../../.config.json');
+const mainnetContracts = config.contracts.mainnet;
 
 const vaultAPIVersions = {
   default: 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
@@ -76,6 +77,15 @@ function promptAndSubmit() {
       //   .map((vault) => vault.strategies)
       //   .flat();
 
+      const harvestV2Keep3rJob = await ethers.getContractAt(
+        'HarvestV2Keep3rJob',
+        mainnetContracts.jobs.harvestV2Keep3rJob
+      );
+      const tendV2Keep3rJob = await ethers.getContractAt(
+        'TendV2Keep3rJob',
+        mainnetContracts.jobs.tendV2Keep3rJob
+      );
+
       for (const strategy of v2Strategies) {
         strategy.contract = await ethers.getContractAt(
           'IBaseStrategy',
@@ -129,27 +139,30 @@ function promptAndSubmit() {
         strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
       }
 
-      // TODO get fast gas from api or LINK on-chain oracle (see Keep3rHelper)
-      const gasPrice = gwei.mul(200);
-      const gasLimit = 2_000_000;
       for (const strategy of v2Strategies) {
-        const harvestable = await strategy.contract.callStatic.harvestTrigger(
-          gasPrice.mul(gasLimit)
-        );
-        const tendable = await strategy.contract.callStatic.tendTrigger(
-          gasPrice.mul(gasLimit)
-        );
+        console.log('strategy:', strategy.address);
+        let harvestable;
+        let tendable;
+        try {
+          harvestable = await harvestV2Keep3rJob.callStatic.workable(
+            strategy.address
+          );
+          tendable = await tendV2Keep3rJob.callStatic.workable(
+            strategy.address
+          );
+        } catch (error) {
+          if (
+            error.message.indexOf('V2Keep3rJob::workable:strategy-not-added') ==
+            -1
+          ) {
+            console.log(error.message);
+          }
+        }
 
         strategy.harvestable = harvestable;
         strategy.tendable = tendable;
 
-        console.log(
-          strategy.address,
-          'harvestable:',
-          harvestable,
-          'tendable:',
-          tendable
-        );
+        console.log('harvestable:', harvestable, 'tendable:', tendable);
 
         if (harvestable)
           console.log(
