@@ -131,6 +131,18 @@ const v1Vaults = [
     address: '0xE625F5923303f1CE7A43ACFEFd11fd12f30DbcA4',
     decimals: 18,
   },
+  {
+    name: 'USDP / 3CRV',
+    requiredEarn: 100_000,
+    address: '0x1B5eb1173D2Bf770e50F10410C9a96F7a8eB6e75',
+    decimals: 18,
+  },
+  {
+    name: 'LINK / sLINK',
+    requiredEarn: 2_500,
+    address: '0x96Ea6AF74Af09522fCB4c28C269C26F59a31ced6',
+    decimals: 18,
+  },
 ];
 
 export { v1Vaults };
