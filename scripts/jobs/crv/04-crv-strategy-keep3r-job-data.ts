@@ -26,10 +26,18 @@ function promptAndSubmit(): Promise<void | Error> {
         const requiredHarvest = await crvStrategyKeep3rJob.callStatic.requiredHarvest(
           strategy
         );
+        const requiredEarn = await crvStrategyKeep3rJob.callStatic.requiredEarn(
+          strategy
+        );
         const strategyData = v1CrvStrategies.find(
           (strategyData: any) => strategyData.address == strategy
         );
-        console.log(strategyData?.name, strategy, requiredHarvest.toString());
+        console.log(
+          strategyData?.name,
+          strategy,
+          requiredHarvest.toString(),
+          requiredEarn.toString()
+        );
       }
       resolve();
     } catch (err) {

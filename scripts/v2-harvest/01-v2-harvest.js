@@ -57,21 +57,19 @@ function promptAndSubmit() {
 
       // HARDCODED v2 Strats
       const v2Strategies = [
-        // { address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87' },
-        // { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
-        // { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
-        // { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
-        // { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
-
-        { address: '0x979843b8eea56e0bea971445200e0ec3398cdb87' },
-        { address: '0x4d7d4485fd600c61d840ccbec328bfd76a050f87' },
-        { address: '0x4031afd3b0f71bace9181e554a9e680ee4abe7df' },
-        { address: '0xee697232df2226c9fb3f02a57062c4208f287851' },
-        { address: '0x32b8c26d0439e1959cea6262cbabc12320b384c4' },
-        { address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079' },
-        { address: '0x6a97fc93e39b3f792f1fd6e01565ff412b002d20' },
-        // { address: '0x9528b97e7495a78325517744b2edbe0150310311' }, // DEPRECATED
-        // { address: '0xe2a130825Ffb7773B8a13157c6A13f482097AA99' }, // DEPRECATED
+        { address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87' },
+        { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
+        { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
+        { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
+        { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
+        { address: '0xB5F6747147990c4ddCeBbd0d4ef25461a967D079' },
+        { address: '0x5148C3124B42e73CA4e15EEd1B304DB59E0F2AF7' },
+        { address: '0x77b7CD137Dd9d94e7056f78308D7F65D2Ce68910' },
+        { address: '0xE68A8565B4F837BDa10e2e917BFAaa562e1cD143' },
+        { address: '0x2886971eCAF2610236b4869f58cD42c115DFb47A' },
+        { address: '0x91cBf0014a966615e1050c90A1aBf1d1d5d8cffd' },
+        { address: '0x0E5397B8547C128Ee20958286436b7BC3f9faAa4' },
+        { address: '0x4730D10703155Ef4a448B17b0eaf3468fD4fb02d' },
       ];
       // const v2Strategies = endorsedVaults
       //   .map((vault) => vault.strategies)
@@ -124,6 +122,7 @@ function promptAndSubmit() {
           strategy.address
         );
         strategy.decimals = await strategy.wantContract.callStatic.decimals();
+        // init default
         strategy.vaultContract = await ethers.getContractAt(
           vaultAPIVersions['default'],
           strategy.vault,
@@ -131,7 +130,8 @@ function promptAndSubmit() {
         );
         strategy.vaultAPIVersion = await strategy.vaultContract.apiVersion();
         strategy.vaultContract = await ethers.getContractAt(
-          vaultAPIVersions[strategy.vaultAPIVersion],
+          vaultAPIVersions[strategy.vaultAPIVersion] ||
+            vaultAPIVersions['0.3.2'],
           strategy.vault,
           strategy.keeperAccount
         );
@@ -325,8 +325,6 @@ async function getStrategyParams(strategy) {
   };
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {
