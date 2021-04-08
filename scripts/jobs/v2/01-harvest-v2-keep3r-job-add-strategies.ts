@@ -46,10 +46,6 @@ function promptAndSubmit(): Promise<void | Error> {
           address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079',
           requiredAmount: null,
         },
-        {
-          address: '0x6a97fc93e39b3f792f1fd6e01565ff412b002d20',
-          requiredAmount: null,
-        },
       ];
 
       for (const strategy of strategies) {
