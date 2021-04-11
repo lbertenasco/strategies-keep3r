@@ -25,7 +25,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     IV2Keeper public V2Keeper;
     address public keep3rHelper;
-    address public slidingOracle;
+    address public oracle;
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
@@ -43,20 +43,32 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         uint256 _age,
         bool _onlyEOA,
         address _keep3rHelper,
-        address _slidingOracle,
+        address _oracle,
         address _v2Keeper,
         uint256 _workCooldown
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         V2Keeper = IV2Keeper(_v2Keeper);
         keep3rHelper = _keep3rHelper;
-        slidingOracle = _slidingOracle;
+        oracle = _oracle;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
     }
 
     // Keep3r Setters
     function setKeep3r(address _keep3r) external override onlyGovernor {
         _setKeep3r(_keep3r);
+    }
+
+    function setV2Keep3r(address _v2Keeper) external override onlyGovernor {
+        V2Keeper = IV2Keeper(_v2Keeper);
+    }
+
+    function setOracle(address _oracle) external override onlyGovernor {
+        oracle = _oracle;
+    }
+
+    function setKeep3rHelper(address _keep3rHelper) external override onlyGovernor {
+        keep3rHelper = _keep3rHelper;
     }
 
     function setKeep3rRequirements(
@@ -159,7 +171,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     function _getCallCosts(address _strategy) internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
         if (requiredAmount[_strategy] == 0) return (0, 0);
         _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
-        _ethCallCost = IUniswapV2SlidingOracle(slidingOracle).current(address(_Keep3r), _kp3rCallCost, WETH);
+        _ethCallCost = IUniswapV2SlidingOracle(oracle).current(address(_Keep3r), _kp3rCallCost, WETH);
     }
 
     // Keep3r actions

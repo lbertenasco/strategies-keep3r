@@ -2,7 +2,7 @@
 pragma solidity >=0.6.8;
 import "../IKeep3rJob.sol";
 
-interface IV2Keep3rJob is IKeep3rJob {
+interface IV2QueueKeep3rJob is IKeep3rJob {
     event Keep3rSet(address keep3r);
     event Keep3rHelperSet(address keep3rHelper);
     event SlidingOracleSet(address slidingOracle);
@@ -13,7 +13,7 @@ interface IV2Keep3rJob is IKeep3rJob {
     event StrategyRemoved(address _strategy);
 
     // Actions by Keeper
-    event Worked(address _strategy, address _keeper, uint256 _credits, bool _workForTokens);
+    event Worked(address _strategy, uint256 _workAmount, address _keeper, uint256 _credits, bool _workForTokens);
 
     // Actions forced by governor
     event ForceWorked(address _strategy);
@@ -21,7 +21,7 @@ interface IV2Keep3rJob is IKeep3rJob {
     // Getters
     function strategies() external view returns (address[] memory);
 
-    function workable(address _strategy) external view returns (bool);
+    function workable(address _strategy, uint256 _workAmount) external view returns (bool);
 
     // Setters
     function setV2Keep3r(address _v2Keeper) external;
@@ -32,22 +32,20 @@ interface IV2Keep3rJob is IKeep3rJob {
 
     function setWorkCooldown(uint256 _workCooldown) external;
 
-    function addStrategies(address[] calldata _strategy, uint256[] calldata _requiredAmount) external;
-
-    function addStrategy(address _strategy, uint256 _requiredAmount) external;
-
-    function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external;
-
-    function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external;
+    function addStrategy(
+        address _strategy,
+        address[] calldata _strategies,
+        uint256[] calldata _requiredAmounts
+    ) external;
 
     function removeStrategy(address _strategy) external;
 
     // Keeper actions
-    function work(address _strategy) external returns (uint256 _credits);
+    function work(address _strategy, uint256 _workAmount) external returns (uint256 _credits);
 
-    function workForBond(address _strategy) external returns (uint256 _credits);
+    function workForBond(address _strategy, uint256 _workAmount) external returns (uint256 _credits);
 
-    function workForTokens(address _strategy) external returns (uint256 _credits);
+    function workForTokens(address _strategy, uint256 _workAmount) external returns (uint256 _credits);
 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
