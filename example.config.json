@@ -47,10 +47,10 @@
         "harvestV2Keep3rJob": "0x82084ed9fd5a582aa2994c0f07f535735e85f318"
       },
       "genericV2Keep3rJob": {
-        "keep3rHelper": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",
-        "slidingOracle": "0x73353801921417F465377c8d898c6f4C0270282C",
-        "crvStrategyKeep3rJob": "0x02027bDA2425204f152B8aa35Fb78687D65E1AF5",
-        "vaultKeep3rJob": "0x4a479E4457841D2D2Ff86e5A5389300963880C10"
+        "keep3rHelperV2": "0x2720535578096f1dE6C8c9B5255F1Bda40e8067A",
+        "slidingOracleV2": "0xe20B3f175F9f4e1EDDf333f96b72Bba138c9e83a",
+        "keep3rHelperV1": "0x24e1565ED1D6530cd977A6A8B3e327b9F53A9fd2",
+        "slidingOracleV1": "0x73353801921417F465377c8d898c6f4C0270282C"
       },
       "oracle": {
         "oracleBondedKeeper": "0xA8646cE5d983E996EbA22eb39e5956653ec63762",
