@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const getGasPrice = async () => {
+export async function getGasPrice() {
   try {
     const res = await axios.get('https://www.gasnow.org/api/v3/gas/price');
     return res.data;
@@ -8,9 +8,9 @@ const getGasPrice = async () => {
     console.error(error);
     return;
   }
-};
+}
 
-const sendPrivateTransaction = async (signedMessage: any) => {
+export async function sendPrivateTransaction(signedMessage: any) {
   try {
     const res = await axios.post(
       'https://api.taichi.network:10001/rpc/public',
@@ -26,9 +26,9 @@ const sendPrivateTransaction = async (signedMessage: any) => {
     console.error(error);
     return;
   }
-};
+}
 
-const queryPrivateTransaction = async (txHash: string) => {
+export async function queryPrivateTransaction(txHash: string) {
   try {
     const res = await axios.get(
       'https://api.taichi.network:10001/txscan/priTx?txHash=' + txHash
@@ -38,10 +38,4 @@ const queryPrivateTransaction = async (txHash: string) => {
     console.error(error);
     return;
   }
-};
-
-module.exports = {
-  getGasPrice,
-  sendPrivateTransaction,
-  queryPrivateTransaction,
-};
+}
