@@ -87,8 +87,8 @@ function promptAndSubmit(
             0, // uint256 _earned,
             0, // uint256 _age,
             true, // bool _onlyEOA,
-            genericV2Keep3rJobContracts.keep3rHelper, // address _keep3rHelper,
-            genericV2Keep3rJobContracts.slidingOracle, // address _slidingOracle,
+            genericV2Keep3rJobContracts.keep3rHelperV2, // address _keep3rHelper,
+            genericV2Keep3rJobContracts.slidingOracleV2, // address _slidingOracle,
             v2Keeper.address, // address _v2Keeper,
             6 * 60 * 60 // 6 hours // uint256 _workCooldown
           );
@@ -100,8 +100,8 @@ function promptAndSubmit(
             0,
             0,
             true,
-            genericV2Keep3rJobContracts.keep3rHelper,
-            genericV2Keep3rJobContracts.slidingOracle,
+            genericV2Keep3rJobContracts.keep3rHelperV2,
+            genericV2Keep3rJobContracts.slidingOracleV2,
             v2Keeper.address,
             6 * 60 * 60 // 6 hours
           );

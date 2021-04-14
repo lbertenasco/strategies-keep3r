@@ -33,6 +33,11 @@
       },
       "jobs": {
         "tendV2Keep3rJob": "0x7b28163e7a3db17eF2dba02BCf7250A8Dc505057",
+        "harvestV2Keep3rJob": "0x808E937a59D0264B0fcDb376aB1ebF5D47C25C2b",
+        "crvStrategyKeep3rJob": "0x02027bDA2425204f152B8aa35Fb78687D65E1AF5",
+        "vaultKeep3rJob": "0x4a479E4457841D2D2Ff86e5A5389300963880C10"
+      },
+      "oldJobs": {
         "harvestV2Keep3rJob": "0x620bd1E1D1d845c8904aC03F6cd6b87706B7596b"
       },
       "proxyJobs": {

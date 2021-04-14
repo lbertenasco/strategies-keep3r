@@ -75,14 +75,29 @@ function promptAndSubmit() {
       //   .map((vault) => vault.strategies)
       //   .flat();
 
+      const v2StrategiesBAG = [
+        // bag
+        { address: '0x6107add73f80AC6015E85103D2f016C6373E4bDc' }, //weth
+        { address: '0xFc403fd9E7A916eC38437807704e92236cA1f7A5' }, //dai
+        { address: '0x063303D9584Ac9A67855086e16Ca7212C109b7b4' }, //usdc
+        { address: '0xF0252a99691D591A5A458b9b4931bF1025BF6Ac3' }, //wbtc
+      ];
+
       const harvestV2Keep3rJob = await ethers.getContractAt(
         'HarvestV2Keep3rJob',
-        mainnetContracts.jobs.harvestV2Keep3rJob
+        mainnetContracts.oldJobs.harvestV2Keep3rJob
       );
       const tendV2Keep3rJob = await ethers.getContractAt(
         'TendV2Keep3rJob',
         mainnetContracts.jobs.tendV2Keep3rJob
       );
+
+      for (const strategy of v2StrategiesBAG) {
+        harvestV2Keep3rJob
+          .connect(deployer)
+          .addStrategy(strategy.address, 1000000);
+        v2Strategies.push(strategy);
+      }
 
       for (const strategy of v2Strategies) {
         strategy.contract = await ethers.getContractAt(
@@ -194,18 +209,25 @@ function promptAndSubmit() {
       }
 
       for (const strategy of v2Strategies) {
-        console.log(
-          'harvestable:',
-          strategy.harvestable,
-          'tendable:',
-          strategy.tendable
-        );
-        logData(strategy, strategy.paramsPre);
-        logVaultData(strategy, strategy.paramsPre);
-        logParams(strategy, strategy.paramsPre);
-        logParams(strategy, strategy.paramsPost);
-        logCompare(strategy, strategy.paramsPre, strategy.paramsPost);
-        logVaultData(strategy, strategy.paramsPost);
+        try {
+          console.log(
+            'harvestable:',
+            strategy.harvestable,
+            'tendable:',
+            strategy.tendable
+          );
+          logData(strategy, strategy.paramsPre);
+          logVaultData(strategy, strategy.paramsPre);
+          logParams(strategy, strategy.paramsPre);
+          logParams(strategy, strategy.paramsPost);
+          logCompare(strategy, strategy.paramsPre, strategy.paramsPost);
+          logVaultData(strategy, strategy.paramsPost);
+        } catch (error) {
+          console.log('### Error:');
+          console.log(error);
+          console.log();
+          console.log();
+        }
         console.log();
       }
 

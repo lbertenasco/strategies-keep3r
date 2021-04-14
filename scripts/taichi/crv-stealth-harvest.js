@@ -19,6 +19,7 @@ const selectStrategyPrompt = new Select({
     'musd',
     'usdn',
     'susd',
+    'link',
   ],
 });
 const checkEarnVaultPrompt = new Toggle({
@@ -64,7 +65,7 @@ function run() {
       // Setup crv strategy keep3r
       const crvStrategyKeep3r = await ethers.getContractAt(
         'CrvStrategyKeep3rJob',
-        config.contracts.mainnet.proxyJobs.crvStrategyKeep3rJob,
+        config.contracts.mainnet.jobs.crvStrategyKeep3rJob,
         signer
       );
 
