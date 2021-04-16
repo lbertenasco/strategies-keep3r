@@ -156,13 +156,18 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Keeper view actions (internal)
+    function _mainStrategyWorkable(address _strategy, uint256 _keep3rEthPrice) internal view virtual returns (bool) {
+        require(_availableStrategies.contains(_strategy), "V2QueueKeep3rJob::main-workable:strategy-not-added");
+        require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown), "V2QueueKeep3rJob::main-workable:on-cooldown");
+        return _strategyTrigger(_strategy, strategyAmount[_strategy].mul(_keep3rEthPrice).div(1 ether));
+    }
+
     function _workable(
         address _strategy,
         uint256 _workAmount,
         uint256 _keep3rEthPrice
     ) internal view virtual returns (bool) {
-        uint256 _ethAmount = (strategyAmount[_strategy] * _keep3rEthPrice) / 1 ether;
-        if (!_strategyTrigger(_strategy, _ethAmount)) return false;
+        if (!_mainStrategyWorkable(_strategy, _keep3rEthPrice)) return false;
         (, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _keep3rEthPrice);
         return uint256(_strategyIndexBytes) > 0;
     }
@@ -172,10 +177,8 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         uint256 _workAmount,
         uint256 _keep3rEthPrice
     ) internal view returns (uint256 _queueIndex, bytes32 _strategyIndexBytes) {
-        require(_availableStrategies.contains(_strategy), "V2QueueKeep3rJob::workable:strategy-not-added");
-        require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown), "V2QueueKeep3rJob::workable:on-cooldown");
         // grab current index
-        if (block.timestamp >= partialWorkAt[_strategy] + workResetCooldown[_strategy]) {
+        if (block.timestamp >= partialWorkAt[_strategy].add(workResetCooldown[_strategy])) {
             _queueIndex = 0;
         } else {
             _queueIndex = strategyQueueIndex[_strategy];
@@ -208,10 +211,12 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     ) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
         uint256 _keep3rEthPrice = _getKeep3rEthPrice();
+        // Checks if main strategy is workable
+        require(_mainStrategyWorkable(_strategy, _keep3rEthPrice), "V2QueueKeep3rJob::work:main-not-workable");
+        // grabs queue strategies to work
         (uint256 _queueIndex, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _keep3rEthPrice);
         require(_strategyIndexBytes > 0, "V2QueueKeep3rJob::work:not-workable");
 
-        // TODO getMax Length before workable and pass it through
         for (; _queueIndex < strategyQueueIndex[_strategy]; _queueIndex++) {
             // recover with _strategyIndexBytes & 2**_index == 2**_index
             if (_strategyIndexBytes & bytes32(2**_queueIndex) == bytes32(2**_queueIndex)) {
