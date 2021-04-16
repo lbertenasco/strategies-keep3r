@@ -234,7 +234,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     function _updateIndex(address _strategy, uint256 _index) internal {
         // save index if unfinished queue
         partialWorkAt[_strategy] = block.timestamp;
-        if (_index == strategyQueue[_strategy].length) {
+        if (_index < strategyQueue[_strategy].length - 1) {
             strategyQueueIndex[_strategy] = _index;
         } else {
             // if index max, set index as 0 and lastWorkAt = now
