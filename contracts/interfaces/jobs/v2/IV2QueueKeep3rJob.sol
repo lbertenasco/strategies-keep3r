@@ -35,7 +35,8 @@ interface IV2QueueKeep3rJob is IKeep3rJob {
     function addStrategy(
         address _strategy,
         address[] calldata _strategies,
-        uint256[] calldata _requiredAmounts
+        uint256[] calldata _requiredAmounts,
+        uint256 _workResetCooldown
     ) external;
 
     function removeStrategy(address _strategy) external;
