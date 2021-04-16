@@ -117,15 +117,17 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
     function addStrategy(
         address _strategy,
+        uint256 _requiredAmount,
         address[] calldata _strategies,
         uint256[] calldata _requiredAmounts,
         uint256 _workResetCooldown
     ) external override onlyGovernorOrMechanic {
-        _setStrategy(_strategy, _strategies, _requiredAmounts, _workResetCooldown);
+        _setStrategy(_strategy, _requiredAmount, _strategies, _requiredAmounts, _workResetCooldown);
     }
 
     function _setStrategy(
         address _strategy,
+        uint256 _requiredAmount,
         address[] calldata _strategies,
         uint256[] calldata _requiredAmounts,
         uint256 _workResetCooldown
@@ -135,7 +137,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         strategyAmounts[_strategy] = _requiredAmounts;
         // emit StrategyAdded(_strategy, _strategies, _strategies);
         _availableStrategies.add(_strategy);
-        strategyAmount[_strategy] = 1_000_000; // TODO <- find from the array? or ask user to send it
+        strategyAmount[_strategy] = _requiredAmount;
         workResetCooldown[_strategy] = _workResetCooldown;
     }
 
