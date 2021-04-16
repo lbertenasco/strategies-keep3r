@@ -53,7 +53,6 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     }
 
     function _work(address _strategy) internal override {
-        lastWorkAt[_strategy] = block.timestamp;
         IV2Keeper(v2Keeper).harvest(_strategy);
     }
 
