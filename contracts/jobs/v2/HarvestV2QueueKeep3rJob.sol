@@ -35,16 +35,20 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     {}
 
     function workable(address _strategy, uint256 _workAmount) external view override returns (bool) {
-        return _workable(_strategy, _workAmount);
+        uint256 _keep3rEthPrice = _getKeep3rEthPrice();
+        return _workable(_strategy, _workAmount, _keep3rEthPrice);
     }
 
-    function _workable(address _strategy, uint256 _workAmount) internal view override returns (bool) {
-        if (!super._workable(_strategy, _workAmount)) return false;
-        (, uint256 _ethCallCost) = _getCallCosts(_strategy);
-        return IBaseStrategy(_strategy).harvestTrigger(_ethCallCost);
+    function _workable(
+        address _strategy,
+        uint256 _workAmount,
+        uint256 _keep3rEthPrice
+    ) internal view override returns (bool) {
+        return super._workable(_strategy, _workAmount, _keep3rEthPrice);
     }
 
     function _strategyTrigger(address _strategy, uint256 _amount) internal view override returns (bool) {
+        if (_amount == 0) return true; // Force harvest on amount 0
         return IBaseStrategy(_strategy).harvestTrigger(_amount);
     }
 

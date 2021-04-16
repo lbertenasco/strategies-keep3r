@@ -29,11 +29,20 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
+    // main strategy amount
+    mapping(address => uint256) public strategyAmount;
+    // strategy queue strategies
     mapping(address => address[]) public strategyQueue;
+    // strategy queue amounts
     mapping(address => uint256[]) public strategyAmounts;
+    // latest strategy queue index
     mapping(address => uint256) public strategyQueueIndex;
-
+    // last strategy workAt timestamp
     mapping(address => uint256) public lastWorkAt;
+    // last strategy partial work timestamp
+    mapping(address => uint256) public partialWorkAt;
+    // strategy amount of time before resetting queue index
+    mapping(address => uint256) public workResetCooldown;
 
     uint256 public workCooldown;
 
@@ -109,21 +118,25 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     function addStrategy(
         address _strategy,
         address[] calldata _strategies,
-        uint256[] calldata _requiredAmounts
+        uint256[] calldata _requiredAmounts,
+        uint256 _workResetCooldown
     ) external override onlyGovernorOrMechanic {
-        _setStrategy(_strategy, _strategies, _requiredAmounts);
+        _setStrategy(_strategy, _strategies, _requiredAmounts, _workResetCooldown);
     }
 
     function _setStrategy(
         address _strategy,
         address[] calldata _strategies,
-        uint256[] calldata _requiredAmounts
+        uint256[] calldata _requiredAmounts,
+        uint256 _workResetCooldown
     ) internal {
         require(strategyQueue[_strategy].length == 0, "V2QueueKeep3rJob::add-strategy:strategy-already-added");
         strategyQueue[_strategy] = _strategies;
         strategyAmounts[_strategy] = _requiredAmounts;
         // emit StrategyAdded(_strategy, _strategies, _strategies);
         _availableStrategies.add(_strategy);
+        strategyAmount[_strategy] = 1_000_000; // TODO <- find from the array? or ask user to send it
+        workResetCooldown[_strategy] = _workResetCooldown;
     }
 
     function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
@@ -143,53 +156,46 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Keeper view actions (internal)
-    function _workable(address _strategy, uint256 _workAmount) internal view virtual returns (bool) {
-        (, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount);
+    function _workable(
+        address _strategy,
+        uint256 _workAmount,
+        uint256 _keep3rEthPrice
+    ) internal view virtual returns (bool) {
+        uint256 _ethAmount = (strategyAmount[_strategy] * _keep3rEthPrice) / 1 ether;
+        if (!_strategyTrigger(_strategy, _ethAmount)) return false;
+        (, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _keep3rEthPrice);
         return uint256(_strategyIndexBytes) > 0;
     }
 
-    function _getWorkableStrategies(address _strategy, uint256 _workAmount)
-        internal
-        view
-        returns (uint256 _queueIndex, bytes32 _strategyIndexBytes)
-    {
+    function _getWorkableStrategies(
+        address _strategy,
+        uint256 _workAmount,
+        uint256 _keep3rEthPrice
+    ) internal view returns (uint256 _queueIndex, bytes32 _strategyIndexBytes) {
         require(_availableStrategies.contains(_strategy), "V2QueueKeep3rJob::workable:strategy-not-added");
         require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown), "V2QueueKeep3rJob::workable:on-cooldown");
         // grab current index
-        _queueIndex = strategyQueueIndex[_strategy];
-        uint256 _index = strategyQueueIndex[_strategy];
+        if (block.timestamp >= partialWorkAt[_strategy] + workResetCooldown[_strategy]) {
+            _queueIndex = 0;
+        } else {
+            _queueIndex = strategyQueueIndex[_strategy];
+        }
+        uint256 _index = _queueIndex;
         uint256 _maxLength =
             _index.add(_workAmount) >= strategyQueue[_strategy].length ? strategyQueue[_strategy].length : _index.add(_workAmount);
         // loop through strategies queue _workAmount of times starting from index
         for (; _index < _maxLength; _index++) {
             // work if workable
-            if (_strategyTrigger(strategyQueue[_strategy][_index], strategyAmounts[_strategy][_index])) {
+            uint256 _ethAmount = (strategyAmounts[_strategy][_index] * _keep3rEthPrice) / 1 ether;
+            if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
                 _strategyIndexBytes = _strategyIndexBytes | bytes32(2**_index);
-                // _amount = _amount.add(1);
             }
         }
-
-        // TODO Move below to work function!
-        // // save index if unfinished queue
-        // if (_index == strategyQueue[_strategy].length) {
-        //     strategyQueueIndex[_strategy] = _index;
-        // } else {
-        //     // if index max, set index as 0 and lastWorkAt = now
-        //     strategyQueueIndex[_strategy] = 0;
-        //     lastWorkAt[_strategy] = block.timestamp;
-        // }
     }
 
     // Get eth costs
-    function _getCallCost() internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
-        _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).quote(1 ether);
-        _ethCallCost = IUniswapV2SlidingOracle(oracle).current(address(_Keep3r), _kp3rCallCost, WETH);
-    }
-
-    function _getCallCosts(address _strategy) internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
-        // if (requiredAmount[_strategy] == 0) return (0, 0);
-        // _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
-        // _ethCallCost = IUniswapV2SlidingOracle(oracle).current(address(_Keep3r), _kp3rCallCost, WETH);
+    function _getKeep3rEthPrice() internal view returns (uint256 _keep3rEthPrice) {
+        return IUniswapV2SlidingOracle(oracle).current(address(_Keep3r), IKeep3rV1Helper(keep3rHelper).quote(1 ether), WETH);
     }
 
     function _strategyTrigger(address _strategy, uint256 _amount) internal view virtual returns (bool) {}
@@ -201,7 +207,8 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         bool _workForTokens
     ) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
-        (uint256 _queueIndex, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount);
+        uint256 _keep3rEthPrice = _getKeep3rEthPrice();
+        (uint256 _queueIndex, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _keep3rEthPrice);
         require(_strategyIndexBytes > 0, "V2QueueKeep3rJob::work:not-workable");
 
         // TODO getMax Length before workable and pass it through
@@ -212,9 +219,23 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
             }
         }
 
+        _updateIndex(_strategy, _queueIndex);
+
         _credits = _calculateCredits(_initialGas);
 
         emit Worked(_strategy, _workAmount, msg.sender, _credits, _workForTokens);
+    }
+
+    function _updateIndex(address _strategy, uint256 _index) internal {
+        // save index if unfinished queue
+        partialWorkAt[_strategy] = block.timestamp;
+        if (_index == strategyQueue[_strategy].length) {
+            strategyQueueIndex[_strategy] = _index;
+        } else {
+            // if index max, set index as 0 and lastWorkAt = now
+            strategyQueueIndex[_strategy] = 0;
+            lastWorkAt[_strategy] = block.timestamp;
+        }
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
