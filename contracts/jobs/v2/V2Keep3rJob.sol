@@ -12,12 +12,13 @@ import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
-import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
+import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     using SafeMath for uint256;
 
-    address public constant WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address public override fastGasOracle = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
@@ -25,7 +26,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     IV2Keeper public V2Keeper;
     address public keep3rHelper;
-    address public oracle;
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
@@ -43,14 +43,12 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         uint256 _age,
         bool _onlyEOA,
         address _keep3rHelper,
-        address _oracle,
         address _v2Keeper,
         uint256 _workCooldown
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         V2Keeper = IV2Keeper(_v2Keeper);
         keep3rHelper = _keep3rHelper;
-        oracle = _oracle;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
     }
 
@@ -63,12 +61,13 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         V2Keeper = IV2Keeper(_v2Keeper);
     }
 
-    function setOracle(address _oracle) external override onlyGovernor {
-        oracle = _oracle;
-    }
-
     function setKeep3rHelper(address _keep3rHelper) external override onlyGovernor {
         keep3rHelper = _keep3rHelper;
+    }
+
+    function setFastGasOracle(address _fastGasOracle) external override onlyGovernor {
+        require(_fastGasOracle != address(0), "V2Keep3rJob::set-fas-gas-oracle:not-zero-address");
+        fastGasOracle = _fastGasOracle;
     }
 
     function setKeep3rRequirements(
@@ -87,7 +86,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     }
 
     function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
-        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "CrvStrategyKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "V2Keep3rJob::set-reward-multiplier:multiplier-exceeds-max");
         rewardMultiplier = _rewardMultiplier;
     }
 
@@ -168,10 +167,9 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     }
 
     // Get eth costs
-    function _getCallCosts(address _strategy) internal view returns (uint256 _kp3rCallCost, uint256 _ethCallCost) {
-        if (requiredAmount[_strategy] == 0) return (0, 0);
-        _kp3rCallCost = IKeep3rV1Helper(keep3rHelper).getQuoteLimit(requiredAmount[_strategy]);
-        _ethCallCost = IUniswapV2SlidingOracle(oracle).current(address(_Keep3r), _kp3rCallCost, WETH);
+    function _getCallCosts(address _strategy) internal view returns (uint256 _callCost) {
+        if (requiredAmount[_strategy] == 0) return 0;
+        return requiredAmount[_strategy].mul(uint256(IChainLinkFeed(fastGasOracle).latestAnswer()));
     }
 
     // Keep3r actions
@@ -188,7 +186,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimit(_initialGas).mul(rewardMultiplier).div(PRECISION);
+        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
     }
 
     // Mechanics keeper bypass
