@@ -12,12 +12,13 @@ import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2QueueKeep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
-import "../../interfaces/keep3r/IUniswapV2SlidingOracle.sol";
+import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob {
     using SafeMath for uint256;
 
-    address public constant WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+    address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address public override fastGasOracle = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
@@ -55,14 +56,12 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         uint256 _age,
         bool _onlyEOA,
         address _keep3rHelper,
-        address _oracle,
         address _v2Keeper,
         uint256 _workCooldown
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         v2Keeper = _v2Keeper;
         keep3rHelper = _keep3rHelper;
-        oracle = _oracle;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
     }
 
@@ -75,8 +74,9 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         v2Keeper = _v2Keeper;
     }
 
-    function setOracle(address _oracle) external override onlyGovernor {
-        oracle = _oracle;
+    function setFastGasOracle(address _fastGasOracle) external override onlyGovernor {
+        require(_fastGasOracle != address(0), "V2QueueKeep3rJob::set-fas-gas-oracle:not-zero-address");
+        fastGasOracle = _fastGasOracle;
     }
 
     function setKeep3rHelper(address _keep3rHelper) external override onlyGovernor {
@@ -99,7 +99,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     function _setRewardMultiplier(uint256 _rewardMultiplier) internal {
-        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "CrvStrategyKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
+        require(_rewardMultiplier <= MAX_REWARD_MULTIPLIER, "V2QueueKeep3rJob::set-reward-multiplier:multiplier-exceeds-max");
         rewardMultiplier = _rewardMultiplier;
     }
 
@@ -158,26 +158,26 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Keeper view actions (internal)
-    function _mainStrategyWorkable(address _strategy, uint256 _keep3rEthPrice) internal view virtual returns (bool) {
+    function _mainStrategyWorkable(address _strategy, uint256 _ethGasPrice) internal view virtual returns (bool) {
         require(_availableStrategies.contains(_strategy), "V2QueueKeep3rJob::main-workable:strategy-not-added");
         require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown), "V2QueueKeep3rJob::main-workable:on-cooldown");
-        return _strategyTrigger(_strategy, strategyAmount[_strategy].mul(_keep3rEthPrice).div(1 ether));
+        return _strategyTrigger(_strategy, strategyAmount[_strategy].mul(_ethGasPrice));
     }
 
     function _workable(
         address _strategy,
         uint256 _workAmount,
-        uint256 _keep3rEthPrice
+        uint256 _ethGasPrice
     ) internal view virtual returns (bool) {
-        if (!_mainStrategyWorkable(_strategy, _keep3rEthPrice)) return false;
-        (, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _keep3rEthPrice);
+        if (!_mainStrategyWorkable(_strategy, _ethGasPrice)) return false;
+        (, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _ethGasPrice);
         return uint256(_strategyIndexBytes) > 0;
     }
 
     function _getWorkableStrategies(
         address _strategy,
         uint256 _workAmount,
-        uint256 _keep3rEthPrice
+        uint256 _ethGasPrice
     ) internal view returns (uint256 _queueIndex, bytes32 _strategyIndexBytes) {
         // grab current index
         if (block.timestamp >= partialWorkAt[_strategy].add(workResetCooldown[_strategy])) {
@@ -191,7 +191,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         // loop through strategies queue _workAmount of times starting from index
         for (; _index < _maxLength; _index++) {
             // work if workable
-            uint256 _ethAmount = (strategyAmounts[_strategy][_index] * _keep3rEthPrice) / 1 ether;
+            uint256 _ethAmount = strategyAmounts[_strategy][_index].mul(_ethGasPrice);
             if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
                 _strategyIndexBytes = _strategyIndexBytes | bytes32(2**_index);
             }
@@ -199,8 +199,8 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Get eth costs
-    function _getKeep3rEthPrice() internal view returns (uint256 _keep3rEthPrice) {
-        return IUniswapV2SlidingOracle(oracle).current(address(_Keep3r), IKeep3rV1Helper(keep3rHelper).quote(1 ether), WETH);
+    function _getEthGasPrice() internal view returns (uint256 _ethGasPrice) {
+        return uint256(IChainLinkFeed(fastGasOracle).latestAnswer());
     }
 
     function _strategyTrigger(address _strategy, uint256 _amount) internal view virtual returns (bool) {}
@@ -212,11 +212,11 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         bool _workForTokens
     ) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
-        uint256 _keep3rEthPrice = _getKeep3rEthPrice();
+        uint256 _ethGasPrice = _getEthGasPrice();
         // Checks if main strategy is workable
-        require(_mainStrategyWorkable(_strategy, _keep3rEthPrice), "V2QueueKeep3rJob::work:main-not-workable");
+        require(_mainStrategyWorkable(_strategy, _ethGasPrice), "V2QueueKeep3rJob::work:main-not-workable");
         // grabs queue strategies to work
-        (uint256 _queueIndex, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _keep3rEthPrice);
+        (uint256 _queueIndex, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _ethGasPrice);
         require(_strategyIndexBytes > 0, "V2QueueKeep3rJob::work:not-workable");
 
         for (; _queueIndex < strategyQueueIndex[_strategy]; _queueIndex++) {
@@ -247,7 +247,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimit(_initialGas).mul(rewardMultiplier).div(PRECISION);
+        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
     }
 
     // Mechanics keeper bypass

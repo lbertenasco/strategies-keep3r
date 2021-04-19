@@ -14,28 +14,12 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         uint256 _age,
         bool _onlyEOA,
         address _keep3rHelper,
-        address _slidingOracle,
         address _v2Keeper,
         uint256 _workCooldown
-    )
-        public
-        V2QueueKeep3rJob(
-            _mechanicsRegistry,
-            _keep3r,
-            _bond,
-            _minBond,
-            _earned,
-            _age,
-            _onlyEOA,
-            _keep3rHelper,
-            _slidingOracle,
-            _v2Keeper,
-            _workCooldown
-        )
-    {}
+    ) public V2QueueKeep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _keep3rHelper, _v2Keeper, _workCooldown) {}
 
     function workable(address _strategy, uint256 _workAmount) external view override returns (bool) {
-        uint256 _keep3rEthPrice = _getKeep3rEthPrice();
+        uint256 _keep3rEthPrice = _getEthGasPrice();
         return _workable(_strategy, _workAmount, _keep3rEthPrice);
     }
 

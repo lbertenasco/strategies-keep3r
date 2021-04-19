@@ -14,9 +14,8 @@ contract TendV2Keep3rJob is V2Keep3rJob {
         uint256 _age,
         bool _onlyEOA,
         address _keep3rHelper,
-        address _slidingOracle,
         address _v2Keeper
-    ) public V2Keep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _keep3rHelper, _slidingOracle, _v2Keeper, 0) {}
+    ) public V2Keep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _keep3rHelper, _v2Keeper, 0) {}
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -24,8 +23,7 @@ contract TendV2Keep3rJob is V2Keep3rJob {
 
     function _workable(address _strategy) internal view override returns (bool) {
         if (!super._workable(_strategy)) return false;
-        (, uint256 _ethCallCost) = _getCallCosts(_strategy);
-        return IBaseStrategy(_strategy).tendTrigger(_ethCallCost);
+        return IBaseStrategy(_strategy).tendTrigger(_getCallCosts(_strategy));
     }
 
     function _work(address _strategy) internal override {
