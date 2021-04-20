@@ -142,7 +142,7 @@ describe('HarvestV2QueueKeep3rJob', () => {
 
     // Add harvest strategies
     const mainQueue = [
-      strategies[1].address,
+      strategies[4].address,
       strategies[2].address,
       strategies[3].address,
       strategies[0].address,
@@ -151,7 +151,7 @@ describe('HarvestV2QueueKeep3rJob', () => {
       strategies[0].address,
       1,
       mainQueue,
-      [100, 100, 100, 1],
+      [0, 0, 0, 0],
       // [strategies[1].requiredAmount, strategies[2].requiredAmount, strategies[3].requiredAmount, strategies[0].requiredAmount],
       30 * 60 // 30 minutes
     );
@@ -175,14 +175,34 @@ describe('HarvestV2QueueKeep3rJob', () => {
       mainStrategy,
       strategyQueue.length
     );
-
     console.log({ workable });
 
+    workable = await harvestV2QueueKeep3rJob.workable(mainStrategy, 0);
+    console.log({ workable });
+    await expect(
+      harvestV2QueueKeep3rJob.connect(keeper).workForTokens(mainStrategy, 0)
+    ).to.be.revertedWith('V2QueueKeep3rJob::work:not-workable');
+
+    workable = await harvestV2QueueKeep3rJob.workable(mainStrategy, 2);
+    console.log({ workable });
+
+    let workTx = await harvestV2QueueKeep3rJob
+      .connect(keeper)
+      .workForTokens(mainStrategy, 2);
+    let workTxData = await workTx.wait();
+    console.log('gasUsed:', workTxData.cumulativeGasUsed.toNumber());
+
+    workTx = await harvestV2QueueKeep3rJob
+      .connect(keeper)
+      .workForTokens(mainStrategy, 1);
+    workTxData = await workTx.wait();
+    console.log('gasUsed:', workTxData.cumulativeGasUsed.toNumber());
+
     // WORK
-    const workTx = await harvestV2QueueKeep3rJob
+    workTx = await harvestV2QueueKeep3rJob
       .connect(keeper)
       .workForTokens(mainStrategy, strategyQueue.length);
-    const workTxData = await workTx.wait();
+    workTxData = await workTx.wait();
     console.log('gasUsed:', workTxData.cumulativeGasUsed.toNumber());
 
     await expect(
