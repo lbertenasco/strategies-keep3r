@@ -240,11 +240,11 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         emit Worked(_strategy, _workAmount, msg.sender, _credits, _workForTokens);
     }
 
-    function _updateIndex(address _strategy, uint256 _index) internal {
+    function _updateIndex(address _strategy, uint256 _nextIndex) internal {
         // save index if unfinished queue
         partialWorkAt[_strategy] = block.timestamp;
-        if (_index < strategyQueue[_strategy].length - 1) {
-            strategyQueueIndex[_strategy] = _index;
+        if (_nextIndex < strategyQueue[_strategy].length) {
+            strategyQueueIndex[_strategy] = _nextIndex;
         } else {
             // if index max, set index as 0 and lastWorkAt = now
             strategyQueueIndex[_strategy] = 0;
