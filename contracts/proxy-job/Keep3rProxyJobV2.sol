@@ -154,6 +154,6 @@ contract Keep3rProxyJobV2 is MachineryReady, Keep3r, IKeep3rProxyJobV2 {
 
     function _calculateCredits(address _job, uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimit(_initialGas).mul(rewardMultiplier[_job]).div(PRECISION);
+        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier[_job]).div(PRECISION);
     }
 }

@@ -3,9 +3,10 @@
     "mainnet": {
       "publicKey": "0xfeb4acf3df3cdea7399794d0869ef76a6efaff52",
       "privateKey": "",
-      "keep3rGovernance": "0x2d407ddb06311396fe14d4b49da5f0471447d45c",
-      "keeper": "0x9f6FdC2565CfC9ab8E184753bafc8e94C0F985a0",
-      "deployer": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74"
+      "keep3rGovernance": "0x0D5Dc686d0a2ABBfDaFDFb4D0533E886517d4E83",
+      "keeper": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74",
+      "deployer": "0x1ea056C13F8ccC981E51c5f1CDF87476666D0A74",
+      "whale": "0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8"
     }
   },
   "contracts": {
