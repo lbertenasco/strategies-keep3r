@@ -29,7 +29,7 @@ async function v2Harvest() {
   // Setup HarvestV2Keep3rJob
   const HarvestV2Keep3rJob = await ethers.getContractAt(
     'HarvestV2Keep3rJob',
-    mainnetContracts.jobs.harvestV2Keep3rJob
+    mainnetContracts.oldJobs.harvestV2Keep3rJob
   );
   console.log('HarvestV2Keep3rJob:', HarvestV2Keep3rJob.address);
 
