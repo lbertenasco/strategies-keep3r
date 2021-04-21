@@ -1,5 +1,12 @@
 import { network } from 'hardhat';
 
+const getBlockNumber = async () => {
+  await network.provider.request({
+    method: 'eth_blockNumber',
+    params: [],
+  });
+};
+
 const advanceTimeAndBlock = async (time: number): Promise<void> => {
   await advanceTime(time);
   await advanceBlock();
@@ -40,6 +47,7 @@ const reset = async (forking?: { [key: string]: any }) => {
 };
 
 export default {
+  getBlockNumber,
   advanceTimeAndBlock,
   advanceToTimeAndBlock,
   advanceTime,
