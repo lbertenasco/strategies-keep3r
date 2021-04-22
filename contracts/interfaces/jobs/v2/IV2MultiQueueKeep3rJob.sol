@@ -2,7 +2,7 @@
 pragma solidity >=0.6.8;
 import "../IKeep3rJob.sol";
 
-interface IV2QueueKeep3rJob is IKeep3rJob {
+interface IV2MultiQueueKeep3rJob is IKeep3rJob {
     event Keep3rSet(address keep3r);
 
     // Setters
@@ -22,7 +22,7 @@ interface IV2QueueKeep3rJob is IKeep3rJob {
 
     function strategyQueueList(address _strategy) external view returns (address[] memory _strategies);
 
-    function workable(address _strategy) external view returns (bool);
+    function workable(address _strategy, uint256 _workAmount) external view returns (bool);
 
     // Setters
     function setV2Keep3r(address _v2Keeper) external;
@@ -33,6 +33,7 @@ interface IV2QueueKeep3rJob is IKeep3rJob {
 
     function addStrategy(
         address _strategy,
+        uint256 _requiredAmount,
         address[] calldata _strategies,
         uint256[] calldata _requiredAmounts,
         uint256 _workResetCooldown

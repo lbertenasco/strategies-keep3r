@@ -29,12 +29,18 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
+    // main strategy amount
+    mapping(address => uint256) public strategyAmount;
     // strategy queue strategies
     mapping(address => address[]) public strategyQueue;
     // strategy queue amounts
     mapping(address => uint256[]) public strategyAmounts;
+    // latest strategy queue index
+    mapping(address => uint256) public strategyQueueIndex;
     // last strategy workAt timestamp
     mapping(address => uint256) public lastWorkAt;
+    // last strategy partial work timestamp
+    mapping(address => uint256) public partialWorkAt;
     // strategy amount of time before resetting queue index
     mapping(address => uint256) public workResetCooldown;
 
@@ -104,15 +110,17 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
     function addStrategy(
         address _strategy,
+        uint256 _requiredAmount,
         address[] calldata _strategies,
         uint256[] calldata _requiredAmounts,
         uint256 _workResetCooldown
     ) external override onlyGovernorOrMechanic {
-        _setStrategy(_strategy, _strategies, _requiredAmounts, _workResetCooldown);
+        _setStrategy(_strategy, _requiredAmount, _strategies, _requiredAmounts, _workResetCooldown);
     }
 
     function _setStrategy(
         address _strategy,
+        uint256 _requiredAmount,
         address[] calldata _strategies,
         uint256[] calldata _requiredAmounts,
         uint256 _workResetCooldown
@@ -121,11 +129,17 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         strategyQueue[_strategy] = _strategies;
         strategyAmounts[_strategy] = _requiredAmounts;
         _availableStrategies.add(_strategy);
+        strategyAmount[_strategy] = _requiredAmount;
         workResetCooldown[_strategy] = _workResetCooldown;
     }
 
-    function updateStrategyConfig(address _strategy, uint256 _workResetCooldown) external onlyGovernorOrMechanic {
+    function updateStrategyConfig(
+        address _strategy,
+        uint256 _requiredAmount,
+        uint256 _workResetCooldown
+    ) external onlyGovernorOrMechanic {
         require(strategyQueue[_strategy].length != 0, "V2QueueKeep3rJob::update-strategy:strategy-doesnt-exist");
+        strategyAmount[_strategy] = _requiredAmount;
         workResetCooldown[_strategy] = _workResetCooldown;
     }
 
@@ -153,14 +167,51 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Keeper view actions (internal)
-    function _mainStrategyWorkable(address _strategy) internal view virtual returns (bool) {
+    function _mainStrategyWorkable(address _strategy, uint256 _ethGasPrice) internal view virtual returns (bool) {
         require(_availableStrategies.contains(_strategy), "V2QueueKeep3rJob::main-workable:strategy-not-added");
         require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown), "V2QueueKeep3rJob::main-workable:on-cooldown");
-        return true;
+        return _strategyTrigger(_strategy, strategyAmount[_strategy].mul(_ethGasPrice));
     }
 
-    function _workable(address _strategy) internal view virtual returns (bool) {
-        return _mainStrategyWorkable(_strategy);
+    function _workable(
+        address _strategy,
+        uint256 _workAmount,
+        uint256 _ethGasPrice
+    ) internal view virtual returns (bool) {
+        if (!_mainStrategyWorkable(_strategy, _ethGasPrice)) return false;
+        (, , bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _ethGasPrice);
+        return uint256(_strategyIndexBytes) > 0;
+    }
+
+    function _getWorkableStrategies(
+        address _strategy,
+        uint256 _workAmount,
+        uint256 _ethGasPrice
+    )
+        internal
+        view
+        returns (
+            uint256 _queueIndex,
+            uint256 _maxLength,
+            bytes32 _strategyIndexBytes
+        )
+    {
+        // grab current index
+        if (block.timestamp >= partialWorkAt[_strategy].add(workResetCooldown[_strategy])) {
+            _queueIndex = 0;
+        } else {
+            _queueIndex = strategyQueueIndex[_strategy];
+        }
+        uint256 _index = _queueIndex;
+        _maxLength = _index.add(_workAmount) >= strategyQueue[_strategy].length ? strategyQueue[_strategy].length : _index.add(_workAmount);
+        // loop through strategies queue _workAmount of times starting from index
+        for (; _index < _maxLength; _index++) {
+            // work if workable
+            uint256 _ethAmount = strategyAmounts[_strategy][_index].mul(_ethGasPrice);
+            if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
+                _strategyIndexBytes = _strategyIndexBytes | bytes32(2**_index);
+            }
+        }
     }
 
     // Get eth costs
@@ -179,23 +230,35 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         uint256 _initialGas = gasleft();
         uint256 _ethGasPrice = _getEthGasPrice();
         // Checks if main strategy is workable
-        require(_mainStrategyWorkable(_strategy), "V2QueueKeep3rJob::work:main-not-workable");
-        bool mainWorked = false;
+        require(_mainStrategyWorkable(_strategy, _ethGasPrice), "V2QueueKeep3rJob::work:main-not-workable");
+        // grabs queue strategies to work
+        (uint256 _queueIndex, uint256 _maxLength, bytes32 _strategyIndexBytes) = _getWorkableStrategies(_strategy, _workAmount, _ethGasPrice);
+        require(_strategyIndexBytes > 0, "V2QueueKeep3rJob::work:not-workable");
 
-        for (uint256 _index = 0; _index < strategyQueue[_strategy].length; _index++) {
-            uint256 _ethAmount = strategyAmounts[_strategy][_index].mul(_ethGasPrice);
-            if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
-                _work(strategyQueue[_strategy][_index]);
-                if (strategyQueue[_strategy][_index] == _strategy) mainWorked = true;
+        for (; _queueIndex < _maxLength; _queueIndex++) {
+            // recover with _strategyIndexBytes & 2**_index == 2**_index
+            if (_strategyIndexBytes & bytes32(2**_queueIndex) == bytes32(2**_queueIndex)) {
+                _work(strategyQueue[_strategy][_queueIndex]);
             }
         }
-        require(mainWorked, "V2QueueKeep3rJob::work:main-not-worked");
 
-        lastWorkAt[_strategy] = block.timestamp;
+        _updateIndex(_strategy, _queueIndex);
 
         _credits = _calculateCredits(_initialGas);
 
         emit Worked(_strategy, _workAmount, msg.sender, _credits, _workForTokens);
+    }
+
+    function _updateIndex(address _strategy, uint256 _nextIndex) internal {
+        // save index if unfinished queue
+        partialWorkAt[_strategy] = block.timestamp;
+        if (_nextIndex < strategyQueue[_strategy].length) {
+            strategyQueueIndex[_strategy] = _nextIndex;
+        } else {
+            // if index max, set index as 0 and lastWorkAt = now
+            strategyQueueIndex[_strategy] = 0;
+            lastWorkAt[_strategy] = block.timestamp;
+        }
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
