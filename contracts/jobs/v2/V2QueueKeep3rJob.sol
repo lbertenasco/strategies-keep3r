@@ -134,6 +134,68 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         workResetCooldown[_strategy] = _workResetCooldown;
     }
 
+    function updateStrategyConfig(
+        address _strategy,
+        uint256 _requiredAmount,
+        uint256 _workResetCooldown,
+    ) external onlyGovernor {
+        require(strategyQueue[_strategy].length != 0, "V2QueueKeep3rJob::update-strategy:strategy-doesnt-exist");
+        strategyAmount[_strategy] = _requiredAmount;
+        workResetCooldown[_strategy] = _workResetCooldown;
+        // maybe need an event of strategy changes
+        // emit StrategyUpdated(_strategy, _requiredAmounts, _workResetCooldown);
+    }
+
+    function _updateStrategy(
+        address _strategy,
+        address[] calldata _strategies,
+        uint256[] calldata _requiredAmounts,
+        bool isAdd
+    ) internal {
+        require(strategyQueue[_strategy].length != 0, "V2QueueKeep3rJob::update-strategy:strategy-doesnt-exist");
+        if (isAdd) {
+            for (uint i = 0; i < _strategies.length; ++i) {
+                strategyQueue[_strategy].add(_strategies[i]);
+                strategyAmounts[_strategy].add(_requiredAmounts[i]);
+            }
+        }
+        else { // isAdd == false -> means removal
+            for (uint i = 0; i < strategyQueue[_strategy].length; ++i) {
+                for (uint j = 0; j < _strategies.length; ++j) {
+                    // double loop can be optimized,
+                    // but the concept is easier to understand with this
+                    if (strategyQueue[_strategy][i] == _strategies[j]) {
+                        delete(strategyQueue[_strategy][i]);
+                        delete(strategyAmounts[_strategy[i]);
+                        // can emit events here
+                    }
+                }
+            }
+        }
+        // maybe need an event of strategy changes
+        // emit StrategyUpdated(_strategy, _strategies, _requiredAmounts, isAdd);
+    }
+
+    function updateStrategy(
+        address _strategy,
+        address[] calldata _strategies,
+        uint256[] calldata _requiredAmounts,
+        bool isAdd
+    ) external onlyGovernor {
+        _updateStrategy(_strategy, _strategies, _requiredAmounts, isAdd);
+    }
+
+    function updateStrategies(
+        address[] _strategy,
+        address[] calldata _strategies,
+        uint256[] calldata _requiredAmounts,
+        bool isAdd
+    ) external onlyGovernor {
+        for (uint i = 0; i < _strategy.length; ++i) {
+            _updateStrategy(_strategy[i], _strategies, _requiredAmounts, isAdd);
+        }
+    }
+
     function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
         require(strategyQueue[_strategy].length > 0, "V2QueueKeep3rJob::remove-strategy:strategy-not-added");
         delete strategyQueue[_strategy];
