@@ -30,8 +30,6 @@ interface IV2Keep3rJob is IKeep3rJob {
 
     function setFastGasOracle(address _fastGasOracle) external;
 
-    function setKeep3rHelper(address _keep3rHelper) external;
-
     function setWorkCooldown(uint256 _workCooldown) external;
 
     function addStrategies(address[] calldata _strategy, uint256[] calldata _requiredAmount) external;
