@@ -35,17 +35,17 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy, uint256 _workAmount) external override returns (uint256 _credits) {
-        return workForBond(_strategy, _workAmount);
+    function work(address _strategy) external override returns (uint256 _credits) {
+        return workForBond(_strategy);
     }
 
-    function workForBond(address _strategy, uint256 _workAmount) public override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _workInternal(_strategy, _workAmount, false);
+    function workForBond(address _strategy) public override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _workInternal(_strategy, false);
         _paysKeeperAmount(msg.sender, _credits);
     }
 
-    function workForTokens(address _strategy, uint256 _workAmount) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _workInternal(_strategy, _workAmount, true);
+    function workForTokens(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _workInternal(_strategy, true);
         _paysKeeperInTokens(msg.sender, _credits);
     }
 }

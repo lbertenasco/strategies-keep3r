@@ -35,8 +35,6 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     mapping(address => uint256[]) public strategyAmounts;
     // last strategy workAt timestamp
     mapping(address => uint256) public lastWorkAt;
-    // strategy amount of time before resetting queue index
-    mapping(address => uint256) public workResetCooldown;
 
     uint256 public workCooldown;
 
@@ -101,32 +99,23 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Governor
-
-    function addStrategy(
+    function setStrategy(
         address _strategy,
         address[] calldata _strategies,
-        uint256[] calldata _requiredAmounts,
-        uint256 _workResetCooldown
+        uint256[] calldata _requiredAmounts
     ) external override onlyGovernorOrMechanic {
-        _setStrategy(_strategy, _strategies, _requiredAmounts, _workResetCooldown);
+        _setStrategy(_strategy, _strategies, _requiredAmounts);
     }
 
     function _setStrategy(
         address _strategy,
         address[] calldata _strategies,
-        uint256[] calldata _requiredAmounts,
-        uint256 _workResetCooldown
+        uint256[] calldata _requiredAmounts
     ) internal {
         require(strategyQueue[_strategy].length == 0, "V2QueueKeep3rJob::add-strategy:strategy-already-added");
         strategyQueue[_strategy] = _strategies;
         strategyAmounts[_strategy] = _requiredAmounts;
         _availableStrategies.add(_strategy);
-        workResetCooldown[_strategy] = _workResetCooldown;
-    }
-
-    function updateStrategyConfig(address _strategy, uint256 _workResetCooldown) external onlyGovernorOrMechanic {
-        require(strategyQueue[_strategy].length != 0, "V2QueueKeep3rJob::update-strategy:strategy-doesnt-exist");
-        workResetCooldown[_strategy] = _workResetCooldown;
     }
 
     function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
@@ -171,11 +160,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     function _strategyTrigger(address _strategy, uint256 _amount) internal view virtual returns (bool) {}
 
     // Keep3r actions
-    function _workInternal(
-        address _strategy,
-        uint256 _workAmount,
-        bool _workForTokens
-    ) internal returns (uint256 _credits) {
+    function _workInternal(address _strategy, bool _workForTokens) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
         uint256 _ethGasPrice = _getEthGasPrice();
         // Checks if main strategy is workable
@@ -184,7 +169,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
         for (uint256 _index = 0; _index < strategyQueue[_strategy].length; _index++) {
             uint256 _ethAmount = strategyAmounts[_strategy][_index].mul(_ethGasPrice);
-            if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
+            if (_ethAmount == 0 || _strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
                 _work(strategyQueue[_strategy][_index]);
                 if (strategyQueue[_strategy][_index] == _strategy) mainWorked = true;
             }
@@ -195,7 +180,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
         _credits = _calculateCredits(_initialGas);
 
-        emit Worked(_strategy, _workAmount, msg.sender, _credits, _workForTokens);
+        emit Worked(_strategy, msg.sender, _credits, _workForTokens);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
@@ -206,11 +191,6 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {
         _work(_strategy);
-        emit ForceWorked(_strategy);
-    }
-
-    function forceWork(address _strategy, uint256 _workAmount) external override onlyGovernorOrMechanic {
-        _workInternal(_strategy, _workAmount, false);
         emit ForceWorked(_strategy);
     }
 
