@@ -169,7 +169,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
         for (uint256 _index = 0; _index < strategyQueue[_strategy].length; _index++) {
             uint256 _ethAmount = strategyAmounts[_strategy][_index].mul(_ethGasPrice);
-            if (_ethAmount == 0 || _strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
+            if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
                 _work(strategyQueue[_strategy][_index]);
                 if (strategyQueue[_strategy][_index] == _strategy) mainWorked = true;
             }

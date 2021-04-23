@@ -46,33 +46,33 @@ function promptAndSubmit(
           // );
           // console.log();
 
-          // console.log(
-          //   'TendV2Keep3rJob:',
-          //   mechanicsContracts.registry,
-          //   config.contracts.mainnet.keep3r.address,
-          //   ZERO_ADDRESS,
-          //   e18.mul(50).toString(), // 50 KP3R required
-          //   0,
-          //   0,
-          //   false,
-          //   v2Keeper.address
-          // );
-          // const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
-          //   mechanicsContracts.registry,
-          //   config.contracts.mainnet.keep3r.address,
-          //   ZERO_ADDRESS,
-          //   e18.mul(50), // 50 KP3R required
-          //   0,
-          //   0,
-          //   false,
-          //   v2Keeper.address
-          // );
-          // console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
-          // console.log(
-          //   'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
-          //   tendV2Keep3rJob.address
-          // );
-          // console.log();
+          console.log(
+            'TendV2Keep3rJob:',
+            mechanicsContracts.registry,
+            config.contracts.mainnet.keep3r.address,
+            ZERO_ADDRESS,
+            e18.mul(50).toString(), // 50 KP3R required
+            0,
+            0,
+            true,
+            v2Keeper.address
+          );
+          const tendV2Keep3rJob = await TendV2Keep3rJob.deploy(
+            mechanicsContracts.registry,
+            config.contracts.mainnet.keep3r.address,
+            ZERO_ADDRESS,
+            e18.mul(50), // 50 KP3R required
+            0,
+            0,
+            true,
+            v2Keeper.address
+          );
+          console.log('TendV2Keep3rJob address:', tendV2Keep3rJob.address);
+          console.log(
+            'PLEASE: change .config.json & example.config.json proxyJobs.tendV2Keep3rJob address to:',
+            tendV2Keep3rJob.address
+          );
+          console.log();
 
           console.log(
             'HarvestV2Keep3rJob:',
