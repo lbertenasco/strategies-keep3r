@@ -25,7 +25,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;
 
     IV2Keeper public V2Keeper;
-    address public keep3rHelper;
 
     EnumerableSet.AddressSet internal _availableStrategies;
 
@@ -42,13 +41,11 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         uint256 _earned,
         uint256 _age,
         bool _onlyEOA,
-        address _keep3rHelper,
         address _v2Keeper,
         uint256 _workCooldown
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         V2Keeper = IV2Keeper(_v2Keeper);
-        keep3rHelper = _keep3rHelper;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
     }
 
@@ -59,10 +56,6 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     function setV2Keep3r(address _v2Keeper) external override onlyGovernor {
         V2Keeper = IV2Keeper(_v2Keeper);
-    }
-
-    function setKeep3rHelper(address _keep3rHelper) external override onlyGovernor {
-        keep3rHelper = _keep3rHelper;
     }
 
     function setFastGasOracle(address _fastGasOracle) external override onlyGovernor {
