@@ -17,12 +17,17 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         uint256 _workCooldown
     ) public V2QueueKeep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
 
-    function workable(address _strategy) external view override returns (bool) {
-        return _workable(_strategy);
+    function workable(address _strategy, uint256 _workAmount) external view override returns (bool) {
+        uint256 _keep3rEthPrice = _getEthGasPrice();
+        return _workable(_strategy, _workAmount, _keep3rEthPrice);
     }
 
-    function _workable(address _strategy) internal view override returns (bool) {
-        return super._workable(_strategy);
+    function _workable(
+        address _strategy,
+        uint256 _workAmount,
+        uint256 _keep3rEthPrice
+    ) internal view override returns (bool) {
+        return super._workable(_strategy, _workAmount, _keep3rEthPrice);
     }
 
     function _strategyTrigger(address _strategy, uint256 _amount) internal view override returns (bool) {
@@ -35,17 +40,17 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override returns (uint256 _credits) {
-        return workForBond(_strategy);
+    function work(address _strategy, uint256 _workAmount) external override returns (uint256 _credits) {
+        return workForBond(_strategy, _workAmount);
     }
 
-    function workForBond(address _strategy) public override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _workInternal(_strategy, false);
+    function workForBond(address _strategy, uint256 _workAmount) public override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _workInternal(_strategy, _workAmount, false);
         _paysKeeperAmount(msg.sender, _credits);
     }
 
-    function workForTokens(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _workInternal(_strategy, true);
+    function workForTokens(address _strategy, uint256 _workAmount) external override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _workInternal(_strategy, _workAmount, true);
         _paysKeeperInTokens(msg.sender, _credits);
     }
 }
