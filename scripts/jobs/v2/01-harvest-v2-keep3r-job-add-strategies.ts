@@ -19,34 +19,38 @@ function promptAndSubmit(): Promise<void | Error> {
       // Setup HarvestV2Keep3rJob
       const oldHarvestV2Keep3rJob = await ethers.getContractAt(
         'HarvestV2Keep3rJob',
-        mainnetContracts.proxyJobs.harvestV2Keep3rJob
+        mainnetContracts.oldJobs.harvestV2Keep3rJob
       );
-      const strategies = [
-        {
-          address: '0x979843b8eea56e0bea971445200e0ec3398cdb87',
-          requiredAmount: null,
-        },
-        {
-          address: '0x4d7d4485fd600c61d840ccbec328bfd76a050f87',
-          requiredAmount: null,
-        },
-        {
-          address: '0x4031afd3b0f71bace9181e554a9e680ee4abe7df',
-          requiredAmount: null,
-        },
-        {
-          address: '0xee697232df2226c9fb3f02a57062c4208f287851',
-          requiredAmount: null,
-        },
-        {
-          address: '0x32b8c26d0439e1959cea6262cbabc12320b384c4',
-          requiredAmount: null,
-        },
-        {
-          address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079',
-          requiredAmount: null,
-        },
-      ];
+      // const strategies = [
+      //   {
+      //     address: '0x979843b8eea56e0bea971445200e0ec3398cdb87',
+      //     requiredAmount: null,
+      //   },
+      //   {
+      //     address: '0x4d7d4485fd600c61d840ccbec328bfd76a050f87',
+      //     requiredAmount: null,
+      //   },
+      //   {
+      //     address: '0x4031afd3b0f71bace9181e554a9e680ee4abe7df',
+      //     requiredAmount: null,
+      //   },
+      //   {
+      //     address: '0xee697232df2226c9fb3f02a57062c4208f287851',
+      //     requiredAmount: null,
+      //   },
+      //   {
+      //     address: '0x32b8c26d0439e1959cea6262cbabc12320b384c4',
+      //     requiredAmount: null,
+      //   },
+      //   {
+      //     address: '0xb5f6747147990c4ddcebbd0d4ef25461a967d079',
+      //     requiredAmount: null,
+      //   },
+      // ];
+      const strategiesAddresses = await oldHarvestV2Keep3rJob.strategies();
+      const strategies = strategiesAddresses.map((address: string) => ({
+        address,
+      }));
 
       for (const strategy of strategies) {
         strategy.requiredAmount = await oldHarvestV2Keep3rJob.requiredAmount(
@@ -60,8 +64,8 @@ function promptAndSubmit(): Promise<void | Error> {
       );
 
       console.log(
-        strategies.map((strategy) => strategy.address),
-        strategies.map((strategies) =>
+        strategies.map((strategy: { address: string }) => strategy.address),
+        strategies.map((strategies: { requiredAmount: any }) =>
           (strategies.requiredAmount as any).toString()
         )
       );
@@ -69,8 +73,10 @@ function promptAndSubmit(): Promise<void | Error> {
 
       // Add harvest strategies
       await harvestV2Keep3rJob.addStrategies(
-        strategies.map((strategy) => strategy.address),
-        strategies.map((strategies) => strategies.requiredAmount)
+        strategies.map((strategy: { address: string }) => strategy.address),
+        strategies.map(
+          (strategies: { requiredAmount: any }) => strategies.requiredAmount
+        )
       );
 
       resolve();
