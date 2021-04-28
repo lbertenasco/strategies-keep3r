@@ -45,11 +45,13 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
         uint256 _age,
         bool _onlyEOA,
         uint256 _maxHarvestPeriod,
-        uint256 _harvestCooldown
+        uint256 _harvestCooldown,
+        address _v2Keeper
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
         _setHarvestCooldown(_harvestCooldown);
+        v2Keeper = _v2Keeper;
     }
 
     // Keep3r Setters
@@ -163,14 +165,15 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
     }
 
     function _setRequiredEarn(address _strategy, uint256 _requiredEarn) internal {
-        // v2
-        if (ICrvStrategy(_strategy).controller() == address(0)) {
-            require(_requiredEarn == 0, "CrvStrategyKeep3rJob::set-required-earn:should-be-zero-for-v2");
+        try ICrvStrategy(_strategy).controller() {
+            // v1
+            require(_requiredEarn > 0, "CrvStrategyKeep3rJob::set-required-earn:should-not-be-zero");
+            requiredEarn[_strategy] = _requiredEarn;
             return;
+        } catch {
+            // v2
+            require(_requiredEarn == 0, "CrvStrategyKeep3rJob::set-required-earn:should-be-zero-for-v2");
         }
-        // v1
-        require(_requiredEarn > 0, "CrvStrategyKeep3rJob::set-required-earn:should-not-be-zero");
-        requiredEarn[_strategy] = _requiredEarn;
     }
 
     function setMaxHarvestPeriod(uint256 _maxHarvestPeriod) external override onlyGovernorOrMechanic {
