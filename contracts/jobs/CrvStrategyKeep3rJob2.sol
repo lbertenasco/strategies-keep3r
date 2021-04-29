@@ -13,6 +13,7 @@ import "../interfaces/keep3r/IKeep3rEscrow.sol";
 
 import "../interfaces/yearn/IV1Controller.sol";
 import "../interfaces/yearn/IV1Vault.sol";
+import "../interfaces/yearn/IBaseStrategy.sol";
 import "../interfaces/crv/ICrvStrategy.sol";
 import "../interfaces/crv/ICrvClaimable.sol";
 
@@ -26,6 +27,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
     mapping(address => uint256) public override requiredHarvest;
     mapping(address => uint256) public override requiredEarn;
     mapping(address => uint256) public override lastWorkAt;
+    mapping(address => bool) public override strategyIsV1;
 
     uint256 public override maxHarvestPeriod;
     uint256 public override lastHarvest;
@@ -165,15 +167,11 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
     }
 
     function _setRequiredEarn(address _strategy, uint256 _requiredEarn) internal {
+        require(_requiredEarn > 0, "CrvStrategyKeep3rJob::set-required-earn:should-not-be-zero");
         try ICrvStrategy(_strategy).controller() {
-            // v1
-            require(_requiredEarn > 0, "CrvStrategyKeep3rJob::set-required-earn:should-not-be-zero");
-            requiredEarn[_strategy] = _requiredEarn;
-            return;
-        } catch {
-            // v2
-            require(_requiredEarn == 0, "CrvStrategyKeep3rJob::set-required-earn:should-be-zero-for-v2");
-        }
+            strategyIsV1[_strategy] = true;
+        } catch {}
+        requiredEarn[_strategy] = _requiredEarn;
     }
 
     function setMaxHarvestPeriod(uint256 _maxHarvestPeriod) external override onlyGovernorOrMechanic {
@@ -219,6 +217,8 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
         if (block.timestamp < lastHarvest.add(harvestCooldown)) return false;
         // if strategy has exceeded maxHarvestPeriod, force workable true
         if (block.timestamp > lastWorkAt[_strategy].add(maxHarvestPeriod)) return true;
+        // if V2, check harvestTrigger for "earn"
+        if (!strategyIsV1[_strategy] && IBaseStrategy(_strategy).harvestTrigger(requiredEarn[_strategy])) return true;
         return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
     }
 
@@ -235,10 +235,10 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
     }
 
     function _workInternal(address _strategy) internal {
-        if (requiredEarn[_strategy] == 0) {
-            _workV2(_strategy);
-        } else {
+        if (strategyIsV1[_strategy]) {
             _workV1(_strategy);
+        } else {
+            _workV2(_strategy);
         }
         _postWork(_strategy);
     }
