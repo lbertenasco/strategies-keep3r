@@ -122,7 +122,7 @@ describe('CrvStrategyKeep3rJob2', () => {
         name: 'StrategystETHCurve',
         address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
         requiredAmount: 10_000,
-        requiredEarn: 0, // v2
+        requiredEarn: 1_000_000, // v2
       },
     ];
 
@@ -149,16 +149,6 @@ describe('CrvStrategyKeep3rJob2', () => {
         e18.mul(strategy.requiredEarn)
       );
     }
-
-    await expect(
-      crvStrategyKeep3rJob2.addStrategy(
-        '0x2A94A56fBEE72ACEC39ea0269c1356a8DFbC4765',
-        2000000,
-        1
-      )
-    ).to.be.revertedWith(
-      'CrvStrategyKeep3rJob::set-required-earn:should-be-zero-for-v2'
-    );
 
     const jobStrategies = await crvStrategyKeep3rJob2.strategies();
     expect(lowerCaseArray(jobStrategies)).to.be.deep.eq(
