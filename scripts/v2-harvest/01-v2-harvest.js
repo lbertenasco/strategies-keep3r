@@ -57,30 +57,48 @@ function promptAndSubmit() {
 
       // HARDCODED v2 Strats
       const v2Strategies = [
+        /*
         { address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87' },
         { address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87' },
         { address: '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF' },
         { address: '0xeE697232DF2226c9fB3F02a57062c4208f287851' },
         { address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4' },
-        { address: '0xB5F6747147990c4ddCeBbd0d4ef25461a967D079' },
+        { address: '0x2A94A56fBEE72ACEC39ea0269c1356a8DFbC4765' },
+        { address: '0x4730D10703155Ef4a448B17b0eaf3468fD4fb02d' },
         { address: '0x5148C3124B42e73CA4e15EEd1B304DB59E0F2AF7' },
         { address: '0x77b7CD137Dd9d94e7056f78308D7F65D2Ce68910' },
-        { address: '0xE68A8565B4F837BDa10e2e917BFAaa562e1cD143' },
+        */
+        { address: '0x0E5397B8547C128Ee20958286436b7BC3f9faAa4' },
         { address: '0x2886971eCAF2610236b4869f58cD42c115DFb47A' },
         { address: '0x91cBf0014a966615e1050c90A1aBf1d1d5d8cffd' },
-        { address: '0x0E5397B8547C128Ee20958286436b7BC3f9faAa4' },
-        { address: '0x4730D10703155Ef4a448B17b0eaf3468fD4fb02d' },
+        { address: '0xE68A8565B4F837BDa10e2e917BFAaa562e1cD143' },
+        { address: '0x683b5C88D48FcCfB3e778FF0fA954F84cA7Ce9DF' },
+        /*
+        { address: '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca' },
+        { address: '0xdD498eB680B0CE6Cac17F7dab0C35Beb6E481a6d' },
+        { address: '0xdD92491B9F55620C043d55D25620a7B126451ddD' },
+        { address: '0xE73817de3418bB44A4FeCeBa53Aa835333C550e7' },
+        { address: '0xda988eBb26F505246C59Ba26514340B634F9a7a2' },
+        { address: '0x24579b82E06aBe25C8ffC4Ee6C2dB676e57F1a32' },
+        { address: '0x04a6E58aAd4Ed8053Ba436B00C02A8a000639e93' },
+        { address: '0xABCBB67Ef2757bCCff074014658d9BD13f559632' },
+        { address: '0x92D03B12E5f67b0df3B50c7c01c141Bf4BD98eA6' },
+        { address: '0x21e5a745d77430568C074569C06e6c765922626a' },
+        { address: '0x2E1ad896D3082C52A5AE7Af307131DE7a37a46a0' },
+        { address: '0x01b54c320d6B3057377cbc71d953d1BBa84df44e' },
+        */
       ];
+
       // const v2Strategies = endorsedVaults
       //   .map((vault) => vault.strategies)
       //   .flat();
 
       const v2StrategiesBAG = [
         // bag
-        { address: '0x6107add73f80AC6015E85103D2f016C6373E4bDc' }, //weth
-        { address: '0xFc403fd9E7A916eC38437807704e92236cA1f7A5' }, //dai
-        { address: '0x063303D9584Ac9A67855086e16Ca7212C109b7b4' }, //usdc
-        { address: '0xF0252a99691D591A5A458b9b4931bF1025BF6Ac3' }, //wbtc
+        // { address: '0x6107add73f80AC6015E85103D2f016C6373E4bDc' }, //weth
+        // { address: '0xFc403fd9E7A916eC38437807704e92236cA1f7A5' }, //dai
+        // { address: '0x063303D9584Ac9A67855086e16Ca7212C109b7b4' }, //usdc
+        // { address: '0xF0252a99691D591A5A458b9b4931bF1025BF6Ac3' }, //wbtc
       ];
 
       const harvestV2Keep3rJob = await ethers.getContractAt(
