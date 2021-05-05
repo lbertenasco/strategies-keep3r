@@ -37,6 +37,7 @@
         "harvestV2Keep3rJob": "0x6947aA05A900153Ef4CC28D893484A4e7ad7EC77",
         "harvestV2QueueKeep3rJob": "0xE5a7db399dEC2c5ddEfeBc52ea70f127284D118d",
         "crvStrategyKeep3rJob": "0x02027bDA2425204f152B8aa35Fb78687D65E1AF5",
+        "crvStrategyKeep3rJob2": "0xeE15010105b9BB564CFDfdc5cee676485092AEDd",
         "vaultKeep3rJob": "0x4a479E4457841D2D2Ff86e5A5389300963880C10"
       },
       "oldJobs": {
