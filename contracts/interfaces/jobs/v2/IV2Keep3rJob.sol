@@ -28,17 +28,29 @@ interface IV2Keep3rJob is IKeep3rJob {
     // Setters
     function setV2Keep3r(address _v2Keeper) external;
 
+    function setYOracle(address _v2Keeper) external;
+
     function setFastGasOracle(address _fastGasOracle) external;
 
     function setWorkCooldown(uint256 _workCooldown) external;
 
-    function addStrategies(address[] calldata _strategy, uint256[] calldata _requiredAmount) external;
+    function addStrategies(
+        address[] calldata _strategy,
+        uint256[] calldata _requiredAmount,
+        address[] calldata _costTokens
+    ) external;
 
-    function addStrategy(address _strategy, uint256 _requiredAmount) external;
+    function addStrategy(
+        address _strategy,
+        uint256 _requiredAmount,
+        address _costToken
+    ) external;
 
     function updateRequiredAmounts(address[] calldata _strategies, uint256[] calldata _requiredAmounts) external;
 
     function updateRequiredAmount(address _strategy, uint256 _requiredAmount) external;
+
+    function updateCostToken(address _strategy, address _costToken) external;
 
     function removeStrategy(address _strategy) external;
 
