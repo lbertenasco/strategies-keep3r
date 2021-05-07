@@ -3,9 +3,12 @@
 pragma solidity 0.6.12;
 
 interface IYOracle {
-    function quote(
+    function setOracle(address _oracle) external;
+
+    function current(
+        address _pair,
         address _tokenIn,
-        address _tokenOut,
-        uint256 amount
-    ) external view returns (uint256 _quote);
+        uint256 _amountIn,
+        address _tokenOut
+    ) external view returns (uint256 _amountOut);
 }

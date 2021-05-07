@@ -32,8 +32,11 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     EnumerableSet.AddressSet internal _availableStrategies;
 
     mapping(address => uint256) public requiredAmount;
-    mapping(address => address) public costToken;
     mapping(address => uint256) public lastWorkAt;
+
+    // custom cost oracle calcs
+    mapping(address => address) public costToken;
+    mapping(address => address) public costPair;
 
     uint256 public workCooldown;
 
@@ -105,30 +108,33 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     function addStrategies(
         address[] calldata _strategies,
         uint256[] calldata _requiredAmounts,
-        address[] calldata _costTokens
+        address[] calldata _costTokens,
+        address[] calldata _costPairs
     ) external override onlyGovernorOrMechanic {
         require(_strategies.length == _requiredAmounts.length, "V2Keep3rJob::add-strategies:strategies-required-amounts-different-length");
         for (uint256 i; i < _strategies.length; i++) {
-            _addStrategy(_strategies[i], _requiredAmounts[i], _costTokens[i]);
+            _addStrategy(_strategies[i], _requiredAmounts[i], _costTokens[i], _costPairs[i]);
         }
     }
 
     function addStrategy(
         address _strategy,
         uint256 _requiredAmount,
-        address _costToken
+        address _costToken,
+        address _costPair
     ) external override onlyGovernorOrMechanic {
-        _addStrategy(_strategy, _requiredAmount, _costToken);
+        _addStrategy(_strategy, _requiredAmount, _costToken, _costPair);
     }
 
     function _addStrategy(
         address _strategy,
         uint256 _requiredAmount,
-        address _costToken
+        address _costToken,
+        address _costPair
     ) internal {
         require(!_availableStrategies.contains(_strategy), "V2Keep3rJob::add-strategy:strategy-already-added");
         _setRequiredAmount(_strategy, _requiredAmount);
-        _setCostToken(_strategy, _costToken);
+        _setCostTokenAndPair(_strategy, _costToken, _costPair);
         emit StrategyAdded(_strategy, _requiredAmount);
         _availableStrategies.add(_strategy);
     }
@@ -154,13 +160,21 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         emit StrategyModified(_strategy, _requiredAmount);
     }
 
-    function updateCostToken(address _strategy, address _costToken) external override onlyGovernorOrMechanic {
-        _updateCostToken(_strategy, _costToken);
+    function updateCostTokenAndPair(
+        address _strategy,
+        address _costToken,
+        address _costPair
+    ) external override onlyGovernorOrMechanic {
+        _updateCostTokenAndPair(_strategy, _costToken, _costPair);
     }
 
-    function _updateCostToken(address _strategy, address _costToken) internal {
+    function _updateCostTokenAndPair(
+        address _strategy,
+        address _costToken,
+        address _costPair
+    ) internal {
         require(_availableStrategies.contains(_strategy), "V2Keep3rJob::update-required-amount:strategy-not-added");
-        _setCostToken(_strategy, _costToken);
+        _setCostTokenAndPair(_strategy, _costToken, _costPair);
     }
 
     function removeStrategy(address _strategy) external override onlyGovernorOrMechanic {
@@ -174,8 +188,13 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         requiredAmount[_strategy] = _requiredAmount;
     }
 
-    function _setCostToken(address _strategy, address _costToken) internal {
+    function _setCostTokenAndPair(
+        address _strategy,
+        address _costToken,
+        address _costPair
+    ) internal {
         costToken[_strategy] = _costToken;
+        costPair[_strategy] = _costPair;
     }
 
     // Getters
@@ -198,7 +217,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         if (requiredAmount[_strategy] == 0) return 0;
         uint256 _ethCost = requiredAmount[_strategy].mul(uint256(IChainLinkFeed(fastGasOracle).latestAnswer()));
         if (costToken[_strategy] == address(0)) return _ethCost;
-        return IYOracle(yOracle).quote(WETH, costToken[_strategy], _ethCost);
+        return IYOracle(yOracle).current(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
     }
 
     // Keep3r actions
