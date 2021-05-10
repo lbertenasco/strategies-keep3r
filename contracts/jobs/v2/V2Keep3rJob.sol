@@ -12,7 +12,7 @@ import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
-import "../../interfaces/yearn/IYOracle.sol";
+import "../../interfaces/oracle/IYOracleV1.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
@@ -217,7 +217,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         if (requiredAmount[_strategy] == 0) return 0;
         uint256 _ethCost = requiredAmount[_strategy].mul(uint256(IChainLinkFeed(fastGasOracle).latestAnswer()));
         if (costToken[_strategy] == address(0)) return _ethCost;
-        return IYOracle(yOracle).current(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
+        return IYOracleV1(yOracle).current(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
     }
 
     // Keep3r actions
