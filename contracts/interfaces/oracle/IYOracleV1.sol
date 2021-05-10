@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IYOracle {
+interface IYOracleV1 {
     function setOracle(address _oracle) external;
 
     function current(

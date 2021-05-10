@@ -3,17 +3,23 @@
 pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 
-import "../../interfaces/yearn/IYOracle.sol";
+import "../../interfaces/oracle/IYOracleV1.sol";
 import "../../interfaces/keep3r/IKeep3rV2OracleFactory.sol";
 
-contract YOracleV1 is MachineryReady, IYOracle {
+contract YOracleV1 is UtilsReady, IYOracleV1 {
     address public oracle;
 
-    constructor(address _mechanicsRegistry) public MachineryReady(_mechanicsRegistry) {}
+    constructor(address _oracle) public UtilsReady() {
+        _setOracle(_oracle);
+    }
 
     function setOracle(address _oracle) external override onlyGovernor {
+        _setOracle(_oracle);
+    }
+
+    function _setOracle(address _oracle) internal {
         oracle = _oracle;
     }
 
