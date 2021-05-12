@@ -225,18 +225,9 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
         emit Worked(_strategy, msg.sender, _credits, _workForTokens);
     }
 
-    function work(address _strategy) external override returns (uint256 _credits) {
-        return workForBond(_strategy);
-    }
-
-    function workForBond(address _strategy) public override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
         _credits = _work(_strategy, false);
         _paysKeeperAmount(msg.sender, _credits);
-    }
-
-    function workForTokens(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_strategy, true);
-        _paysKeeperInTokens(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
