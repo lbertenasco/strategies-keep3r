@@ -245,11 +245,7 @@ abstract contract V2MultiQueueKeep3rJob is MachineryReady, Keep3r, IV2MultiQueue
     function _strategyTrigger(address _strategy, uint256 _amount) internal view virtual returns (bool) {}
 
     // Keep3r actions
-    function _workInternal(
-        address _strategy,
-        uint256 _workAmount,
-        bool _workForTokens
-    ) internal returns (uint256 _credits) {
+    function _workInternal(address _strategy, uint256 _workAmount) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
         uint256 _ethGasPrice = _getEthGasPrice();
         // Checks if main strategy is workable
@@ -269,7 +265,7 @@ abstract contract V2MultiQueueKeep3rJob is MachineryReady, Keep3r, IV2MultiQueue
 
         _credits = _calculateCredits(_initialGas);
 
-        emit Worked(_strategy, _workAmount, msg.sender, _credits, _workForTokens);
+        emit Worked(_strategy, _workAmount, msg.sender, _credits);
     }
 
     function _updateIndex(address _strategy, uint256 _nextIndex) internal {
@@ -296,7 +292,7 @@ abstract contract V2MultiQueueKeep3rJob is MachineryReady, Keep3r, IV2MultiQueue
     }
 
     function forceWork(address _strategy, uint256 _workAmount) external override onlyGovernorOrMechanic {
-        _workInternal(_strategy, _workAmount, false);
+        _workInternal(_strategy, _workAmount);
         emit ForceWorked(_strategy);
     }
 
