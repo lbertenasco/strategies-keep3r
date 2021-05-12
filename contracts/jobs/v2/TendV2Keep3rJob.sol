@@ -13,8 +13,9 @@ contract TendV2Keep3rJob is V2Keep3rJob {
         uint256 _earned,
         uint256 _age,
         bool _onlyEOA,
-        address _v2Keeper
-    ) public V2Keep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, 0) {}
+        address _v2Keeper,
+        uint256 _workCooldown
+    ) public V2Keep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -26,6 +27,7 @@ contract TendV2Keep3rJob is V2Keep3rJob {
     }
 
     function _work(address _strategy) internal override {
+        lastWorkAt[_strategy] = block.timestamp;
         V2Keeper.tend(_strategy);
     }
 
