@@ -205,7 +205,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
     }
 
     // Keeper actions
-    function _work(address _strategy, bool _workForTokens) internal returns (uint256 _credits) {
+    function _work(address _strategy) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
         require(_workable(_strategy), "CrvStrategyKeep3rJob::harvest:not-workable");
 
@@ -222,11 +222,11 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
 
         _credits = _calculateCredits(_initialGas);
 
-        emit Worked(_strategy, msg.sender, _credits, _workForTokens);
+        emit Worked(_strategy, msg.sender, _credits);
     }
 
     function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_strategy, false);
+        _credits = _work(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }
 

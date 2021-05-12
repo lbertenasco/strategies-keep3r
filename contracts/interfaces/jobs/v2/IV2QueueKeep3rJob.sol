@@ -10,7 +10,7 @@ interface IV2QueueKeep3rJob is IKeep3rJob {
     event StrategyRemoved(address _strategy);
 
     // Actions by Keeper
-    event Worked(address _strategy, address _keeper, uint256 _credits, bool _workForTokens);
+    event Worked(address _strategy, address _keeper, uint256 _credits);
 
     // Actions forced by governor
     event ForceWorked(address _strategy);
