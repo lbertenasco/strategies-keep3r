@@ -30,17 +30,8 @@ contract TendV2Keep3rJob is V2Keep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override returns (uint256 _credits) {
-        return workForBond(_strategy);
-    }
-
-    function workForBond(address _strategy) public override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
         _credits = _workInternal(_strategy, false);
         _paysKeeperAmount(msg.sender, _credits);
-    }
-
-    function workForTokens(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _workInternal(_strategy, true);
-        _paysKeeperInTokens(msg.sender, _credits);
     }
 }

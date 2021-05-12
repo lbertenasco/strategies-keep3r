@@ -156,18 +156,9 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
         emit Worked(_vault, msg.sender, _credits, _workForTokens);
     }
 
-    function work(address _vault) external override returns (uint256 _credits) {
-        return workForBond(_vault);
-    }
-
-    function workForBond(address _vault) public override notPaused onlyKeeper limitGasPrice returns (uint256 _credits) {
+    function work(address _vault) external override notPaused onlyKeeper returns (uint256 _credits) {
         _credits = _work(_vault, false);
         _paysKeeperAmount(msg.sender, _credits);
-    }
-
-    function workForTokens(address _vault) external override notPaused onlyKeeper limitGasPrice returns (uint256 _credits) {
-        _credits = _work(_vault, true);
-        _paysKeeperInTokens(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {

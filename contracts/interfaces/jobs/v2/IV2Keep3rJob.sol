@@ -63,10 +63,6 @@ interface IV2Keep3rJob is IKeep3rJob {
     // Keeper actions
     function work(address _strategy) external returns (uint256 _credits);
 
-    function workForBond(address _strategy) external returns (uint256 _credits);
-
-    function workForTokens(address _strategy) external returns (uint256 _credits);
-
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
 }
