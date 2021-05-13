@@ -5,6 +5,7 @@ pragma solidity 0.6.12;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
+import "../utils/OnlyStealthRelayer.sol";
 
 import "../interfaces/jobs/ICrvStrategyKeep3rJob.sol";
 import "../interfaces/jobs/ICrvStrategyKeep3rJobV2.sol";
@@ -17,7 +18,7 @@ import "../interfaces/yearn/IBaseStrategy.sol";
 import "../interfaces/crv/ICrvStrategy.sol";
 import "../interfaces/crv/ICrvClaimable.sol";
 
-contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
+contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
     using SafeMath for uint256;
 
     uint256 public constant PRECISION = 1_000;
@@ -40,6 +41,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
 
     constructor(
         address _mechanicsRegistry,
+        address _stealthRelayer,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -49,11 +51,16 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
         uint256 _maxHarvestPeriod,
         uint256 _harvestCooldown,
         address _v2Keeper
-    ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+    ) public MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
         _setHarvestCooldown(_harvestCooldown);
         v2Keeper = _v2Keeper;
+    }
+
+    // Stealth Relayer Setters
+    function setStealthRelayer(address _stealthRelayer) external override onlyGovernor {
+        _setStealthRelayer(_stealthRelayer);
     }
 
     // Keep3r Setters
@@ -259,7 +266,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
         IV2Keeper(v2Keeper).harvest(_strategy);
     }
 
-    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
         _credits = _work(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }
@@ -270,7 +277,15 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
     }
 
     // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic {
+    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
+        _forceWork(_strategy);
+    }
+
+    function forceWorkUnsafe(address _strategy) external override onlyGovernorOrMechanic {
+        _forceWork(_strategy);
+    }
+
+    function _forceWork(address _strategy) internal {
         _workInternal(_strategy);
         emit ForceWorked(_strategy);
     }
