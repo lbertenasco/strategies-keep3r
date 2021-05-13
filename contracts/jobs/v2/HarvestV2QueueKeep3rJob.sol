@@ -7,6 +7,7 @@ import "./V2QueueKeep3rJob.sol";
 contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     constructor(
         address _mechanicsRegistry,
+        address _stealthRelayer,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -15,7 +16,10 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public V2QueueKeep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
+    )
+        public
+        V2QueueKeep3rJob(_mechanicsRegistry, _stealthRelayer, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown)
+    {}
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -35,7 +39,7 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
         _credits = _workInternal(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }

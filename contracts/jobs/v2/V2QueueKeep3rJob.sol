@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1Helper.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
+import "../../utils/OnlyStealthRelayer.sol";
 
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
@@ -14,7 +15,7 @@ import "../../interfaces/jobs/v2/IV2QueueKeep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
-abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob {
+abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2QueueKeep3rJob {
     using SafeMath for uint256;
 
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -40,6 +41,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
 
     constructor(
         address _mechanicsRegistry,
+        address _stealthRelayer,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -48,10 +50,15 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+    ) public MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         v2Keeper = _v2Keeper;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
+    }
+
+    // Stealth Relayer Setters
+    function setStealthRelayer(address _stealthRelayer) external override onlyGovernor {
+        _setStealthRelayer(_stealthRelayer);
     }
 
     // Keep3r Setters
@@ -189,7 +196,15 @@ abstract contract V2QueueKeep3rJob is MachineryReady, Keep3r, IV2QueueKeep3rJob 
     }
 
     // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic {
+    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
+        _forceWork(_strategy);
+    }
+
+    function forceWorkUnsafe(address _strategy) external override onlyGovernorOrMechanic {
+        _forceWork(_strategy);
+    }
+
+    function _forceWork(address _strategy) internal {
         _work(_strategy);
         emit ForceWorked(_strategy);
     }
