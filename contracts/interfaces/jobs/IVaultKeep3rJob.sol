@@ -9,7 +9,7 @@ interface IVaultKeep3rJob is IKeep3rJob {
     event VaultRemoved(address _vault);
 
     // Actions by Keeper
-    event Worked(address _vault, address _keeper, uint256 _credits, bool _workForTokens);
+    event Worked(address _vault, address _keeper, uint256 _credits);
 
     // Actions forced by Governor
     event ForceWorked(address _vault);
@@ -36,10 +36,6 @@ interface IVaultKeep3rJob is IKeep3rJob {
 
     // Keeper actions
     function work(address _vault) external returns (uint256 _credits);
-
-    function workForBond(address _vault) external returns (uint256 _credits);
-
-    function workForTokens(address _vault) external returns (uint256 _credits);
 
     // Mechanics keeper bypass
     function forceWork(address _vault) external;

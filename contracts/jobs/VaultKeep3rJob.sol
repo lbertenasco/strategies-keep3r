@@ -144,7 +144,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
     }
 
     // Keeper actions
-    function _work(address _vault, bool _workForTokens) internal returns (uint256 _credits) {
+    function _work(address _vault) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
 
         require(_workable(_vault), "VaultKeep3rJob::earn:not-workable");
@@ -153,21 +153,12 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
 
         _credits = _calculateCredits(_initialGas);
 
-        emit Worked(_vault, msg.sender, _credits, _workForTokens);
+        emit Worked(_vault, msg.sender, _credits);
     }
 
-    function work(address _vault) external override returns (uint256 _credits) {
-        return workForBond(_vault);
-    }
-
-    function workForBond(address _vault) public override notPaused onlyKeeper limitGasPrice returns (uint256 _credits) {
-        _credits = _work(_vault, false);
+    function work(address _vault) external override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _work(_vault);
         _paysKeeperAmount(msg.sender, _credits);
-    }
-
-    function workForTokens(address _vault) external override notPaused onlyKeeper limitGasPrice returns (uint256 _credits) {
-        _credits = _work(_vault, true);
-        _paysKeeperInTokens(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
