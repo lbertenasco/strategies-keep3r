@@ -4,10 +4,10 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
 
-import "../../interfaces/keep3r/IKeep3rEscrow.sol";
+import "../interfaces/keep3r/IKeep3rEscrow.sol";
 
 contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
     using SafeMath for uint256;
@@ -25,10 +25,6 @@ contract Keep3rEscrow is UtilsReady, IKeep3rEscrow {
         Keep3rV1 = IKeep3rV1(_keep3r);
         lpToken = IERC20(_lpToken);
         _addProtocolToken(_lpToken);
-    }
-
-    function isKeep3rEscrow() external pure override returns (bool) {
-        return true;
     }
 
     function returnLPsToGovernance() external override onlyGovernor {

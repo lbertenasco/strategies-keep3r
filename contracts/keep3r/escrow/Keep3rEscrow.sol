@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-import "@lbertenasco/contract-utils/contracts/utils/UtilsReady.sol";
+import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 
 import "./Keep3rEscrowParameters.sol";
 import "./Keep3rEscrowMetadata.sol";

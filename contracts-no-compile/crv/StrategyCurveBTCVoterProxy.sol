@@ -7,13 +7,13 @@ import "@openzeppelinV2/contracts/math/SafeMath.sol";
 import "@openzeppelinV2/contracts/utils/Address.sol";
 import "@openzeppelinV2/contracts/token/ERC20/SafeERC20.sol";
 
-import "../../interfaces/yearn/IController.sol";
-import "../../interfaces/curve/Gauge.sol";
-import "../../interfaces/curve/Mintr.sol";
-import "../../interfaces/uniswap/Uni.sol";
-import "../../interfaces/curve/Curve.sol";
-import "../../interfaces/yearn/IToken.sol";
-import "../../interfaces/yearn/IVoterProxy.sol";
+import "../interfaces/yearn/IController.sol";
+import "../interfaces/curve/Gauge.sol";
+import "../interfaces/curve/Mintr.sol";
+import "../interfaces/uniswap/Uni.sol";
+import "../interfaces/curve/Curve.sol";
+import "../interfaces/yearn/IToken.sol";
+import "../interfaces/yearn/IVoterProxy.sol";
 
 contract StrategyCurveBTCVoterProxy {
     using SafeERC20 for IERC20;

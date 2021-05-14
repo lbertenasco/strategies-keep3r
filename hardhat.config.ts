@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import '@nomiclabs/hardhat-etherscan';
 import { removeConsoleLog } from 'hardhat-preprocessor';
@@ -7,25 +8,33 @@ import 'solidity-coverage';
 
 module.exports = {
   defaultNetwork: 'hardhat',
-  networks: process.env.TEST
-    ? {}
-    : {
-        hardhat: {
-          enabled: process.env.FORK ? true : false,
-          forking: {
+  networks:
+    !process.env.FORK && process.env.TEST
+      ? {}
+      : {
+          hardhat: {
+            forking: {
+              enabled: process.env.FORK ? true : false,
+              url: process.env.MAINNET_HTTPS_URL,
+            },
+          },
+          // localMainnet: {
+          //   url: process.env.LOCAL_MAINNET_HTTPS_URL,
+          //   accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
+          // },
+          mainnet: {
             url: process.env.MAINNET_HTTPS_URL,
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+            gasPrice: 50000000000, // 50 gwei
+          },
+          staticMainnet: {
+            url: process.env.MAINNET_HTTPS_URL,
+            accounts: [
+              '0x0000000000000000000000000000000000000000000000000000000000000001',
+            ],
+            gasPrice: 1, // 1 wei
           },
         },
-        localMainnet: {
-          url: process.env.LOCAL_MAINNET_HTTPS_URL,
-          accounts: [process.env.LOCAL_MAINNET_PRIVATE_KEY],
-        },
-        mainnet: {
-          url: process.env.MAINNET_HTTPS_URL,
-          accounts: [process.env.MAINNET_PRIVATE_KEY],
-          gasPrice: 'auto',
-        },
-      },
   solidity: {
     compilers: [
       {

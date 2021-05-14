@@ -16,10 +16,10 @@ describe('Keep3rEscrowMetadata', () => {
     keep3rEscrowMetadata = await keep3rEscrowMetadataContract.deploy();
   });
 
-  describe('isKeep3rEscrow', () => {
-    it('returns true', async () => {
-      const isKeep3rEscrow = await keep3rEscrowMetadata.isKeep3rEscrow();
-      expect(isKeep3rEscrow).to.be.true;
-    });
-  });
+  // describe('isKeep3rEscrow', () => {
+  //   it('returns true', async () => {
+  //     const isKeep3rEscrow = await keep3rEscrowMetadata.isKeep3rEscrow();
+  //     expect(isKeep3rEscrow).to.be.true;
+  //   });
+  // });
 });
