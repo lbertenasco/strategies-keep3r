@@ -223,7 +223,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
     }
 
     // Keeper actions
-    function _work(address _strategy, bool _workForTokens) internal returns (uint256 _credits) {
+    function _work(address _strategy) internal returns (uint256 _credits) {
         uint256 _initialGas = gasleft();
         require(_workable(_strategy), "CrvStrategyKeep3rJob::harvest:not-workable");
 
@@ -231,7 +231,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
 
         _credits = _calculateCredits(_initialGas);
 
-        emit Worked(_strategy, msg.sender, _credits, _workForTokens);
+        emit Worked(_strategy, msg.sender, _credits);
     }
 
     function _workInternal(address _strategy) internal {
@@ -259,18 +259,9 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, Keep3r, ICrvStrategyKeep3rJob,
         IV2Keeper(v2Keeper).harvest(_strategy);
     }
 
-    function work(address _strategy) external override returns (uint256 _credits) {
-        return workForBond(_strategy);
-    }
-
-    function workForBond(address _strategy) public override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_strategy, false);
+    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+        _credits = _work(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
-    }
-
-    function workForTokens(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
-        _credits = _work(_strategy, true);
-        _paysKeeperInTokens(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
