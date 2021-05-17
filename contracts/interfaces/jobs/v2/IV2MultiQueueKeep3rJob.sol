@@ -10,7 +10,7 @@ interface IV2MultiQueueKeep3rJob is IKeep3rJob {
     event StrategyRemoved(address _strategy);
 
     // Actions by Keeper
-    event Worked(address _strategy, uint256 _workAmount, address _keeper, uint256 _credits, bool _workForTokens);
+    event Worked(address _strategy, uint256 _workAmount, address _keeper, uint256 _credits);
 
     // Actions forced by governor
     event ForceWorked(address _strategy);
@@ -43,10 +43,6 @@ interface IV2MultiQueueKeep3rJob is IKeep3rJob {
 
     // Keeper actions
     function work(address _strategy, uint256 _workAmount) external returns (uint256 _credits);
-
-    function workForBond(address _strategy, uint256 _workAmount) external returns (uint256 _credits);
-
-    function workForTokens(address _strategy, uint256 _workAmount) external returns (uint256 _credits);
 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
