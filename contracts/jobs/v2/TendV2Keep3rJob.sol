@@ -7,6 +7,7 @@ import "./V2Keep3rJob.sol";
 contract TendV2Keep3rJob is V2Keep3rJob {
     constructor(
         address _mechanicsRegistry,
+        address _yOracle,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -15,7 +16,7 @@ contract TendV2Keep3rJob is V2Keep3rJob {
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public V2Keep3rJob(_mechanicsRegistry, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
+    ) public V2Keep3rJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
