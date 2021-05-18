@@ -5,7 +5,7 @@ pragma solidity 0.6.12;
 import "../interfaces/oracle/ISimpleOracle.sol";
 import "../interfaces/keep3r/IKeep3rV2OracleFactory.sol";
 
-contract YUnsafeOracleV1 is ISimpleOracle {
+contract Keep3rV2OracleFactoryWrapper is ISimpleOracle {
     address public immutable keep3rV2OracleFactory;
 
     constructor(address _keep3rV2OracleFactory) public {
