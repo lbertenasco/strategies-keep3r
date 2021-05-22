@@ -28,4 +28,6 @@ interface IBaseStrategy {
     function harvestTrigger(uint256 callCost) external view returns (bool);
 
     function harvest() external;
+
+    function setBorrowCollateralizationRatio(uint256 _c) external;
 }

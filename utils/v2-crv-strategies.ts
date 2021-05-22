@@ -3,6 +3,7 @@ import { e18 } from './web3-utils';
 export const defaultRequiredHarvestAmount = e18.mul(10_000);
 
 export const v2CrvStrategies = [
+  // TODO update all and add strategy.profitFactor
   {
     name: 'LUSD',
     added: true,
