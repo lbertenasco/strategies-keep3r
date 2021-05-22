@@ -23,7 +23,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
-    uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;
+    uint256 public override rewardMultiplier = 850;
 
     IV2Keeper public V2Keeper;
 

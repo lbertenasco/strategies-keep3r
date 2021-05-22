@@ -3,7 +3,7 @@ import { e18 } from './web3-utils';
 export const defaultRequiredHarvestAmount = e18.mul(10_000);
 
 export const v2CrvStrategies = [
-  // TODO update all and add strategy.profitFactor
+  // TODO update all strategy.profitFactor
   {
     name: 'LUSD',
     added: true,
@@ -80,55 +80,54 @@ export const v2CrvStrategies = [
     address: '0x4C547b6202247E7B7c45A95d7747A85704530ab3',
     requiredHarvestAmount: defaultRequiredHarvestAmount,
     requiredEarn: { amount: 100, decimals: 18 },
-  },  
+  },
   {
     name: 'hbtc',
-    added: false,
+    added: true,
     address: '0xEeabc022EA72AFC585809214a43e1dDF3b34FBB6',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
   {
     name: 'sbtc',
-    added: false,
+    added: true,
     address: '0x24345144c80BC994C12d85fb276bB4c5520579Ea',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
   {
     name: 'obtc',
-    added: false,
+    added: true,
     address: '0x126e4fDfa9DCEA94F8f4157EF8ad533140C60fC7',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
   {
     name: 'pbtc',
-    added: false,
+    added: true,
     address: '0xf726472B7BE7461001df396C55CAdB1870c78dAE',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
   {
     name: 'rbtc',
-    added: false,
+    added: true,
     address: '0x9eCC1abbA680C5cAACA37AD56E446ED741d86731',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
   {
     name: 'bbtc',
-    added: false,
+    added: true,
     address: '0xe9Fd1BEfdd412C8966689A64dE74a783AfA6AD57',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
   {
     name: 'tbtc',
-    added: false,
+    added: true,
     address: '0x060E04305C07DdE40A9f57bB4fFAcd662D51Ab96',
     requiredHarvestAmount: e18.mul(5000),
     requiredEarn: { amount: 3, decimals: 18 },
   },
-    
 ];
