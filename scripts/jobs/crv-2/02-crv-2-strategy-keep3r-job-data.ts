@@ -37,9 +37,16 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy
         );
         const profitFactor = await strategyContract.profitFactor();
+        const want = await strategyContract.callStatic.want();
+        const wantContract = await ethers.getContractAt(
+          'IV1Vault', // Using vault as detailed IERC20
+          want
+        );
+        const symbol = await wantContract.callStatic.symbol();
 
         console.log(
           strategyData?.name,
+          symbol,
           strategy,
           requiredHarvest.toString(),
           requiredEarn.toString(),
