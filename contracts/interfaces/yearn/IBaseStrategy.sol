@@ -14,6 +14,8 @@ interface IBaseStrategy {
 
     function name() external view returns (string memory _name);
 
+    function profitFactor() external view returns (uint256 _profitFactor);
+
     // Setters
     function setStrategist(address _strategist) external;
 
@@ -28,4 +30,6 @@ interface IBaseStrategy {
     function harvestTrigger(uint256 callCost) external view returns (bool);
 
     function harvest() external;
+
+    function setBorrowCollateralizationRatio(uint256 _c) external;
 }

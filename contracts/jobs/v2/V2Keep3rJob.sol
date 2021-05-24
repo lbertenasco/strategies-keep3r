@@ -12,7 +12,7 @@ import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
-import "../../interfaces/oracle/IYOracleV1.sol";
+import "../../interfaces/oracle/IYOracle.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
@@ -23,7 +23,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
-    uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;
+    uint256 public override rewardMultiplier = 850;
 
     IV2Keeper public V2Keeper;
 
@@ -42,6 +42,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
 
     constructor(
         address _mechanicsRegistry,
+        address _yOracle,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -51,6 +52,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         address _v2Keeper,
         uint256 _workCooldown
     ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+        _setYOracle(_yOracle);
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         V2Keeper = IV2Keeper(_v2Keeper);
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
@@ -66,6 +68,10 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
     }
 
     function setYOracle(address _yOracle) external override onlyGovernor {
+        _setYOracle(_yOracle);
+    }
+
+    function _setYOracle(address _yOracle) internal {
         yOracle = _yOracle;
     }
 
@@ -217,7 +223,7 @@ abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
         if (requiredAmount[_strategy] == 0) return 0;
         uint256 _ethCost = requiredAmount[_strategy].mul(uint256(IChainLinkFeed(fastGasOracle).latestAnswer()));
         if (costToken[_strategy] == address(0)) return _ethCost;
-        return IYOracleV1(yOracle).current(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
+        return IYOracle(yOracle).getAmountOut(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
     }
 
     // Keep3r actions
