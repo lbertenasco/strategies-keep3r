@@ -2,10 +2,8 @@
 
 pragma solidity 0.6.12;
 
-interface IYOracleV1 {
-    function setOracle(address _oracle) external;
-
-    function current(
+interface ISimpleOracle {
+    function getAmountOut(
         address _pair,
         address _tokenIn,
         uint256 _amountIn,

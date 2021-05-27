@@ -8,6 +8,7 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     constructor(
         address _mechanicsRegistry,
         address _stealthRelayer,
+        address _yOracle,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -18,7 +19,19 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         uint256 _workCooldown
     )
         public
-        V2QueueKeep3rJob(_mechanicsRegistry, _stealthRelayer, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown)
+        V2QueueKeep3rJob(
+            _mechanicsRegistry,
+            _stealthRelayer,
+            _yOracle, /*TODO:_yOracle*/
+            _keep3r,
+            _bond,
+            _minBond,
+            _earned,
+            _age,
+            _onlyEOA,
+            _v2Keeper,
+            _workCooldown
+        )
     {}
 
     function workable(address _strategy) external view override returns (bool) {

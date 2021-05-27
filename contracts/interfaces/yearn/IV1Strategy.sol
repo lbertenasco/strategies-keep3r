@@ -24,4 +24,6 @@ interface IV1Strategy {
     function gauge() external pure returns (address);
 
     function voter() external pure returns (address);
+
+    function setBorrowCollateralizationRatio(uint256 _c) external;
 }
