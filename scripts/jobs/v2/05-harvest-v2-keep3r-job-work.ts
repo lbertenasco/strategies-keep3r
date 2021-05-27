@@ -1,6 +1,6 @@
 import { run, ethers } from 'hardhat';
 import config from '../../../.config.json';
-import { gwei } from '../../../utils/web3-utils';
+import { bn, gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
 const { Confirm } = require('enquirer');
 const sendTxPrompt = new Confirm({ message: 'Send tx?' });
@@ -38,7 +38,7 @@ function promptAndSubmit(): Promise<void | Error> {
     }));
 
     try {
-      const now = Math.round(new Date().valueOf() / 1000);
+      const now = bn.from(Math.round(new Date().valueOf() / 1000));
 
       for (const strategy of strategies) {
         console.log('strategy', strategy.address);
@@ -64,13 +64,25 @@ function promptAndSubmit(): Promise<void | Error> {
         const params = await strategy.vaultContract.callStatic.strategies(
           strategy.address
         );
-        strategy.lastReport = params.lastReport.toNumber();
-        const cooldown = strategy.lastReport <= now - strategy.maxReportDelay;
+        strategy.lastReport = params.lastReport;
+        const cooldown = strategy.lastReport.lt(
+          now.sub(strategy.maxReportDelay)
+        );
         console.log(
           'maxReportDelay hrs:',
           strategy.maxReportDelay.div(60 * 60).toNumber()
         );
-        console.log('strategy over cooldown:', cooldown);
+        console.log(
+          'strategy over cooldown:',
+          cooldown,
+          ', will work in:',
+          strategy.lastReport
+            .add(strategy.maxReportDelay)
+            .sub(now)
+            .div(60 * 60)
+            .toNumber(),
+          'hours'
+        );
         if (!cooldown) continue;
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
