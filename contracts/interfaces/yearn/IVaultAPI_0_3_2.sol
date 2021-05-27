@@ -608,6 +608,8 @@ interface VaultAPI is IERC20 {
 
     function strategies(address _strategy) external view returns (StrategyParams memory);
 
+    function pricePerShare() external view returns (uint256);
+
     /**
      * View how much the Vault would increase this Strategy's borrow limit,
      * based on its present performance (since its last report). Can be used to

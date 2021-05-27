@@ -25,6 +25,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
     uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;
 
+    address public yOracle;
     address public v2Keeper;
     address public oracle;
 
@@ -42,6 +43,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
     constructor(
         address _mechanicsRegistry,
         address _stealthRelayer,
+        address _yOracle,
         address _keep3r,
         address _bond,
         uint256 _minBond,
@@ -51,6 +53,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
         address _v2Keeper,
         uint256 _workCooldown
     ) public MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
+        _setYOracle(_yOracle);
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         v2Keeper = _v2Keeper;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
@@ -59,6 +62,22 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
     // Stealth Relayer Setters
     function setStealthRelayer(address _stealthRelayer) external override onlyGovernor {
         _setStealthRelayer(_stealthRelayer);
+    }
+
+    // TODO:
+    // - add strategies cost(token & pair)
+    // - add cost calculations though yOracle in each specific costToken
+    // yOracle
+    function setYOracle(address _yOracle)
+        external
+        /*override*/
+        onlyGovernor
+    {
+        _setYOracle(_yOracle);
+    }
+
+    function _setYOracle(address _yOracle) internal {
+        yOracle = _yOracle;
     }
 
     // Keep3r Setters

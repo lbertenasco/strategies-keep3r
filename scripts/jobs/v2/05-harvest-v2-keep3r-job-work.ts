@@ -1,6 +1,6 @@
 import { run, ethers } from 'hardhat';
 import config from '../../../.config.json';
-import { gwei } from '../../../utils/web3-utils';
+import { bn, gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
 const { Confirm } = require('enquirer');
 const sendTxPrompt = new Confirm({ message: 'Send tx?' });
@@ -23,26 +23,22 @@ function promptAndSubmit(): Promise<void | Error> {
       '0x' + config.accounts.mainnet.privateKey
     ).connect(provider);
     console.log('working v2 harvest strategies as:', signer.address);
+    const v2Keeper = await ethers.getContractAt(
+      'V2Keeper',
+      config.contracts.mainnet.proxyJobs.v2Keeper,
+      signer
+    );
+    const harvestV2Keep3rJob = await ethers.getContractAt(
+      'HarvestV2Keep3rJob',
+      config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
+    );
+    let strategiesAddresses = await harvestV2Keep3rJob.callStatic.strategies();
+    const strategies = strategiesAddresses.map((address: string) => ({
+      address,
+    }));
+
     try {
-      const now = Math.round(new Date().valueOf() / 1000);
-      const strategies: any[] = [
-        {
-          address: '0x6107add73f80AC6015E85103D2f016C6373E4bDc',
-          cooldown: 180 * 60,
-        }, //weth
-        {
-          address: '0xFc403fd9E7A916eC38437807704e92236cA1f7A5',
-          cooldown: 180 * 60,
-        }, //dai
-        {
-          address: '0x063303D9584Ac9A67855086e16Ca7212C109b7b4',
-          cooldown: 180 * 60,
-        }, //usdc
-        {
-          address: '0xF0252a99691D591A5A458b9b4931bF1025BF6Ac3',
-          cooldown: 12 * 60 * 60,
-        }, //wbtc
-      ];
+      const now = bn.from(Math.round(new Date().valueOf() / 1000));
 
       for (const strategy of strategies) {
         console.log('strategy', strategy.address);
@@ -51,6 +47,7 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy.address,
           signer
         );
+        strategy.maxReportDelay = await strategy.contract.callStatic.maxReportDelay();
         strategy.vault = await strategy.contract.callStatic.vault();
         strategy.vaultContract = await ethers.getContractAt(
           vaultAPIVersions['default'],
@@ -67,13 +64,29 @@ function promptAndSubmit(): Promise<void | Error> {
         const params = await strategy.vaultContract.callStatic.strategies(
           strategy.address
         );
-        strategy.lastReport = params.lastReport.toNumber();
-        const cooldown = strategy.lastReport <= now - strategy.cooldown;
-        console.log('90 minutes elapsed', cooldown);
+        strategy.lastReport = params.lastReport;
+        const cooldown = strategy.lastReport.lt(
+          now.sub(strategy.maxReportDelay)
+        );
+        console.log(
+          'maxReportDelay hrs:',
+          strategy.maxReportDelay.div(60 * 60).toNumber()
+        );
+        console.log(
+          'strategy over cooldown:',
+          cooldown,
+          ', will work in:',
+          strategy.lastReport
+            .add(strategy.maxReportDelay)
+            .sub(now)
+            .div(60 * 60)
+            .toNumber(),
+          'hours'
+        );
+        if (!cooldown) continue;
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
-        if (!cooldown) continue;
-        await strategy.contract.callStatic.harvest();
+        await v2Keeper.callStatic.harvest(strategy.address);
         console.log('working...');
 
         // continue;
@@ -95,11 +108,14 @@ function promptAndSubmit(): Promise<void | Error> {
         const nonce = ethers.BigNumber.from(await signer.getTransactionCount());
         console.log('using account nonce:', nonce.toNumber());
 
-        const rawMessage = await strategy.contract.populateTransaction.harvest({
-          gasPrice,
-          nonce,
-          gasLimit: 3000000,
-        });
+        const rawMessage = await v2Keeper.populateTransaction.harvest(
+          strategy.address,
+          {
+            gasPrice,
+            nonce,
+            gasLimit: 3000000,
+          }
+        );
         console.log(rawMessage);
 
         const signedMessage = await signer.signTransaction(rawMessage);
