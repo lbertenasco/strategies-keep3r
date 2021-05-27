@@ -21,7 +21,7 @@ abstract contract OnlyStealthRelayer is IOnlyStealthRelayer {
     }
 
     modifier onlyStealthRelayer() {
-        require(stealthRelayer == address(0) || msg.sender == stealthRelayer, "OnlyStealthRelayer::msg-sender-not-stealth-relayer");
+        require(stealthRelayer == address(0) || msg.sender == stealthRelayer, "OnlyStealthRelayer::not-realyer");
         _;
     }
 
