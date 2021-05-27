@@ -16,6 +16,8 @@ interface IBaseStrategy {
 
     function profitFactor() external view returns (uint256 _profitFactor);
 
+    function maxReportDelay() external view returns (uint256 _maxReportDelay);
+
     // Setters
     function setStrategist(address _strategist) external;
 
