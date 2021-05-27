@@ -23,6 +23,16 @@ function promptAndSubmit(): Promise<void | Error> {
       '0x' + config.accounts.mainnet.privateKey
     ).connect(provider);
     console.log('working v2 harvest strategies as:', signer.address);
+    const v2Keeper = await ethers.getContractAt(
+      'V2Keeper',
+      config.contracts.mainnet.proxyJobs.v2Keeper
+    );
+    const harvestV2Keep3rJob = await ethers.getContractAt(
+      'HarvestV2Keep3rJob',
+      config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
+    );
+    let strategies = await harvestV2Keep3rJob.callStatic.strategies();
+
     try {
       const now = Math.round(new Date().valueOf() / 1000);
       const strategies: any[] = [
@@ -95,7 +105,7 @@ function promptAndSubmit(): Promise<void | Error> {
         const nonce = ethers.BigNumber.from(await signer.getTransactionCount());
         console.log('using account nonce:', nonce.toNumber());
 
-        const rawMessage = await strategy.contract.populateTransaction.harvest({
+        const rawMessage = await v2Keeper.populateTransaction.harvest({
           gasPrice,
           nonce,
           gasLimit: 3000000,
