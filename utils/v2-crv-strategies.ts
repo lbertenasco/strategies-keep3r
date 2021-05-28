@@ -141,7 +141,7 @@ export const v2CrvStrategies = [
   {
     name: 'undefined',
     wantSymbol: 'ALUSD3CRV-f',
-    added: false,
+    added: true,
     address: '0x31CD90D60516ED18750bA49b2C9d1053190F40d9',
     requiredHarvestAmount: e18.mul(10000),
     requiredEarn: { amount: 100_000, decimals: 18 },
@@ -150,7 +150,7 @@ export const v2CrvStrategies = [
   {
     name: 'undefined',
     wantSymbol: 'rCRV',
-    added: false,
+    added: true,
     address: '0x3bd9847c8c5C11448DBd6EE119F663FC177b614E',
     requiredHarvestAmount: e18.mul(3000),
     requiredEarn: { amount: 15, decimals: 18 },
