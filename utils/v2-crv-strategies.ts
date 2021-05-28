@@ -77,6 +77,15 @@ export const v2CrvStrategies = [
   },
   {
     name: 'undefined',
+    wantSymbol: 'a3CRV',
+    added: true,
+    address: '0xB11FC91DF59ADc604485f1B25ABa1F96A685473f',
+    requiredHarvestAmount: e18.mul(10000),
+    requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
+  },
+  {
+    name: 'undefined',
     wantSymbol: 'saCRV',
     added: true,
     address: '0x106838c85Ab33F41567F7AbCfF787d7269E824AF',
@@ -145,6 +154,15 @@ export const v2CrvStrategies = [
     address: '0x31CD90D60516ED18750bA49b2C9d1053190F40d9',
     requiredHarvestAmount: e18.mul(10000),
     requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
+  },
+  {
+    name: 'undefined',
+    wantSymbol: 'ankrCRV',
+    added: true,
+    address: '0x32EF165F2ABbdbE7dcC25B86EdB14a2C0dc52571',
+    requiredHarvestAmount: e18.mul(3000),
+    requiredEarn: { amount: 15, decimals: 18 },
     profitFactor: 1,
   },
   {
