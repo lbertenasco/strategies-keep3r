@@ -184,6 +184,15 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
+    name: 'undefined',
+    wantSymbol: 'eursCRV',
+    added: true,
+    address: '0x53cE22d5b4F667eC73710d428E828Cd96E9a37C9',
+    requiredHarvestAmount: e18.mul(10000),
+    requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
+  },
+  {
     name: 'hbtc',
     wantSymbol: 'hCRV',
     added: true,
