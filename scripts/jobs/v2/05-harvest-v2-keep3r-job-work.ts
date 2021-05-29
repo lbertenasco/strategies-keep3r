@@ -32,8 +32,15 @@ function promptAndSubmit(): Promise<void | Error> {
       'HarvestV2Keep3rJob',
       config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
     );
-    let strategiesAddresses = await harvestV2Keep3rJob.callStatic.strategies();
-    const strategies = strategiesAddresses.map((address: string) => ({
+    let strategiesAddresses: string[] = await harvestV2Keep3rJob.callStatic.strategies();
+
+    // manually add extra strategies
+    strategiesAddresses = [
+      ...strategiesAddresses,
+      '0xe9bD008A97e362F7C501F6F5532A348d2e6B8131',
+    ];
+
+    const strategies: any = strategiesAddresses.map((address: string) => ({
       address,
     }));
 
