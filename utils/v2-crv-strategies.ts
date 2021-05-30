@@ -18,8 +18,8 @@ export const v2CrvStrategies = [
     added: true,
     address: '0x9d7c11D1268C8FD831f1b92A304aCcb2aBEbfDe1',
     requiredHarvestAmount: e18.mul(10000),
-    requiredEarn: { amount: 100, decimals: 18 },
-    profitFactor: 1000,
+    requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
   },
   {
     name: 'GUSD',
@@ -27,8 +27,8 @@ export const v2CrvStrategies = [
     added: true,
     address: '0x9C1117cf2ED3A0F4A9F069001F517c1D511c8B53',
     requiredHarvestAmount: e18.mul(10000),
-    requiredEarn: { amount: 100, decimals: 18 },
-    profitFactor: 1000,
+    requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
   },
   {
     name: 'DUSD',
@@ -36,8 +36,8 @@ export const v2CrvStrategies = [
     added: true,
     address: '0x4C547b6202247E7B7c45A95d7747A85704530ab3',
     requiredHarvestAmount: e18.mul(10000),
-    requiredEarn: { amount: 100, decimals: 18 },
-    profitFactor: 1000,
+    requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
   },
   {
     name: 'Compound',
