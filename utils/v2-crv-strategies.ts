@@ -149,6 +149,15 @@ export const v2CrvStrategies = [
   },
   {
     name: 'undefined',
+    wantSymbol: 'TUSD3CRV-f',
+    added: true,
+    address: '0xF088aC5ebf8423b894903312AaC8Ac42c3Ab3A02',
+    requiredHarvestAmount: e18.mul(10000),
+    requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
+  },
+  {
+    name: 'undefined',
     wantSymbol: 'ALUSD3CRV-f',
     added: true,
     address: '0x31CD90D60516ED18750bA49b2C9d1053190F40d9',
