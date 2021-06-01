@@ -1,6 +1,6 @@
 import { run, ethers } from 'hardhat';
 import config from '../../../.config.json';
-import { bn, gwei } from '../../../utils/web3-utils';
+import { bn, e18, gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
 const { Confirm } = require('enquirer');
 const sendTxPrompt = new Confirm({ message: 'Send tx?' });
@@ -12,7 +12,7 @@ async function main() {
 const vaultAPIVersions = {
   default: 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
   '0.3.0': 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
-  '0.3.2': 'contracts/interfaces/yearn/IVaultAPI_0_3_2.sol:VaultAPI',
+  '0.3.2': 'contracts/interfaces/yearn/IVaultAPI_0_3_2_s.sol:VaultAPI',
 };
 
 function promptAndSubmit(): Promise<void | Error> {
@@ -40,9 +40,44 @@ function promptAndSubmit(): Promise<void | Error> {
       '0xe9bD008A97e362F7C501F6F5532A348d2e6B8131',
     ];
 
-    const strategies: any = strategiesAddresses.map((address: string) => ({
+    const baseStrategies: any = strategiesAddresses.map((address: string) => ({
       address,
     }));
+
+    // custom maxReportDelay and amount:
+    const strategies = [
+      ...baseStrategies,
+      {
+        name: 'convex_hcrv',
+        address: '0x7Ed0d52C5944C7BF92feDC87FEC49D474ee133ce',
+        maxReportDelay: 60 * 60 * 24 * 1, // 1 day
+        amount: e18.mul(3),
+      },
+      {
+        name: 'convex_link',
+        address: '0xb7f013426d33fe27e4E8ABEE58500268554736bD',
+        maxReportDelay: 60 * 60 * 24 * 1, // 1 day
+        amount: e18.mul(3000),
+      },
+      {
+        name: 'convex_usdp',
+        address: '0xfb0702469A1a0440E87C06605461E8660FD0F43d',
+        maxReportDelay: 60 * 60 * 24 * 1, // 1 day
+        amount: e18.mul(50000),
+      },
+      {
+        name: 'convex_usdn',
+        address: '0x8e87e65Cb28c069550012f92d5470dB6EB6897c0',
+        maxReportDelay: 60 * 60 * 24 * 1, // 1 day
+        amount: e18.mul(50000),
+      },
+      {
+        name: 'convex_eurs',
+        address: '0x4DC2CCC9E76bD30982243C1cB915003e17a88Eb9',
+        maxReportDelay: 60 * 60 * 24 * 1, // 1 day
+        amount: e18.mul(50000),
+      },
+    ];
 
     try {
       const now = bn.from(Math.round(new Date().valueOf() / 1000));
@@ -54,7 +89,9 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy.address,
           signer
         );
-        strategy.maxReportDelay = await strategy.contract.callStatic.maxReportDelay();
+        strategy.maxReportDelay = strategy.maxReportDelay
+          ? bn.from(strategy.maxReportDelay)
+          : await strategy.contract.callStatic.maxReportDelay();
         strategy.vault = await strategy.contract.callStatic.vault();
         strategy.vaultContract = await ethers.getContractAt(
           vaultAPIVersions['default'],
@@ -90,7 +127,23 @@ function promptAndSubmit(): Promise<void | Error> {
             .toNumber(),
           'hours'
         );
-        if (!cooldown) continue;
+        if (!cooldown && !strategy.amount) continue;
+        if (!cooldown) {
+          console.log('checking debtOutstanding:');
+          // vault.debtOutstanding(strategy) >= amount -> do a harvest if true.
+          const debtOutstanding = await strategy.vaultContract.callStatic.debtOutstanding(
+            strategy.address
+          );
+          // if debtOutstanding is less than amount, do not harvest;
+          console.log(
+            'amount:',
+            strategy.amount.toString(),
+            'do:',
+            debtOutstanding.toString()
+          );
+          if (debtOutstanding.lt(strategy.amount)) continue;
+        }
+
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
         await v2Keeper.callStatic.harvest(strategy.address);
