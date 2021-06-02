@@ -57,6 +57,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         v2Keeper = _v2Keeper;
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
+        revert("yOracle-not-fully-implemented");
     }
 
     // Stealth Relayer Setters

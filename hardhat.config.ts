@@ -25,7 +25,7 @@ module.exports = {
           mainnet: {
             url: process.env.MAINNET_HTTPS_URL,
             accounts: [process.env.MAINNET_PRIVATE_KEY],
-            gasPrice: 35000000000, // 35 gwei
+            gasPrice: 25000000000, // 25 gwei
           },
           staticMainnet: {
             url: process.env.MAINNET_HTTPS_URL,

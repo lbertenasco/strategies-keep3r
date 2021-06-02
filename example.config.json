@@ -33,8 +33,8 @@
         "registry": "0xE8d5A85758FE98F7Dce251CAd552691D49b499Bb"
       },
       "jobs": {
-        "tendV2Keep3rJob": "0xD6e720733EDb27FD2110D06Bba3DF258187D4148",
-        "harvestV2Keep3rJob": "0xCb71fe9529CecB5B440819eFC85824D133b8ed54",
+        "tendV2Keep3rJob": "",
+        "harvestV2Keep3rJob": "0x3Da70a551C0F785580A291b7d8c7D0F3Dc4c6688",
         "harvestV2QueueKeep3rJob": "0xE5a7db399dEC2c5ddEfeBc52ea70f127284D118d",
         "crvStrategyKeep3rJob": "0x02027bDA2425204f152B8aa35Fb78687D65E1AF5",
         "crvStrategyKeep3rJob2": "0xeE15010105b9BB564CFDfdc5cee676485092AEDd",
@@ -43,8 +43,10 @@
       "oldJobs": {
         "tendV2Keep3rJob": "0x7b28163e7a3db17eF2dba02BCf7250A8Dc505057",
         "tendV2Keep3rJob.0": "0x2ef7801c6A9d451EF20d0F513c738CC012C57bC3",
+        "tendV2Keep3rJob.1.unused": "0xD6e720733EDb27FD2110D06Bba3DF258187D4148",
         "harvestV2Keep3rJob": "0x620bd1E1D1d845c8904aC03F6cd6b87706B7596b",
-        "harvestV2Keep3rJob.0": "0x6947aA05A900153Ef4CC28D893484A4e7ad7EC77"
+        "harvestV2Keep3rJob.0": "0x6947aA05A900153Ef4CC28D893484A4e7ad7EC77",
+        "harvestV2Keep3rJob.1.unused": "0xCb71fe9529CecB5B440819eFC85824D133b8ed54"
       },
       "proxyJobs": {
         "crvStrategyKeep3rJob": "0xb990961d30A5fa10F7929851a76d8017Cf4a8eBb",
