@@ -99,19 +99,19 @@ function promptAndSubmit(): Promise<void | Error> {
         );
         if (!cooldownCompleted && !strategy.amount) continue;
         if (!cooldownCompleted) {
-          console.log('checking debtOutstanding:');
-          // vault.debtOutstanding(strategy) >= amount -> do a harvest if true.
-          const debtOutstanding = await strategy.vaultContract.callStatic.debtOutstanding(
+          console.log('checking creditAvailable:');
+          // vault.creditAvailable(strategy) >= amount -> do a harvest if true.
+          const creditAvailable = await strategy.vaultContract.callStatic.creditAvailable(
             strategy.address
           );
-          // if debtOutstanding is less than amount, do not harvest;
+          // if creditAvailable is less than amount, do not harvest;
           console.log(
             'amount:',
             strategy.amount.toString(),
-            'do:',
-            debtOutstanding.toString()
+            'creditAvailable:',
+            creditAvailable.toString()
           );
-          if (debtOutstanding.lt(strategy.amount)) continue;
+          if (creditAvailable.lt(strategy.amount)) continue;
         }
 
         const workable = await strategy.contract.harvestTrigger(1_000_000);
@@ -119,7 +119,7 @@ function promptAndSubmit(): Promise<void | Error> {
         await v2Keeper.callStatic.harvest(strategy.address);
         console.log('working...');
 
-        // continue;
+        continue;
 
         const gasResponse = await taichi.getGasPrice();
         console.log('taichi gasPrices:', {
