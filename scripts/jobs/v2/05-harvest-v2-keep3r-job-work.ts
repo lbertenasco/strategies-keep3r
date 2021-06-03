@@ -79,7 +79,7 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy.address
         );
         strategy.lastReport = params.lastReport;
-        const cooldown = strategy.lastReport.lt(
+        const cooldownCompleted = strategy.lastReport.lt(
           now.sub(strategy.maxReportDelay)
         );
         console.log(
@@ -88,7 +88,7 @@ function promptAndSubmit(): Promise<void | Error> {
         );
         console.log(
           'strategy over cooldown:',
-          cooldown,
+          cooldownCompleted,
           ', will work in:',
           strategy.lastReport
             .add(strategy.maxReportDelay)
@@ -97,8 +97,8 @@ function promptAndSubmit(): Promise<void | Error> {
             .toNumber(),
           'hours'
         );
-        if (!cooldown && !strategy.amount) continue;
-        if (!cooldown) {
+        if (!cooldownCompleted && !strategy.amount) continue;
+        if (!cooldownCompleted) {
           console.log('checking debtOutstanding:');
           // vault.debtOutstanding(strategy) >= amount -> do a harvest if true.
           const debtOutstanding = await strategy.vaultContract.callStatic.debtOutstanding(
