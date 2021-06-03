@@ -178,7 +178,7 @@ export const v2CrvStrategies = [
     name: 'undefined',
     wantSymbol: 'rCRV',
     added: true,
-    address: '0x3bd9847c8c5C11448DBd6EE119F663FC177b614E',
+    address: '0x16468a3999d931Dd6b6ffA0086Cf195D6C5BDAFA',
     requiredHarvestAmount: e18.mul(3000),
     requiredEarn: { amount: 15, decimals: 18 },
     profitFactor: 1,
