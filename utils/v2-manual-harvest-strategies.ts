@@ -9,7 +9,7 @@ export const manualHarvestStrategies = [
   },
   {
     name: 'convex_ankr',
-    address: '',
+    address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
     maxReportDelay: 60 * 60 * 24 * 1, // 1 day
     amount: e18.mul(50000),
   },
