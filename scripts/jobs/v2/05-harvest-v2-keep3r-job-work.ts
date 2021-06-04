@@ -159,6 +159,7 @@ function promptAndSubmit(): Promise<void | Error> {
         // }
         const res = await taichi.sendPrivateTransaction(signedMessage);
         if (res.error) {
+          if (res.error == 'already known') continue;
           return reject(res.error.message);
         }
 
