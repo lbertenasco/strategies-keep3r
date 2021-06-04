@@ -23,13 +23,13 @@ export const manualHarvestStrategies = [
     name: 'convex_ankr',
     address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
     maxReportDelay: 60 * 60 * 24 * 1, // 1 day
-    amount: e18.mul(50000),
+    amount: e18.mul(15),
   },
   {
     name: 'convex_reth',
     address: '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16',
     maxReportDelay: 60 * 60 * 24 * 1, // 1 day
-    amount: e18.mul(50000),
+    amount: e18.mul(15),
   },
   {
     name: 'convex_link',
