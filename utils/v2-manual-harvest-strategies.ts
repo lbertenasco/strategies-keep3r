@@ -20,6 +20,12 @@ export const manualHarvestStrategies = [
     amount: e18.mul(3),
   },
   {
+    name: 'convex_sbtc',
+    address: '0x7aB4DB515bf258A88Bb14f3685769a0f70B8778f',
+    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    amount: e18.mul(3),
+  },
+  {
     name: 'convex_ankr',
     address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
