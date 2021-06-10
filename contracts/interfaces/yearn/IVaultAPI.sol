@@ -31,7 +31,7 @@ interface VaultAPI is IERC20 {
      * based on its present performance (since its last report). Can be used to
      * determine expectedReturn in your Strategy.
      */
-    function creditAvailable() external view returns (uint256);
+    function creditAvailable(address _strategy) external view returns (uint256);
 
     /**
      * View how much the Vault would like to pull back from the Strategy,

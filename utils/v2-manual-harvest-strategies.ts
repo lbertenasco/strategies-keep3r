@@ -163,4 +163,9 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 20, // 20 hours
     amount: e18.mul(300),
   },
+  {
+    name: 'idle_rai_yield',
+    address: '0x5d411d2cde10e138d68517c42be2808c90c22026',
+    amount: e18.mul(1000000),
+  },
 ];
