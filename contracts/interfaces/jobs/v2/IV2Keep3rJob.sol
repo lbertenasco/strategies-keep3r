@@ -65,6 +65,4 @@ interface IV2Keep3rJob is IKeep3rJob {
 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
-
-    function forceWorkUnsafe(address _strategy) external;
 }

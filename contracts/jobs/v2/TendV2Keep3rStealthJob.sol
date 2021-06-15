@@ -2,11 +2,12 @@
 
 pragma solidity 0.6.12;
 
-import "./V2Keep3rJob.sol";
+import "./V2Keep3rStealthJob.sol";
 
-contract TendV2Keep3rJob is V2Keep3rJob {
+contract TendV2Keep3rStealthJob is V2Keep3rStealthJob {
     constructor(
         address _mechanicsRegistry,
+        address _stealthRelayer,
         address _yOracle,
         address _keep3r,
         address _bond,
@@ -16,7 +17,22 @@ contract TendV2Keep3rJob is V2Keep3rJob {
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public V2Keep3rJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
+    )
+        public
+        V2Keep3rStealthJob(
+            _mechanicsRegistry,
+            _stealthRelayer,
+            _yOracle,
+            _keep3r,
+            _bond,
+            _minBond,
+            _earned,
+            _age,
+            _onlyEOA,
+            _v2Keeper,
+            _workCooldown
+        )
+    {}
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -33,7 +49,7 @@ contract TendV2Keep3rJob is V2Keep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
         _credits = _workInternal(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }

@@ -2,9 +2,9 @@
 
 pragma solidity 0.6.12;
 
-import "./V2Keep3rJob.sol";
+import "./V2Keep3rStealthJob.sol";
 
-contract HarvestV2Keep3rJob is V2Keep3rJob {
+contract HarvestV2Keep3rStealthJob is V2Keep3rStealthJob {
     constructor(
         address _mechanicsRegistry,
         address _stealthRelayer,
