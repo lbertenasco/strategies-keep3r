@@ -46,6 +46,7 @@
     "@commitlint/cli": "12.1.1",
     "@commitlint/config-conventional": "12.1.1",
     "@flashbots/ethers-provider-bundle": "0.2.1",
+    "@lbertenasco/bonded-stealth-tx": "0.3.0",
     "@lbertenasco/contract-utils": "0.3.4",
     "@nomiclabs/hardhat-ethers": "2.0.2",
     "@nomiclabs/hardhat-etherscan": "2.1.1",

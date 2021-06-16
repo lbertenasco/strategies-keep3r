@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 import "../utils/GasPriceLimited.sol";
@@ -11,8 +10,6 @@ import "../interfaces/jobs/IVaultKeep3rJob.sol";
 import "../interfaces/yearn/IEarnableVault.sol";
 
 contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3rJob {
-    using SafeMath for uint256;
-
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
     uint256 public override rewardMultiplier = MAX_REWARD_MULTIPLIER;

@@ -7,10 +7,7 @@ contract Keep3rJobMock is Keep3rJob {
     uint256 public timesWorked = 0;
     bool public workableReturn = true;
 
-    constructor(
-        address _keep3rProxyJob,
-        uint256 _maxGasPrice
-    ) public Keep3rJob(_keep3rProxyJob) {
+    constructor(address _keep3rProxyJob, uint256 _maxGasPrice) public Keep3rJob(_keep3rProxyJob) {
         _setMaxGasPrice(_maxGasPrice);
     }
 
@@ -28,7 +25,7 @@ contract Keep3rJobMock is Keep3rJob {
     }
 
     function workable(address _contractAddress) public view returns (bool) {
-        return _contractAddress == address(this); 
+        return _contractAddress == address(this);
     }
 
     // Keep3r actions
@@ -45,18 +42,22 @@ contract Keep3rJobMock is Keep3rJob {
 
     // Governable
     function acceptGovernor() external override {}
-    function governor() external override view returns (address _governor) {
+
+    function governor() external view override returns (address _governor) {
         return msg.sender;
     }
-    function isGovernor(address _account) external override view returns (bool _isGovernor) {
+
+    function isGovernor(address _account) external view override returns (bool _isGovernor) {
         _account; // shh
         return true;
     }
-    function pendingGovernor() external override view returns (address _pendingGovernor) {}
-    function setPendingGovernor(address _pendingGovernor) external override { }
+
+    function pendingGovernor() external view override returns (address _pendingGovernor) {}
+
+    function setPendingGovernor(address _pendingGovernor) external override {}
 
     // Setter for test
     function setWorkableReturn(bool _workableReturn) external {
         workableReturn = _workableReturn;
-    } 
+    }
 }

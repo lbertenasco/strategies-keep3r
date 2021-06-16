@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 interface IController {
     function withdraw(address, uint256) external;
@@ -110,7 +109,6 @@ interface VoterProxy {
 contract StrategyCurveYVoterProxy {
     using SafeERC20 for IERC20;
     using Address for address;
-    using SafeMath for uint256;
 
     address public constant want = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
     address public constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);

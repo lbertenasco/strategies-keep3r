@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 import "./V2Keep3rJob.sol";
 
-import "../../utils/OnlyStealthRelayer.sol";
+import "@lbertenasco/bonded-stealth-tx/contracts/utils/OnlyStealthRelayer.sol";
 import "../../interfaces/jobs/v2/IV2Keep3rStealthJob.sol";
 
 import "../../interfaces/stealth/IStealthRelayer.sol";

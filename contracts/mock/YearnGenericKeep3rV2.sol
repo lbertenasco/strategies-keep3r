@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
 contract GenericKeep3rV2 {
-    using SafeMath for uint256;
 
     EnumerableSet.AddressSet internal availableStrategies;
     mapping(address => uint256) public requiredHarvest;

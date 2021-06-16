@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/interfaces/utils/IGovernable.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
@@ -12,7 +11,6 @@ import "../interfaces/proxy-job/IKeep3rJob.sol";
 import "../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract Keep3rJob is IKeep3rJob, IGovernable {
-    using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     IChainLinkFeed public constant FASTGAS = IChainLinkFeed(0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C);

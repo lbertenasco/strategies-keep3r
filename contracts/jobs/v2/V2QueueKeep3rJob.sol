@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1Helper.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
-import "../../utils/OnlyStealthRelayer.sol";
-
+import "@lbertenasco/bonded-stealth-tx/contracts/utils/OnlyStealthRelayer.sol";
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
 
 import "../../interfaces/jobs/v2/IV2QueueKeep3rJob.sol";
@@ -16,8 +14,6 @@ import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2QueueKeep3rJob {
-    using SafeMath for uint256;
-
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address public override fastGasOracle = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
 
