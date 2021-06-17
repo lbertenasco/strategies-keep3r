@@ -18,7 +18,7 @@ abstract contract V2Keep3rPublicJob is V2Keep3rJob, IV2Keep3rPublicJob {
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public V2Keep3rJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
+    ) V2Keep3rJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external override onlyGovernorOrMechanic {

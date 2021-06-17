@@ -10,7 +10,7 @@ import "../interfaces/keep3r/IKeep3rV2OracleFactory.sol";
 contract Keep3rV2OracleFactoryWrapper is UtilsReady, ISimpleOracle {
     address public immutable keep3rV2OracleFactory;
 
-    constructor(address _keep3rV2OracleFactory) public UtilsReady() {
+    constructor(address _keep3rV2OracleFactory) UtilsReady() {
         keep3rV2OracleFactory = _keep3rV2OracleFactory;
     }
 

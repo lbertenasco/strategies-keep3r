@@ -14,6 +14,8 @@ import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
 abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2QueueKeep3rJob {
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address public override fastGasOracle = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
 
@@ -48,7 +50,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
+    ) MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
         _setYOracle(_yOracle);
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         v2Keeper = _v2Keeper;
@@ -167,7 +169,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
     // Keeper view actions (internal)
     function _mainStrategyWorkable(address _strategy) internal view virtual returns (bool) {
         require(_availableStrategies.contains(_strategy), "V2QueueKeep3rJob::main-workable:strategy-not-added");
-        require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown), "V2QueueKeep3rJob::main-workable:on-cooldown");
+        require(workCooldown == 0 || block.timestamp > lastWorkAt[_strategy] + workCooldown, "V2QueueKeep3rJob::main-workable:on-cooldown");
         return true;
     }
 
@@ -191,7 +193,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
         bool mainWorked = false;
 
         for (uint256 _index = 0; _index < strategyQueue[_strategy].length; _index++) {
-            uint256 _ethAmount = strategyAmounts[_strategy][_index].mul(_ethGasPrice);
+            uint256 _ethAmount = strategyAmounts[_strategy][_index] * _ethGasPrice;
             if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
                 _work(strategyQueue[_strategy][_index]);
                 if (strategyQueue[_strategy][_index] == _strategy) mainWorked = true;
@@ -208,7 +210,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimitFor(tx.origin, _initialGas).mul(rewardMultiplier).div(PRECISION);
+        return (_getQuoteLimitFor(tx.origin, _initialGas) * rewardMultiplier) / PRECISION;
     }
 
     // Mechanics keeper bypass

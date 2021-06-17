@@ -16,7 +16,12 @@ contract TendV2Keep3rJob is V2Keep3rPublicJob {
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public V2Keep3rPublicJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown) {}
+    )
+        V2Keep3rPublicJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown)
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -33,7 +38,7 @@ contract TendV2Keep3rJob is V2Keep3rPublicJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyKeeper(msg.sender) returns (uint256 _credits) {
         _credits = _workInternal(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }

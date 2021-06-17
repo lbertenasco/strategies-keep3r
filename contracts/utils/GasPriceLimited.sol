@@ -10,7 +10,8 @@ abstract contract GasPriceLimited is IGasPriceLimited {
 
     uint256 public override maxGasPrice;
 
-    constructor() public {}
+    // solhint-disable-next-line no-empty-blocks
+    constructor() {}
 
     // MaxGasPrice
     function _setMaxGasPrice(uint256 _maxGasPrice) internal {

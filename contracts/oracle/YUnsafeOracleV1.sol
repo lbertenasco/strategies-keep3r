@@ -12,7 +12,7 @@ contract YUnsafeOracleV1 is UtilsReady, IYOracle {
 
     mapping(address => address) public override pairOracle;
 
-    constructor(address _defaultOracle) public UtilsReady() {
+    constructor(address _defaultOracle) UtilsReady() {
         _setOracle(_defaultOracle);
     }
 

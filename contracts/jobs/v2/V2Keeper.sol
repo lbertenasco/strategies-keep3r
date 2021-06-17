@@ -13,7 +13,8 @@ contract V2Keeper is MachineryReady, IV2Keeper {
 
     EnumerableSet.AddressSet internal _validJobs;
 
-    constructor(address _mechanicsRegistry) public MachineryReady(_mechanicsRegistry) {}
+    // solhint-disable-next-line no-empty-blocks
+    constructor(address _mechanicsRegistry) MachineryReady(_mechanicsRegistry) {}
 
     // Setters
     function addJobs(address[] calldata _jobs) external override onlyGovernorOrMechanic {

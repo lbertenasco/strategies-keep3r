@@ -265,14 +265,14 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
         IV2Keeper(v2Keeper).harvest(_strategy);
     }
 
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper(msg.sender) returns (uint256 _credits) {
         _credits = _work(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
+        return (_getQuoteLimitFor(msg.sender, _initialGas) * rewardMultiplier) / PRECISION;
     }
 
     // Mechanics keeper bypass

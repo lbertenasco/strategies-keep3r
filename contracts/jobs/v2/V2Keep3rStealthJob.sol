@@ -23,10 +23,12 @@ abstract contract V2Keep3rStealthJob is V2Keep3rJob, OnlyStealthRelayer, IV2Keep
         address _v2Keeper,
         uint256 _workCooldown
     )
-        public
         V2Keep3rJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown)
         OnlyStealthRelayer(_stealthRelayer)
-    {}
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     // StealthRelayer custom isKeep3r modifier
     modifier onlyStealthKeeper() {
