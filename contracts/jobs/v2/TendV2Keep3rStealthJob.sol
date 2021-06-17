@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 import "./V2Keep3rStealthJob.sol";
 
@@ -18,7 +18,6 @@ contract TendV2Keep3rStealthJob is V2Keep3rStealthJob {
         address _v2Keeper,
         uint256 _workCooldown
     )
-        public
         V2Keep3rStealthJob(
             _mechanicsRegistry,
             _stealthRelayer,
@@ -32,7 +31,10 @@ contract TendV2Keep3rStealthJob is V2Keep3rStealthJob {
             _v2Keeper,
             _workCooldown
         )
-    {}
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);

@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 interface IController {
     function withdraw(address, uint256) external;
@@ -110,7 +109,6 @@ interface VoterProxy {
 contract StrategyCurveYVoterProxy {
     using SafeERC20 for IERC20;
     using Address for address;
-    using SafeMath for uint256;
 
     address public constant want = address(0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8);
     address public constant crv = address(0xD533a949740bb3306d119CC777fa900bA034cd52);
@@ -139,7 +137,7 @@ contract StrategyCurveYVoterProxy {
     address public controller;
     address public strategist;
 
-    constructor(address _controller) public {
+    constructor(address _controller) {
         governance = msg.sender;
         strategist = msg.sender;
         controller = _controller;
@@ -198,17 +196,17 @@ contract StrategyCurveYVoterProxy {
         require(msg.sender == controller, "!controller");
         uint256 _balance = IERC20(want).balanceOf(address(this));
         if (_balance < _amount) {
-            _amount = _withdrawSome(_amount.sub(_balance));
-            _amount = _amount.add(_balance);
+            _amount = _withdrawSome(_amount - _balance);
+            _amount = _amount + _balance;
         }
 
-        uint256 _fee = _amount.mul(withdrawalFee).div(withdrawalMax);
+        uint256 _fee = (_amount * withdrawalFee) / withdrawalMax;
 
         IERC20(want).safeTransfer(IController(controller).rewards(), _fee);
         address _vault = IController(controller).vaults(address(want));
         require(_vault != address(0), "!vault"); // additional protection so we don't burn the funds
 
-        IERC20(want).safeTransfer(_vault, _amount.sub(_fee));
+        IERC20(want).safeTransfer(_vault, _amount - _fee);
     }
 
     // Withdraw all funds, normally used when migrating strategies
@@ -232,9 +230,9 @@ contract StrategyCurveYVoterProxy {
         VoterProxy(proxy).harvest(gauge);
         uint256 _crv = IERC20(crv).balanceOf(address(this));
         if (_crv > 0) {
-            uint256 _keepCRV = _crv.mul(keepCRV).div(keepCRVMax);
+            uint256 _keepCRV = (_crv * keepCRV) / keepCRVMax;
             IERC20(crv).safeTransfer(voter, _keepCRV);
-            _crv = _crv.sub(_keepCRV);
+            _crv = _crv - _keepCRV;
 
             IERC20(crv).safeApprove(uni, 0);
             IERC20(crv).safeApprove(uni, _crv);
@@ -244,7 +242,7 @@ contract StrategyCurveYVoterProxy {
             path[1] = weth;
             path[2] = dai;
 
-            Uni(uni).swapExactTokensForTokens(_crv, uint256(0), path, address(this), now.add(1800));
+            Uni(uni).swapExactTokensForTokens(_crv, uint256(0), path, address(this), block.timestamp + 1800);
         }
         uint256 _dai = IERC20(dai).balanceOf(address(this));
         if (_dai > 0) {
@@ -260,7 +258,7 @@ contract StrategyCurveYVoterProxy {
         }
         uint256 _want = IERC20(want).balanceOf(address(this));
         if (_want > 0) {
-            uint256 _fee = _want.mul(performanceFee).div(performanceMax);
+            uint256 _fee = (_want * performanceFee) / performanceMax;
             IERC20(want).safeTransfer(IController(controller).rewards(), _fee);
             deposit();
         }
@@ -280,7 +278,7 @@ contract StrategyCurveYVoterProxy {
     }
 
     function balanceOf() public view returns (uint256) {
-        return balanceOfWant().add(balanceOfPool());
+        return balanceOfWant() + balanceOfPool();
     }
 
     function setGovernance(address _governance) external {

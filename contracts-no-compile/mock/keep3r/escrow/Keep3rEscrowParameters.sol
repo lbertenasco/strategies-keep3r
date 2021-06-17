@@ -9,7 +9,7 @@ contract Keep3rEscrowParametersMock is Keep3rEscrowParameters {
         address _governance,
         IKeep3rV1 _keep3r,
         IERC20 _lpToken
-    ) public Keep3rEscrowParameters(_governance, _keep3r, _lpToken) { }
+    ) public Keep3rEscrowParameters(_governance, _keep3r, _lpToken) {}
 
     function returnLPsToGovernance() public override {
         _returnLPsToGovernance();

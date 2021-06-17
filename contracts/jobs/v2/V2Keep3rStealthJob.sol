@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 import "./V2Keep3rJob.sol";
 
-import "../../utils/OnlyStealthRelayer.sol";
+import "@lbertenasco/bonded-stealth-tx/contracts/utils/OnlyStealthRelayer.sol";
 import "../../interfaces/jobs/v2/IV2Keep3rStealthJob.sol";
 
 import "../../interfaces/stealth/IStealthRelayer.sol";
@@ -23,10 +23,12 @@ abstract contract V2Keep3rStealthJob is V2Keep3rJob, OnlyStealthRelayer, IV2Keep
         address _v2Keeper,
         uint256 _workCooldown
     )
-        public
         V2Keep3rJob(_mechanicsRegistry, _yOracle, _keep3r, _bond, _minBond, _earned, _age, _onlyEOA, _v2Keeper, _workCooldown)
         OnlyStealthRelayer(_stealthRelayer)
-    {}
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     // StealthRelayer custom isKeep3r modifier
     modifier onlyStealthKeeper() {

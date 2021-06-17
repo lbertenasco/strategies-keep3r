@@ -46,6 +46,23 @@ function promptAndSubmit(): Promise<void | Error> {
       address,
     }));
 
+    const strategiesToAvoid: any = [
+      // from vault DAI yVault 0x19D3364A399d251E894aC732651be8B0E4e85001
+      // '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
+      // '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca',
+      // '0x7D960F3313f3cB1BBB6BF67419d303597F3E2Fa8',
+      // '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF',
+      // '0x77b7CD137Dd9d94e7056f78308D7F65D2Ce68910',
+      // '0x30010039Ea4a0c4fa1Ac051E8aF948239678353d',
+      // '0x57e848A6915455a7e77CF0D55A1474bEFd9C374d',
+      // '0xB361a3E75Bc2Ae6c8A045b3A43E2B0c9aD890d48',
+      // from vault WETH yVault 0xa258C4606Ca8206D8aA700cE2143D7db854D168c
+      // '0xec2DB4A1Ad431CC3b102059FA91Ba643620F0826',
+      // '0xC5e385f7Dad49F230AbD53e21b06aA0fE8dA782D',
+      // '0x37770F958447fFa1571fc9624BFB3d673161f37F',
+      // '0xd28b508EA08f14A473a5F332631eA1972cFd7cC0',
+    ];
+
     // custom maxReportDelay and amount:
     const strategies = [...baseStrategies, ...manualHarvestStrategies];
 
@@ -54,6 +71,10 @@ function promptAndSubmit(): Promise<void | Error> {
 
       for (const strategy of strategies) {
         console.log('strategy', strategy.address);
+        if (strategiesToAvoid.indexOf(strategy.address) != -1) {
+          console.log('avoiding...');
+          continue;
+        }
         strategy.contract = await ethers.getContractAt(
           'IBaseStrategy',
           strategy.address,

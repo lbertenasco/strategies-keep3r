@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 
 import "../interfaces/oracle/IYOracle.sol";
@@ -13,7 +12,7 @@ contract YUnsafeOracleV1 is UtilsReady, IYOracle {
 
     mapping(address => address) public override pairOracle;
 
-    constructor(address _defaultOracle) public UtilsReady() {
+    constructor(address _defaultOracle) UtilsReady() {
         _setOracle(_defaultOracle);
     }
 

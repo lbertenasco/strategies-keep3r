@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 import "./V2QueueKeep3rJob.sol";
 
@@ -18,7 +18,6 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         address _v2Keeper,
         uint256 _workCooldown
     )
-        public
         V2QueueKeep3rJob(
             _mechanicsRegistry,
             _stealthRelayer,
@@ -32,7 +31,10 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
             _v2Keeper,
             _workCooldown
         )
-    {}
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
@@ -52,7 +54,7 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper(msg.sender) returns (uint256 _credits) {
         _credits = _workInternal(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }
