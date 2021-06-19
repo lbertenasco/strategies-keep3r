@@ -58,7 +58,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'mUSD',
     wantSymbol: 'musd3CRV',
     added: true,
     address: '0xf9fF7f463A7e6f43d4E65c230D3743355fC954e4',
@@ -67,7 +67,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'UST',
     wantSymbol: 'ust3CRV',
     added: true,
     address: '0xbf811462955DEeD9aaD62EFE771E34e8B5811857',
@@ -76,7 +76,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'AAVE',
     wantSymbol: 'a3CRV',
     added: true,
     address: '0xB11FC91DF59ADc604485f1B25ABa1F96A685473f',
@@ -85,7 +85,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'SAAVE',
     wantSymbol: 'saCRV',
     added: true,
     address: '0x106838c85Ab33F41567F7AbCfF787d7269E824AF',
@@ -94,7 +94,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'sUSD',
     wantSymbol: 'crvPlain3andSUSD',
     added: true,
     address: '0x9730F52AB5BcEc960bE41b0fE4913a09c0B57066',
@@ -103,7 +103,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'USDN',
     wantSymbol: 'usdn3CRV',
     added: true,
     address: '0x23a09D84e50fF3fDFa270308851443734b0a4b6D',
@@ -112,7 +112,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'USDP',
     wantSymbol: 'usdp3CRV',
     added: true,
     address: '0x94fA3A90E680f6b866545C904D1dc9DEe6416de9',
@@ -121,7 +121,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'LUSD',
     wantSymbol: 'LUSD3CRV-f',
     added: true,
     address: '0xE13C452b5F10686366C2183964341A01A24d9984',
@@ -130,7 +130,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'FRAX',
     wantSymbol: 'FRAX3CRV-f',
     added: true,
     address: '0x8423590CD0343c4E18d35aA780DF50a5751bebae',
@@ -139,7 +139,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'BUSD',
     wantSymbol: 'BUSD3CRV-f',
     added: true,
     address: '0xD670439D889f9Eb16497d8D6EA9a5E549ae5bFF5',
@@ -148,7 +148,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'TUSD',
     wantSymbol: 'TUSD3CRV-f',
     added: true,
     address: '0xF088aC5ebf8423b894903312AaC8Ac42c3Ab3A02',
@@ -157,7 +157,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'ALUSD',
     wantSymbol: 'ALUSD3CRV-f',
     added: true,
     address: '0x31CD90D60516ED18750bA49b2C9d1053190F40d9',
@@ -166,7 +166,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'ankrETH',
     wantSymbol: 'ankrCRV',
     added: true,
     address: '0x32EF165F2ABbdbE7dcC25B86EdB14a2C0dc52571',
@@ -175,7 +175,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'rETH',
     wantSymbol: 'rCRV',
     added: true,
     address: '0x16468a3999d931Dd6b6ffA0086Cf195D6C5BDAFA',
@@ -184,7 +184,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'LINK',
     wantSymbol: 'linkCRV',
     added: true,
     address: '0x0E94D346D8A53FEF83484b178a581695E0001E55',
@@ -193,7 +193,7 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    name: 'undefined',
+    name: 'EURS',
     wantSymbol: 'eursCRV',
     added: true,
     address: '0x53cE22d5b4F667eC73710d428E828Cd96E9a37C9',
