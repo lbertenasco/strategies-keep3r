@@ -10,6 +10,12 @@ export const manualHarvestStrategies = [
     amount: e18.mul(3),
   },
   {
+    name: 'convex_bbtc',
+    address: '0xE9ac8D34C546CBfdAD98F9a4546Db5fE08D01bF2',
+    maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
+    amount: e18.mul(3),
+  },
+  {
     name: 'convex_obtc',
     address: '0xDb2D3F149270630382D4E6B4dbCd47e665D78D76',
     maxReportDelay: 60 * 60 * 24 * 2, // 2 days
@@ -25,6 +31,18 @@ export const manualHarvestStrategies = [
     name: 'convex_sbtc',
     address: '0x7aB4DB515bf258A88Bb14f3685769a0f70B8778f',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    amount: e18.mul(3),
+  },
+  {
+    name: 'convex_tbtc',
+    address: '0x07fb6A53185E2F095253099A47F34CD410eB2A89',
+    maxReportDelay: 60 * 60 * 24 * 4, // 4 days
+    amount: e18.mul(3),
+  },
+  {
+    name: 'convex_rbtc',
+    address: '0x7799F476522Ebe259fc525C1A21E84f7Dd551955',
+    maxReportDelay: 60 * 60 * 24 * 4, // 4 days
     amount: e18.mul(3),
   },
   /* ETH */
