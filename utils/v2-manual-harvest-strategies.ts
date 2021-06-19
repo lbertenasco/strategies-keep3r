@@ -1,6 +1,7 @@
 import { e18 } from './web3-utils';
 
 export const manualHarvestStrategies = [
+  /* BTC */
   {
     /* BTC */
     name: 'convex_hcrv',
