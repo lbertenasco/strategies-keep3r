@@ -4,6 +4,7 @@ export const defaultRequiredHarvestAmount = e18.mul(10_000);
 
 export const v2CrvStrategies = [
   {
+    /* STABLECOINS */
     name: 'yUSD',
     wantSymbol: 'yDAI+yUSDC+yUSDT+yTUSD',
     added: true,
@@ -165,6 +166,7 @@ export const v2CrvStrategies = [
     requiredEarn: { amount: 100_000, decimals: 18 },
     profitFactor: 1,
   },
+  /* ETH */
   {
     name: 'ankrETH',
     wantSymbol: 'ankrCRV',
@@ -183,6 +185,7 @@ export const v2CrvStrategies = [
     requiredEarn: { amount: 15, decimals: 18 },
     profitFactor: 1,
   },
+  /* MISC */
   {
     name: 'LINK',
     wantSymbol: 'linkCRV',
@@ -201,6 +204,7 @@ export const v2CrvStrategies = [
     requiredEarn: { amount: 100_000, decimals: 18 },
     profitFactor: 1,
   },
+  /* BTC */
   {
     name: 'hbtc',
     wantSymbol: 'hCRV',
