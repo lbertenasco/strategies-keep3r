@@ -127,6 +127,12 @@ export const manualHarvestStrategies = [
     amount: e18.mul(50000),
   },
   {
+    name: 'convex_husd',
+    address: '0xdC929e76081a78e5c32552C2e79D29ECab3F6755',
+    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    amount: e18.mul(10000),
+  },
+  {
     name: 'convex_dusd',
     address: '0x33d7E0Fa2c7Db85Ef3AbC1C44e07E0b5cB2E4C14',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
