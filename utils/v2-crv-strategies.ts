@@ -77,6 +77,15 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
+    name: 'HUSD',
+    wantSymbol: 'husd3CRV',
+    added: true,
+    address: '0x5ED527A2cfC5411EB63b12E46e270b07b6813824',
+    requiredHarvestAmount: e18.mul(3000),
+    requiredEarn: { amount: 10_000, decimals: 18 },
+    profitFactor: 1,
+  },
+  {
     name: 'AAVE',
     wantSymbol: 'a3CRV',
     added: true,
@@ -202,6 +211,15 @@ export const v2CrvStrategies = [
     address: '0x53cE22d5b4F667eC73710d428E828Cd96E9a37C9',
     requiredHarvestAmount: e18.mul(10000),
     requiredEarn: { amount: 100_000, decimals: 18 },
+    profitFactor: 1,
+  },
+  {
+    name: 'TRICRYPTO',
+    wantSymbol: 'triCRV',
+    added: true,
+    address: '',
+    requiredHarvestAmount: e18.mul(3000),
+    requiredEarn: { amount: 10_000, decimals: 18 },
     profitFactor: 1,
   },
   /* BTC */
