@@ -1,9 +1,16 @@
 import { e18 } from './web3-utils';
 
 export const manualHarvestStrategies = [
+  /* BTC */
   {
     name: 'convex_hcrv',
     address: '0x7Ed0d52C5944C7BF92feDC87FEC49D474ee133ce',
+    maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
+    amount: e18.mul(3),
+  },
+  {
+    name: 'convex_bbtc',
+    address: '0xE9ac8D34C546CBfdAD98F9a4546Db5fE08D01bF2',
     maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
     amount: e18.mul(3),
   },
@@ -26,6 +33,19 @@ export const manualHarvestStrategies = [
     amount: e18.mul(3),
   },
   {
+    name: 'convex_tbtc',
+    address: '0x07fb6A53185E2F095253099A47F34CD410eB2A89',
+    maxReportDelay: 60 * 60 * 24 * 4, // 4 days
+    amount: e18.mul(3),
+  },
+  {
+    name: 'convex_rbtc',
+    address: '0x7799F476522Ebe259fc525C1A21E84f7Dd551955',
+    maxReportDelay: 60 * 60 * 24 * 4, // 4 days
+    amount: e18.mul(3),
+  },
+  /* ETH */
+  {
     name: 'convex_ankr',
     address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
@@ -37,6 +57,7 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
     amount: e18.mul(15),
   },
+  /* MISC */
   {
     name: 'convex_link',
     address: '0xb7f013426d33fe27e4E8ABEE58500268554736bD',
@@ -49,6 +70,7 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
     amount: e18.mul(100000),
   },
+  /* STABLECOINS */
   {
     name: 'convex_usdp',
     address: '0xfb0702469A1a0440E87C06605461E8660FD0F43d',
@@ -102,6 +124,12 @@ export const manualHarvestStrategies = [
     address: '0x0921E388e86bbE0356e37413F946ccE47EDd294D',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
     amount: e18.mul(50000),
+  },
+  {
+    name: 'convex_husd',
+    address: '0xdC929e76081a78e5c32552C2e79D29ECab3F6755',
+    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    amount: e18.mul(10000),
   },
   {
     name: 'convex_dusd',
@@ -160,19 +188,19 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_ironbank',
     address: '0x864F408B422B7d33416AC678b1a1A7E6fbcF5C8c',
-    maxReportDelay: 60 * 60 * 14, // 14 hours
+    maxReportDelay: 60 * 60 * 15, // 15 hours
     amount: e18.mul(5000000),
   },
   {
     name: 'convex_seth',
     address: '0xc2fC89E79D4Fd2570dD9B413b851F38076bCd930',
-    maxReportDelay: 60 * 60 * 45, // 45 hours
+    maxReportDelay: 60 * 60 * 46, // 46 hours
     amount: e18.mul(200),
   },
   {
     name: 'convex_steth',
     address: '0x6C0496fC55Eb4089f1Cf91A4344a2D56fAcE51e3',
-    maxReportDelay: 60 * 60 * 26, // 26 hours
+    maxReportDelay: 60 * 60 * 35, // 35 hours
     amount: e18.mul(300),
   },
   {
