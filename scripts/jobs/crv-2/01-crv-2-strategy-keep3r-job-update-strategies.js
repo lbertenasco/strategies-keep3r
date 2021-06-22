@@ -66,6 +66,7 @@ function run() {
 
     // Checks if local data matches chain data
     for (const strategy of v2CrvStrategies) {
+      console.log(strategy.name);
       const requiredHarvest = await crvStrategyKeep3rJob2.requiredHarvest(
         strategy.address
       );
