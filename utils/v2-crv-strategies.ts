@@ -218,8 +218,8 @@ export const v2CrvStrategies = [
     wantSymbol: 'triCRV',
     added: true,
     address: '',
-    requiredHarvestAmount: e18.mul(3000),
-    requiredEarn: { amount: 10_000, decimals: 18 },
+    requiredHarvestAmount: e18.mul(5000),
+    requiredEarn: { amount: 100, decimals: 18 },
     profitFactor: 1,
   },
   /* BTC */
