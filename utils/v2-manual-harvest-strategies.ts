@@ -208,4 +208,10 @@ export const manualHarvestStrategies = [
     address: '0x5d411d2cde10e138d68517c42be2808c90c22026',
     amount: e18.mul(1000000),
   },
+  // unknown
+  {
+    name: 'sam_unknown',
+    address: '0x55ec3771376b6E1E4cA88D0eEa5e42A448f51C7F',
+    maxReportDelay: 60 * 60 * 8, // 8 hours
+  },
 ];
