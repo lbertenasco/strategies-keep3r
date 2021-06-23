@@ -64,12 +64,12 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
     amount: e18.mul(3000),
   },
-  {
-    name: 'convex_eurs',
-    address: '0x4DC2CCC9E76bD30982243C1cB915003e17a88Eb9',
-    maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
-    amount: e18.mul(100000),
-  },
+  // { // Deprecated due to low liquidity on pool
+  //   name: 'convex_eurs',
+  //   address: '0x4DC2CCC9E76bD30982243C1cB915003e17a88Eb9',
+  //   maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
+  //   amount: e18.mul(100000),
+  // },
   /* STABLECOINS */
   {
     name: 'convex_usdp',
