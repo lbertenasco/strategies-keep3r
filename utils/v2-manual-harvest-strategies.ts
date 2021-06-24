@@ -70,6 +70,12 @@ export const manualHarvestStrategies = [
   //   maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
   //   amount: e18.mul(100000),
   // },
+  {
+    name: 'convex_tricrypto',
+    address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
+    maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
+    amount: e18.mul(100),
+  },
   /* STABLECOINS */
   {
     name: 'convex_usdp',
