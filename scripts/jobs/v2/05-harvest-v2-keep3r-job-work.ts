@@ -31,7 +31,7 @@ function promptAndSubmit(): Promise<void | Error> {
       signer
     );
     const harvestV2Keep3rJob = await ethers.getContractAt(
-      'HarvestV2Keep3rJob',
+      'V2Keep3rJob',
       config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
     );
     let strategiesAddresses: string[] = await harvestV2Keep3rJob.callStatic.strategies();
@@ -49,16 +49,26 @@ function promptAndSubmit(): Promise<void | Error> {
     // custom maxReportDelay and amount:
     const strategies = [...baseStrategies, ...manualHarvestStrategies];
 
+    let harvestedCRV = false;
     try {
       const now = bn.from(Math.round(new Date().valueOf() / 1000));
 
       for (const strategy of strategies) {
-        console.log('strategy', strategy.address);
+        if (strategy.name)
+          console.log('strategy', strategy.name, strategy.address);
+        else console.log('strategy', strategy.address);
+        // if (strategiesToAvoid.indexOf(strategy.address) != -1) {
+        //   console.log('avoiding...');
+        //   continue;
+        // }
         strategy.contract = await ethers.getContractAt(
           'IBaseStrategy',
           strategy.address,
           signer
         );
+        try {
+          strategy.isCRV = !!(await strategy.contract.callStatic.crv());
+        } catch (error) {}
         strategy.maxReportDelay = strategy.maxReportDelay
           ? bn.from(strategy.maxReportDelay)
           : await strategy.contract.callStatic.maxReportDelay();
@@ -117,6 +127,10 @@ function promptAndSubmit(): Promise<void | Error> {
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
         await v2Keeper.callStatic.harvest(strategy.address);
+        if (strategy.isCRV && harvestedCRV) {
+          console.log('already harvested a CRV strat this cycle, skipping...');
+          continue;
+        }
         console.log('working...');
 
         continue;
@@ -179,6 +193,7 @@ function promptAndSubmit(): Promise<void | Error> {
             console.log(query.obj);
           }
         }
+        if (strategy.isCRV) harvestedCRV = true;
       }
       console.log('waiting 10 minutes...');
     } catch (err) {
