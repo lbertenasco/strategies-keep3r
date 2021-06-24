@@ -213,15 +213,15 @@ export const v2CrvStrategies = [
     requiredEarn: { amount: 100_000, decimals: 18 },
     profitFactor: 1,
   },
-  // {
-  //   name: 'TRICRYPTO',
-  //   wantSymbol: 'triCRV',
-  //   added: true,
-  //   address: '',
-  //   requiredHarvestAmount: e18.mul(5000),
-  //   requiredEarn: { amount: 100, decimals: 18 },
-  //   profitFactor: 1,
-  // },
+  {
+    name: 'TRICRYPTO',
+    wantSymbol: 'triCRV',
+    added: true,
+    address: '0x4ce03bCFC3122eB0F724b94913629c6062949947',
+    requiredHarvestAmount: e18.mul(10000),
+    requiredEarn: { amount: 100, decimals: 18 },
+    profitFactor: 1,
+  },
   /* BTC */
   {
     name: 'hbtc',
