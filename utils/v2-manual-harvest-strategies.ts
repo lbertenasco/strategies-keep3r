@@ -194,19 +194,19 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_ironbank',
     address: '0x864F408B422B7d33416AC678b1a1A7E6fbcF5C8c',
-    maxReportDelay: 60 * 60 * 15, // 15 hours
+    maxReportDelay: 60 * 60 * 22, // 22 hours
     amount: e18.mul(5000000),
   },
   {
     name: 'convex_seth',
     address: '0xc2fC89E79D4Fd2570dD9B413b851F38076bCd930',
-    maxReportDelay: 60 * 60 * 46, // 46 hours
+    maxReportDelay: 60 * 60 * 90, // 90 hours
     amount: e18.mul(200),
   },
   {
     name: 'convex_steth',
     address: '0x6C0496fC55Eb4089f1Cf91A4344a2D56fAcE51e3',
-    maxReportDelay: 60 * 60 * 35, // 35 hours
+    maxReportDelay: 60 * 60 * 45, // 45 hours
     amount: e18.mul(300),
   },
   {
