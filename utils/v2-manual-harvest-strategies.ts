@@ -64,12 +64,12 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
     amount: e18.mul(5000),
   },
-  // { // Deprecated due to low liquidity on pool
-  //   name: 'convex_eurs',
-  //   address: '0x4DC2CCC9E76bD30982243C1cB915003e17a88Eb9',
-  //   maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
-  //   amount: e18.mul(100000),
-  // },
+  {
+    name: 'convex_eurs',
+    address: '0xC45b3312c0DE684301a58A1eee558151BBE8f45c',
+    maxReportDelay: 60 * 60 * 24 * 1.5, // 1.5 days
+    amount: e18.mul(100000),
+  },
   {
     name: 'convex_tricrypto',
     address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
