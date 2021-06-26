@@ -208,7 +208,7 @@ export const v2CrvStrategies = [
     name: 'EURS',
     wantSymbol: 'eursCRV',
     added: true,
-    address: '0x53cE22d5b4F667eC73710d428E828Cd96E9a37C9',
+    address: '0xd61216954cC49d164Fa3d3cE27823310A61FF46F',
     requiredHarvestAmount: e18.mul(10000),
     requiredEarn: { amount: 100_000, decimals: 18 },
     profitFactor: 1,
