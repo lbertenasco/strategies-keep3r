@@ -4,13 +4,13 @@ import { Contract, ContractFactory } from 'ethers';
 
 // Example file for Yearn Test
 
-describe('CrvStrategyKeep3r', function () {
+describe('CrvStrategyKeep3rJob', function () {
   let crvStrategyKeep3rContract: ContractFactory;
   // let crvStrategyKeep3r: Contract;
 
   before('Setup accounts and contracts', async () => {
     crvStrategyKeep3rContract = await ethers.getContractFactory(
-      'CrvStrategyKeep3r'
+      'CrvStrategyKeep3rJob'
     );
   });
 
@@ -25,7 +25,7 @@ describe('CrvStrategyKeep3r', function () {
     // );
   });
 
-  describe('isCrvStrategyKeep3r', () => {
+  describe('isCrvStrategyKeep3rJob', () => {
     it('returns true', async () => {
       expect(true).to.be.true;
     });
