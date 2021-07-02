@@ -2,9 +2,9 @@
 
 pragma solidity 0.8.4;
 
-import "./V2QueueKeep3rJob.sol";
+import "./V2QueueKeep3rStealthJob.sol";
 
-contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
+contract HarvestV2QueueKeep3rStealthJob is V2QueueKeep3rStealthJob {
     constructor(
         address _mechanicsRegistry,
         address _stealthRelayer,
@@ -18,7 +18,7 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         address _v2Keeper,
         uint256 _workCooldown
     )
-        V2QueueKeep3rJob(
+        V2QueueKeep3rStealthJob(
             _mechanicsRegistry,
             _stealthRelayer,
             _yOracle, /*TODO:_yOracle*/
@@ -54,8 +54,10 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper(msg.sender) returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer returns (uint256 _credits) {
+        address _keeper = IStealthRelayer(stealthRelayer).caller();
+        _isKeeper(_keeper);
         _credits = _workInternal(_strategy);
-        _paysKeeperAmount(msg.sender, _credits);
+        _paysKeeperAmount(_keeper, _credits);
     }
 }

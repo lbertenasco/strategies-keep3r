@@ -51,8 +51,10 @@ contract HarvestV2Keep3rStealthJob is V2Keep3rStealthJob {
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyStealthKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer returns (uint256 _credits) {
+        address _keeper = IStealthRelayer(stealthRelayer).caller();
+        _isKeeper(_keeper);
         _credits = _workInternal(_strategy);
-        _paysKeeperAmount(msg.sender, _credits);
+        _paysKeeperAmount(_keeper, _credits);
     }
 }

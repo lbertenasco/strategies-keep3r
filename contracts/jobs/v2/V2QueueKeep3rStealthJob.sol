@@ -8,12 +8,13 @@ import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1Helper.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 import "@lbertenasco/bonded-stealth-tx/contracts/utils/OnlyStealthRelayer.sol";
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
+import "../../interfaces/stealth/IStealthRelayer.sol";
 
 import "../../interfaces/jobs/v2/IV2QueueKeep3rJob.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
-abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2QueueKeep3rJob {
+abstract contract V2QueueKeep3rStealthJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2QueueKeep3rJob {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -214,7 +215,9 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
     }
 
     // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
+    function forceWork(address _strategy) external override onlyStealthRelayer {
+        address _caller = IStealthRelayer(stealthRelayer).caller();
+        require(isGovernor(_caller) || isMechanic(_caller), "V2Keep3rStealthJob::forceWork:invalid-stealth-caller");
         _forceWork(_strategy);
     }
 

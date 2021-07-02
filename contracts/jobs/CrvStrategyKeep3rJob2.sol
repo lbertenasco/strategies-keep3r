@@ -10,6 +10,7 @@ import "../interfaces/jobs/ICrvStrategyKeep3rJob.sol";
 import "../interfaces/jobs/ICrvStrategyKeep3rJobV2.sol";
 import "../interfaces/jobs/v2/IV2Keeper.sol";
 import "../interfaces/keep3r/IKeep3rEscrow.sol";
+import "../interfaces/stealth/IStealthRelayer.sol";
 
 import "../interfaces/yearn/IV1Controller.sol";
 import "../interfaces/yearn/IV1Vault.sol";
@@ -265,9 +266,11 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
         IV2Keeper(v2Keeper).harvest(_strategy);
     }
 
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper(msg.sender) returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer returns (uint256 _credits) {
+        address _keeper = IStealthRelayer(stealthRelayer).caller();
+        _isKeeper(_keeper);
         _credits = _work(_strategy);
-        _paysKeeperAmount(msg.sender, _credits);
+        _paysKeeperAmount(_keeper, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
@@ -276,7 +279,9 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
     }
 
     // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
+    function forceWork(address _strategy) external override onlyStealthRelayer {
+        address _caller = IStealthRelayer(stealthRelayer).caller();
+        require(isGovernor(_caller) || isMechanic(_caller), "V2Keep3rStealthJob::forceWork:invalid-stealth-caller");
         _forceWork(_strategy);
     }
 

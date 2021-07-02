@@ -30,19 +30,15 @@ abstract contract V2Keep3rStealthJob is V2Keep3rJob, OnlyStealthRelayer, IV2Keep
 
     }
 
-    // StealthRelayer custom isKeep3r modifier
-    modifier onlyStealthKeeper() {
-        _isKeeper(IStealthRelayer(stealthRelayer).caller());
-        _;
-    }
-
     // Stealth Relayer Setters
     function setStealthRelayer(address _stealthRelayer) external override onlyGovernor {
         _setStealthRelayer(_stealthRelayer);
     }
 
     // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
+    function forceWork(address _strategy) external override onlyStealthRelayer {
+        address _caller = IStealthRelayer(stealthRelayer).caller();
+        require(isGovernor(_caller) || isMechanic(_caller), "V2Keep3rStealthJob::forceWork:invalid-stealth-caller");
         _forceWork(_strategy);
     }
 
