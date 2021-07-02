@@ -192,7 +192,7 @@ abstract contract V2QueueKeep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r
         require(_mainStrategyWorkable(_strategy), "V2QueueKeep3rJob::work:main-not-workable");
         bool mainWorked = false;
 
-        for (uint256 _index = 0; _index < strategyQueue[_strategy].length; _index++) {
+        for (uint256 _index; _index < strategyQueue[_strategy].length; _index++) {
             uint256 _ethAmount = strategyAmounts[_strategy][_index] * _ethGasPrice;
             if (_strategyTrigger(strategyQueue[_strategy][_index], _ethAmount)) {
                 _work(strategyQueue[_strategy][_index]);
