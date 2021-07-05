@@ -214,4 +214,26 @@ export const manualHarvestStrategies = [
     address: '0x5d411d2cde10e138d68517c42be2808c90c22026',
     amount: e18.mul(1000000),
   },
+  // sam unknown
+  {
+    name: 'sam_unknown_1',
+    address: '0xF2E9e8eae24deA1a5d40F3a105677AF1797A47D3',
+    maxReportDelay: 60 * 60 * 12, // 12 hours
+  },
+  {
+    name: 'sam_unknown_2',
+    address: '0xE6c78b85f93c25B8EE7d963fD15d1d53a00F5908',
+    maxReportDelay: 60 * 60 * 12, // 12 hours
+  },
+  // orb unknown
+  {
+    name: 'orb_unknown_1',
+    address: '0x8c44Cc5c0f5CD2f7f17B9Aca85d456df25a61Ae8',
+    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+  },
+  {
+    name: 'orb_unknown_2',
+    address: '0xCdC3d3A18c9d83Ee6E10E91B48b1fcb5268C97B5',
+    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+  },
 ];
