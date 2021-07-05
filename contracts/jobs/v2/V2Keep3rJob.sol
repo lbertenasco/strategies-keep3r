@@ -1,23 +1,21 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1Helper.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
-import "../../utils/OnlyStealthRelayer.sol";
 
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
-
 import "../../interfaces/jobs/v2/IV2Keep3rJob.sol";
+
 import "../../interfaces/yearn/IBaseStrategy.sol";
 import "../../interfaces/oracle/IYOracle.sol";
 import "../../interfaces/keep3r/IChainLinkFeed.sol";
 
-abstract contract V2Keep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2Keep3rJob {
-    using SafeMath for uint256;
+abstract contract V2Keep3rJob is MachineryReady, Keep3r, IV2Keep3rJob {
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address public override fastGasOracle = 0x169E633A2D1E6c10dD91238Ba11c4A708dfEF37C;
@@ -43,7 +41,6 @@ abstract contract V2Keep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2
 
     constructor(
         address _mechanicsRegistry,
-        address _stealthRelayer,
         address _yOracle,
         address _keep3r,
         address _bond,
@@ -53,16 +50,11 @@ abstract contract V2Keep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2
         bool _onlyEOA,
         address _v2Keeper,
         uint256 _workCooldown
-    ) public MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
+    ) MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setYOracle(_yOracle);
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         V2Keeper = IV2Keeper(_v2Keeper);
         if (_workCooldown > 0) _setWorkCooldown(_workCooldown);
-    }
-
-    // Stealth Relayer Setters
-    function setStealthRelayer(address _stealthRelayer) external override onlyGovernor {
-        _setStealthRelayer(_stealthRelayer);
     }
 
     // Keep3r Setters
@@ -221,14 +213,14 @@ abstract contract V2Keep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2
     // Keeper view actions (internal)
     function _workable(address _strategy) internal view virtual returns (bool) {
         require(_availableStrategies.contains(_strategy), "V2Keep3rJob::workable:strategy-not-added");
-        if (workCooldown == 0 || block.timestamp > lastWorkAt[_strategy].add(workCooldown)) return true;
+        if (workCooldown == 0 || block.timestamp > lastWorkAt[_strategy] + workCooldown) return true;
         return false;
     }
 
     // Get eth costs
     function _getCallCosts(address _strategy) internal view returns (uint256 _callCost) {
         if (requiredAmount[_strategy] == 0) return 0;
-        uint256 _ethCost = requiredAmount[_strategy].mul(uint256(IChainLinkFeed(fastGasOracle).latestAnswer()));
+        uint256 _ethCost = requiredAmount[_strategy] * uint256(IChainLinkFeed(fastGasOracle).latestAnswer());
         if (costToken[_strategy] == address(0)) return _ethCost;
         return IYOracle(yOracle).getAmountOut(costPair[_strategy], WETH, _ethCost, costToken[_strategy]);
     }
@@ -247,16 +239,7 @@ abstract contract V2Keep3rJob is MachineryReady, OnlyStealthRelayer, Keep3r, IV2
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
-    }
-
-    // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
-        _forceWork(_strategy);
-    }
-
-    function forceWorkUnsafe(address _strategy) external override onlyGovernorOrMechanic {
-        _forceWork(_strategy);
+        return (_getQuoteLimitFor(msg.sender, _initialGas) * rewardMultiplier) / PRECISION;
     }
 
     function _forceWork(address _strategy) internal {

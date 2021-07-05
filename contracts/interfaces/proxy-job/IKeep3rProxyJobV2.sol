@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3r.sol";
 
 interface IKeep3rProxyJobV2 is IKeep3r {

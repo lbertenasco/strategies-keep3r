@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/UtilsReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
@@ -12,7 +11,6 @@ import "../interfaces/proxy-job/IKeep3rProxyJob.sol";
 import "../interfaces/proxy-job/IKeep3rJob.sol";
 
 contract Keep3rProxyJob is UtilsReady, Keep3r, IKeep3rProxyJob {
-    using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     EnumerableSet.AddressSet internal _validJobs;

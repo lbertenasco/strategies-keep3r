@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "./V2QueueKeep3rJob.sol";
+import "./V2Keep3rStealthJob.sol";
 
-contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
+contract HarvestV2Keep3rStealthJob is V2Keep3rStealthJob {
     constructor(
         address _mechanicsRegistry,
         address _stealthRelayer,
@@ -18,11 +18,10 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
         address _v2Keeper,
         uint256 _workCooldown
     )
-        public
-        V2QueueKeep3rJob(
+        V2Keep3rStealthJob(
             _mechanicsRegistry,
             _stealthRelayer,
-            _yOracle, /*TODO:_yOracle*/
+            _yOracle,
             _keep3r,
             _bond,
             _minBond,
@@ -32,28 +31,30 @@ contract HarvestV2QueueKeep3rJob is V2QueueKeep3rJob {
             _v2Keeper,
             _workCooldown
         )
-    {}
+    // solhint-disable-next-line no-empty-blocks
+    {
+
+    }
 
     function workable(address _strategy) external view override returns (bool) {
         return _workable(_strategy);
     }
 
     function _workable(address _strategy) internal view override returns (bool) {
-        return super._workable(_strategy);
-    }
-
-    function _strategyTrigger(address _strategy, uint256 _amount) internal view override returns (bool) {
-        if (_amount == 0) return true; // Force harvest on amount 0
-        return IBaseStrategy(_strategy).harvestTrigger(_amount);
+        if (!super._workable(_strategy)) return false;
+        return IBaseStrategy(_strategy).harvestTrigger(_getCallCosts(_strategy));
     }
 
     function _work(address _strategy) internal override {
-        IV2Keeper(v2Keeper).harvest(_strategy);
+        lastWorkAt[_strategy] = block.timestamp;
+        V2Keeper.harvest(_strategy);
     }
 
     // Keep3r actions
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer returns (uint256 _credits) {
+        address _keeper = IStealthRelayer(stealthRelayer).caller();
+        _isKeeper(_keeper);
         _credits = _workInternal(_strategy);
-        _paysKeeperAmount(msg.sender, _credits);
+        _paysKeeperAmount(_keeper, _credits);
     }
 }

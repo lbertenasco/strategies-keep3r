@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
-import "../utils/OnlyStealthRelayer.sol";
+import "@lbertenasco/bonded-stealth-tx/contracts/utils/OnlyStealthRelayer.sol";
 
 import "../interfaces/jobs/ICrvStrategyKeep3rJob.sol";
 import "../interfaces/jobs/ICrvStrategyKeep3rJobV2.sol";
 import "../interfaces/jobs/v2/IV2Keeper.sol";
 import "../interfaces/keep3r/IKeep3rEscrow.sol";
+import "../interfaces/stealth/IStealthRelayer.sol";
 
 import "../interfaces/yearn/IV1Controller.sol";
 import "../interfaces/yearn/IV1Vault.sol";
@@ -19,7 +19,7 @@ import "../interfaces/crv/ICrvStrategy.sol";
 import "../interfaces/crv/ICrvClaimable.sol";
 
 contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
-    using SafeMath for uint256;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
@@ -51,7 +51,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
         uint256 _maxHarvestPeriod,
         uint256 _harvestCooldown,
         address _v2Keeper
-    ) public MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
+    ) MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
         _setHarvestCooldown(_harvestCooldown);
@@ -221,9 +221,9 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
     function _workable(address _strategy) internal returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
         // ensures no other strategy has been harvested for at least the harvestCooldown
-        if (block.timestamp < lastHarvest.add(harvestCooldown)) return false;
+        if (block.timestamp < lastHarvest + harvestCooldown) return false;
         // if strategy has exceeded maxHarvestPeriod, force workable true
-        if (block.timestamp > lastWorkAt[_strategy].add(maxHarvestPeriod)) return true;
+        if (block.timestamp > lastWorkAt[_strategy] + maxHarvestPeriod) return true;
         // if V2, check harvestTrigger for "earn"
         if (!strategyIsV1[_strategy] && IBaseStrategy(_strategy).harvestTrigger(requiredEarn[_strategy])) return true;
         return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
@@ -266,18 +266,22 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
         IV2Keeper(v2Keeper).harvest(_strategy);
     }
 
-    function work(address _strategy) external override notPaused onlyStealthRelayer onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyStealthRelayer returns (uint256 _credits) {
+        address _keeper = IStealthRelayer(stealthRelayer).caller();
+        _isKeeper(_keeper);
         _credits = _work(_strategy);
-        _paysKeeperAmount(msg.sender, _credits);
+        _paysKeeperAmount(_keeper, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
+        return (_getQuoteLimitFor(msg.sender, _initialGas) * rewardMultiplier) / PRECISION;
     }
 
     // Mechanics keeper bypass
-    function forceWork(address _strategy) external override onlyGovernorOrMechanic onlyStealthRelayer {
+    function forceWork(address _strategy) external override onlyStealthRelayer {
+        address _caller = IStealthRelayer(stealthRelayer).caller();
+        require(isGovernor(_caller) || isMechanic(_caller), "V2Keep3rStealthJob::forceWork:invalid-stealth-caller");
         _forceWork(_strategy);
     }
 

@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/interfaces/keep3r/IKeep3rV1.sol";
@@ -13,8 +12,6 @@ import "../interfaces/jobs/IKeep3rEscrowJob.sol";
 import "../interfaces/keep3r/IKeep3rEscrow.sol";
 
 contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
-    using SafeMath for uint256;
-
     IKeep3rV1 public Keep3rV1;
     IERC20 public Liquidity;
 

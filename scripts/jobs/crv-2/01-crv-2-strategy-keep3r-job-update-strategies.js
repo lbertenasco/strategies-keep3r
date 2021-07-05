@@ -45,6 +45,25 @@ function run() {
       deployer
     );
 
+    const chainStrategies = await crvStrategyKeep3rJob2.callStatic.strategies();
+    const strategyAddressess = v2CrvStrategies.map(
+      (strategy) => strategy.address
+    );
+    // Checks if there are strategies to remove
+    for (const chainStrategyAddress of chainStrategies) {
+      if (strategyAddressess.indexOf(chainStrategyAddress) != -1) continue;
+      // else, chain strategy is not on local config. remove it!
+      console.log(
+        'chain strategy:',
+        chainStrategyAddress,
+        'is not on the local config file'
+      );
+      console.log(
+        `https://etherscan.io/address/${crvStrategyKeep3rJob2.address}#writeContract`
+      );
+      console.log(`removeStrategy(${chainStrategyAddress})`);
+    }
+
     // Checks if local data matches chain data
     for (const strategy of v2CrvStrategies) {
       const requiredHarvest = await crvStrategyKeep3rJob2.requiredHarvest(
