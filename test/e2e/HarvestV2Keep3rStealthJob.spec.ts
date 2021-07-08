@@ -5,6 +5,7 @@ import config from '../../.config.json';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { BigNumber } from 'ethers';
 import * as contracts from '../../utils/contracts';
+import * as yOracleContracts from '@lbertenasco/y-oracle/dist/utils/contracts';
 
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 
@@ -80,7 +81,7 @@ describe('HarvestV2Keep3rStealthJob', () => {
       await HarvestV2Keep3rStealthJob.deploy(
         mechanicsContracts.registry, // address _mechanicsRegistry,
         contracts.stealthRelayer.mainnet, // address _stealthRelayer
-        contracts.stealthRelayer.mainnet, // address _yOracle // TODO!
+        yOracleContracts.yUnsafeOracleV1.mainnet, // address _yOracle
         config.contracts.mainnet.keep3r.address, // address _keep3r,
         ZERO_ADDRESS, // address _bond,
         e18.mul(50), // 50 KP3R required // uint256 _minBond,
