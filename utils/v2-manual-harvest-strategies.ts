@@ -194,7 +194,7 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_ironbank',
     address: '0xf0aAba6bb8E6bAE83Ea984BC4b7dcf0fF54a8FEF',
-    maxReportDelay: 60 * 60 * 30, // 30 hours
+    maxReportDelay: 60 * 60 * 22, // 22 hours
     amount: e18.mul(5000000),
   },
   {
