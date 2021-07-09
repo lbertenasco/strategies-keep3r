@@ -23,12 +23,10 @@ function promptAndSubmit(): Promise<void | Error> {
       const strategies = await crvStrategyKeep3rJob2.callStatic.strategies();
 
       for (const strategy of strategies) {
-        const requiredHarvest = await crvStrategyKeep3rJob2.callStatic.requiredHarvest(
-          strategy
-        );
-        const requiredEarn = await crvStrategyKeep3rJob2.callStatic.requiredEarn(
-          strategy
-        );
+        const requiredHarvest =
+          await crvStrategyKeep3rJob2.callStatic.requiredHarvest(strategy);
+        const requiredEarn =
+          await crvStrategyKeep3rJob2.callStatic.requiredEarn(strategy);
         const strategyData = v2CrvStrategies.find(
           (strategyData: any) => strategyData.address == strategy
         );

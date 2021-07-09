@@ -132,8 +132,11 @@ contract Keep3rEscrowJob is MachineryReady, Keep3rJob, IKeep3rEscrowJob {
                     OtherEscrow.addLiquidityToJob(address(Liquidity), address(Keep3rProxyJob), _amount);
                 } else {
                     //      - if no liquidity to add and liquidityAmountsUnbonding then removeLiquidityFromJob + addLiquidityToJob
-                    uint256 _liquidityAmountsUnbonding =
-                        Keep3rV1.liquidityAmountsUnbonding(address(OtherEscrow), address(Liquidity), address(Keep3rProxyJob));
+                    uint256 _liquidityAmountsUnbonding = Keep3rV1.liquidityAmountsUnbonding(
+                        address(OtherEscrow),
+                        address(Liquidity),
+                        address(Keep3rProxyJob)
+                    );
                     uint256 _liquidityUnbonding = Keep3rV1.liquidityUnbonding(address(OtherEscrow), address(Liquidity), address(Keep3rProxyJob));
                     if (_liquidityAmountsUnbonding > 0 && _liquidityUnbonding < block.timestamp) {
                         OtherEscrow.removeLiquidityFromJob(address(Liquidity), address(Keep3rProxyJob));

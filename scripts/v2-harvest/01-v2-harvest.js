@@ -151,9 +151,8 @@ function promptAndSubmit() {
           strategy.keeperAccount
         );
         strategy.wantSymbol = await strategy.wantContract.callStatic.symbol();
-        strategy.wantBalancePre = await strategy.wantContract.callStatic.balanceOf(
-          strategy.address
-        );
+        strategy.wantBalancePre =
+          await strategy.wantContract.callStatic.balanceOf(strategy.address);
         strategy.decimals = await strategy.wantContract.callStatic.decimals();
         // init default
         strategy.vaultContract = await ethers.getContractAt(
@@ -169,7 +168,8 @@ function promptAndSubmit() {
           strategy.keeperAccount
         );
 
-        strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
+        strategy.vaultTotalAssets =
+          await strategy.vaultContract.callStatic.totalAssets();
       }
 
       for (const strategy of v2Strategies) {
@@ -221,9 +221,8 @@ function promptAndSubmit() {
           strategy.address
         );
         strategy.paramsPost = await getStrategyParams(strategy);
-        strategy.wantBalancePost = await strategy.wantContract.callStatic.balanceOf(
-          strategy.address
-        );
+        strategy.wantBalancePost =
+          await strategy.wantContract.callStatic.balanceOf(strategy.address);
       }
 
       for (const strategy of v2Strategies) {

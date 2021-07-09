@@ -34,7 +34,8 @@ function promptAndSubmit(): Promise<void | Error> {
       'V2Keep3rJob',
       config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
     );
-    let strategiesAddresses: string[] = await harvestV2Keep3rJob.callStatic.strategies();
+    let strategiesAddresses: string[] =
+      await harvestV2Keep3rJob.callStatic.strategies();
 
     // manually add extra strategies
     strategiesAddresses = [
@@ -128,9 +129,10 @@ function promptAndSubmit(): Promise<void | Error> {
         if (!cooldownCompleted) {
           console.log('checking creditAvailable:');
           // vault.creditAvailable(strategy) >= amount -> do a harvest if true.
-          const creditAvailable = await strategy.vaultContract.callStatic.creditAvailable(
-            strategy.address
-          );
+          const creditAvailable =
+            await strategy.vaultContract.callStatic.creditAvailable(
+              strategy.address
+            );
           // if creditAvailable is less than amount, do not harvest;
           console.log(
             'amount:',

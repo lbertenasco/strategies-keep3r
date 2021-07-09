@@ -21,7 +21,8 @@ describe('DforceStrategyKeep3r', function () {
       0,
       true
     );
-    const isDforceStrategyKeep3r = await dforceStrategyKeep3r.isDforceStrategyKeep3r();
+    const isDforceStrategyKeep3r =
+      await dforceStrategyKeep3r.isDforceStrategyKeep3r();
     expect(isDforceStrategyKeep3r).to.be.true;
   });
 

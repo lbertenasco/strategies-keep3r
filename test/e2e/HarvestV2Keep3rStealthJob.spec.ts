@@ -116,7 +116,7 @@ describe('HarvestV2Keep3rStealthJob', () => {
       // },
       {
         name: 'test',
-        address: '0x2923a58c1831205C854DBEa001809B194FDb3Fa5',
+        address: '0xF2E9e8eae24deA1a5d40F3a105677AF1797A47D3',
         requiredAmount: 0,
         costToken: ZERO_ADDRESS,
         costPair: ZERO_ADDRESS,

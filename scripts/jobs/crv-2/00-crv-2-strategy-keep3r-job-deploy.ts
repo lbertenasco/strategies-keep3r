@@ -10,9 +10,8 @@ const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
 
 async function main() {
   await run('compile');
-  const CrvStrategyKeep3rJob2: ContractFactory = await ethers.getContractFactory(
-    'CrvStrategyKeep3rJob2'
-  );
+  const CrvStrategyKeep3rJob2: ContractFactory =
+    await ethers.getContractFactory('CrvStrategyKeep3rJob2');
   await promptAndSubmit(CrvStrategyKeep3rJob2);
 }
 
