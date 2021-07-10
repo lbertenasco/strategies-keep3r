@@ -216,6 +216,11 @@ export const manualHarvestStrategies = [
   },
   // sam unknown
   {
+    name: 'sam_unknown_1',
+    address: '0x4d069f267DaAb537c4ff135556F711c0A6538496',
+    maxReportDelay: 60 * 60 * 8, // 8 hours
+  },
+  {
     name: 'sam_unknown_2',
     address: '0xE6c78b85f93c25B8EE7d963fD15d1d53a00F5908',
     maxReportDelay: 60 * 60 * 8, // 8 hours
@@ -230,5 +235,12 @@ export const manualHarvestStrategies = [
     name: 'orb_unknown_2',
     address: '0xCdC3d3A18c9d83Ee6E10E91B48b1fcb5268C97B5',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+  },
+  // dudesahn unknown
+  {
+    name: 'dude_unknown_1',
+    address: '0x6D892A5585F45f3C45A238C717AA0a228aE69e2C',
+    maxReportDelay: 60 * 60 * 150, // 150 hours
+    amount: e18.mul(5000000),
   },
 ];
