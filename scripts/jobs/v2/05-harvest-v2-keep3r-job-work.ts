@@ -49,7 +49,7 @@ function promptAndSubmit(): Promise<void | Error> {
 
     const strategiesToAvoid: any = [
       // from vault DAI yVault 0x19D3364A399d251E894aC732651be8B0E4e85001
-      // '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
+      '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
       // '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca',
       // '0x7D960F3313f3cB1BBB6BF67419d303597F3E2Fa8',
       // '0x4031afd3B0F71Bace9181E554A9E680Ee4AbE7dF',
@@ -153,7 +153,7 @@ function promptAndSubmit(): Promise<void | Error> {
         }
         console.log('working...');
 
-        continue;
+        // continue;
 
         const gasResponse = await taichi.getGasPrice();
         console.log('taichi gasPrices:', {

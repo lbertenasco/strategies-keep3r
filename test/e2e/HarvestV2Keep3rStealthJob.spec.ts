@@ -188,7 +188,7 @@ describe('HarvestV2Keep3rStealthJob', () => {
       harvestV2Keep3rStealthJob.address, // address _job,
       callData, // bytes memory _callData,
       stealthHash, // bytes32 _stealthHash,
-      blockNumber + 1, // uint256 _blockNumber
+      blockNumber + 2, // uint256 _blockNumber
       { gasLimit: blockGasLimit.sub(15_000) }
     );
 
