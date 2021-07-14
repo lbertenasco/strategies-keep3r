@@ -48,13 +48,13 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_ankr',
     address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    maxReportDelay: 60 * 60 * 24 * 6.84, // 6.84 days
     amount: e18.mul(125),
   },
   {
     name: 'convex_reth',
     address: '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    maxReportDelay: 60 * 60 * 24 * 6.45, // 6.45 days
     amount: e18.mul(125),
   },
   /* MISC */
@@ -67,7 +67,7 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_eurs',
     address: '0xC45b3312c0DE684301a58A1eee558151BBE8f45c',
-    maxReportDelay: 60 * 60 * 24 * 3.4, // 3.4 days, this one should be longer but may have slippage
+    maxReportDelay: 60 * 60 * 24 * 4.1, // 4.1 days
     amount: e18.mul(250000),
   },
   {
@@ -128,7 +128,7 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_ust',
     address: '0x0921E388e86bbE0356e37413F946ccE47EDd294D',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    maxReportDelay: 60 * 60 * 24 * 6.75, // 6.75 days
     amount: e18.mul(250000),
   },
   {
