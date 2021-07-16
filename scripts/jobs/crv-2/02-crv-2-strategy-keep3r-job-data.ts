@@ -3,6 +3,7 @@ import { run, ethers } from 'hardhat';
 import { bnToDecimal } from '../../../utils/web3-utils';
 import config from '../../../.config.json';
 import { v2CrvStrategies } from '../../../utils/v2-crv-strategies';
+import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
 const mainnetContracts = config.contracts.mainnet;
 
 async function main() {
@@ -20,6 +21,8 @@ function promptAndSubmit(): Promise<void | Error> {
         mainnetContracts.jobs.crvStrategyKeep3rJob2
       );
 
+      const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
+
       const strategies = await crvStrategyKeep3rJob2.callStatic.strategies();
 
       for (const strategy of strategies) {
@@ -27,7 +30,7 @@ function promptAndSubmit(): Promise<void | Error> {
           await crvStrategyKeep3rJob2.callStatic.requiredHarvest(strategy);
         const requiredEarn =
           await crvStrategyKeep3rJob2.callStatic.requiredEarn(strategy);
-        const strategyData = v2CrvStrategies.find(
+        const strategyData = crvStrategies.find(
           (strategyData: any) => strategyData.address == strategy
         );
         const strategyContract = await ethers.getContractAt(
