@@ -7,6 +7,7 @@ const {
   ZERO_ADDRESS,
 } = require('../../../utils/web3-utils');
 const { v2CrvStrategies } = require('../../../utils/v2-crv-strategies');
+const { v1CrvStrategies } = require('../../../utils/v1-crv-strategies');
 const config = require('../../../.config.json');
 const jobs = config.contracts.mainnet.jobs;
 
@@ -45,6 +46,8 @@ function run() {
       deployer
     );
 
+    const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
+
     const chainStrategies = await crvStrategyKeep3rJob2.callStatic.strategies();
     const strategyAddressess = v2CrvStrategies.map(
       (strategy) => strategy.address
@@ -65,7 +68,7 @@ function run() {
     }
 
     // Checks if local data matches chain data
-    for (const strategy of v2CrvStrategies) {
+    for (const strategy of crvStrategies) {
       const requiredHarvest = await crvStrategyKeep3rJob2.requiredHarvest(
         strategy.address
       );
@@ -103,10 +106,10 @@ function run() {
       }
     }
 
-    const outdatedV1CrvStrategies = v2CrvStrategies.filter(
+    const outdatedV1CrvStrategies = crvStrategies.filter(
       (strategy) => strategy.update
     );
-    console.log('updating', outdatedV1CrvStrategies.length, 'v2CrvStrategies');
+    console.log('updating', outdatedV1CrvStrategies.length, 'crvStrategies');
     console.log(
       outdatedV1CrvStrategies.map((strategy) => strategy.name).join(', ')
     );
