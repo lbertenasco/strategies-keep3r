@@ -17,7 +17,7 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_obtc',
     address: '0xDb2D3F149270630382D4E6B4dbCd47e665D78D76',
-    maxReportDelay: 60 * 60 * 24 * 4.9 , // 4.9 days
+    maxReportDelay: 60 * 60 * 24 * 4.9, // 4.9 days
     amount: e18.mul(10),
   },
   {

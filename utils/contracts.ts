@@ -12,3 +12,8 @@ export const harvestV2Keep3rStealthJob = {
   mainnet: '0x2150b45626199CFa5089368BDcA30cd0bfB152D6',
   goerli: '',
 };
+
+export const mechanicsRegistry = {
+  mainnet: '0xE8d5A85758FE98F7Dce251CAd552691D49b499Bb',
+  polygon: '0x7A99923aA2efa71178BB11294349EC1F6b23a814',
+};

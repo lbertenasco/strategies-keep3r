@@ -89,7 +89,7 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy.isCRV = !!(await strategy.contract.callStatic.crv());
         } catch (error) {}
         strategy.maxReportDelay = strategy.maxReportDelay
-          ? bn.from(strategy.maxReportDelay)
+          ? bn.from(Math.round(strategy.maxReportDelay))
           : await strategy.contract.callStatic.maxReportDelay();
         strategy.vault = await strategy.contract.callStatic.vault();
         strategy.vaultContract = await ethers.getContractAt(

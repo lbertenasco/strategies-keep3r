@@ -3,6 +3,7 @@
 pragma solidity 0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@lbertenasco/contract-utils/contracts/mechanics/MechanicsRegistry.sol";
 
 contract ERC20Mock is ERC20 {
   constructor(

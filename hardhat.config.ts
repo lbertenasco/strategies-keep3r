@@ -27,6 +27,11 @@ module.exports = {
             accounts: [process.env.MAINNET_PRIVATE_KEY],
             gasPrice: 31000000000, // 31 gwei
           },
+          polygonMainnet: {
+            url: 'https://rpc-mainnet.matic.quiknode.pro',
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+            gasPrice: 5000000000, // 5 gwei
+          },
           staticMainnet: {
             url: process.env.MAINNET_HTTPS_URL,
             accounts: [
