@@ -89,8 +89,7 @@ describe('CrvStrategyKeep3rStealthJob2', () => {
         true,
         2 * 24 * 60 * 60, // 2 days maxHarvestPeriod,
         30 * 60, // 30 minutes harvestCooldown
-        v2Keeper.address,
-        contracts.curveClaimableTokensHelper.mainnet
+        v2Keeper.address
       )
     ).connect(owner);
 

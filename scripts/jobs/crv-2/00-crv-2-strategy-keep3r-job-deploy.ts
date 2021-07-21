@@ -7,7 +7,9 @@ const mainnetContracts = config.contracts.mainnet;
 const mechanicsContracts = mainnetContracts.mechanics;
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm('Do you wish to deploy crv keep3r contract?');
+const prompt = new Confirm({
+  message: 'Do you wish to deploy crv keep3r contract?',
+});
 
 async function main() {
   await run('compile');
@@ -42,8 +44,7 @@ function promptAndSubmit(
             true,
             2 * 24 * 60 * 60, // 2 days maxHarvestPeriod,
             30 * 60, // 30 minutes harvestCooldown
-            v2Keeper.address,
-            contracts.curveClaimableTokensHelper.mainnet
+            v2Keeper.address
           );
           const crvStrategyKeep3rStealthJob2 =
             await CrvStrategyKeep3rStealthJob2.deploy(
@@ -57,8 +58,7 @@ function promptAndSubmit(
               true,
               2 * 24 * 60 * 60, // 2 days maxHarvestPeriod,
               30 * 60, // 30 minutes harvestCooldown
-              v2Keeper.address,
-              contracts.curveClaimableTokensHelper.mainnet
+              v2Keeper.address
             );
           console.timeEnd('CrvStrategyKeep3rStealthJob2 deployed');
           console.log(

@@ -38,7 +38,6 @@ contract CrvStrategyKeep3rStealthJob2 is MachineryReady, OnlyStealthRelayer, Kee
 
     // v2 specific
     address public override v2Keeper;
-    address public override curveClaimableTokensHelper;
 
     constructor(
         address _mechanicsRegistry,
@@ -51,14 +50,12 @@ contract CrvStrategyKeep3rStealthJob2 is MachineryReady, OnlyStealthRelayer, Kee
         bool _onlyEOA,
         uint256 _maxHarvestPeriod,
         uint256 _harvestCooldown,
-        address _v2Keeper,
-        address _curveClaimableTokensHelper
+        address _v2Keeper
     ) MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
         _setHarvestCooldown(_harvestCooldown);
         v2Keeper = _v2Keeper;
-        curveClaimableTokensHelper = _curveClaimableTokensHelper;
     }
 
     // Stealth Relayer Setters
