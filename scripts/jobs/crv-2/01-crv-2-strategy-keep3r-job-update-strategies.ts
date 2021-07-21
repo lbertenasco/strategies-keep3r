@@ -1,15 +1,10 @@
-const hre = require('hardhat');
+import hre from 'hardhat';
+import { bn } from '../../../utils/web3-utils';
 const ethers = hre.ethers;
-const {
-  bn,
-  e18,
-  e18ToDecimal,
-  ZERO_ADDRESS,
-} = require('../../../utils/web3-utils');
-const { v2CrvStrategies } = require('../../../utils/v2-crv-strategies');
-const { v1CrvStrategies } = require('../../../utils/v1-crv-strategies');
-const config = require('../../../.config.json');
-const jobs = config.contracts.mainnet.jobs;
+import { v2CrvStrategies } from '../../../utils/v2-crv-strategies';
+import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
+import config from '../../../.config.json';
+import * as contracts from '../../../utils/contracts';
 
 const { Confirm } = require('enquirer');
 const confirm = new Confirm(
@@ -21,11 +16,11 @@ async function main() {
   await run();
 }
 
-function run() {
+function run(): Promise<void | Error> {
   return new Promise(async (resolve) => {
     // Setup deployer
     const [owner] = await ethers.getSigners();
-    let deployer;
+    let deployer: any;
     if (owner.address == config.accounts.mainnet.deployer) {
       deployer = owner;
       deployer._address = owner.address;
@@ -34,23 +29,23 @@ function run() {
         method: 'hardhat_impersonateAccount',
         params: [config.accounts.mainnet.deployer],
       });
-      deployer = owner.provider.getUncheckedSigner(
+      deployer = (owner as any).provider.getUncheckedSigner(
         config.accounts.mainnet.deployer
       );
     }
     console.log('using address:', deployer._address);
 
-    const crvStrategyKeep3rJob2 = await ethers.getContractAt(
-      'CrvStrategyKeep3rJob2',
-      jobs.crvStrategyKeep3rJob2,
+    const crvStrategyKeep3rStealthJob2 = await ethers.getContractAt(
+      'CrvStrategyKeep3rStealthJob2',
+      contracts.crvStrategyKeep3rStealthJob2.mainnet,
       deployer
     );
 
-    const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
-
-    const chainStrategies = await crvStrategyKeep3rJob2.callStatic.strategies();
+    const crvStrategies: any = [...v2CrvStrategies, ...v1CrvStrategies];
+    const chainStrategies =
+      await crvStrategyKeep3rStealthJob2.callStatic.strategies();
     const strategyAddressess = v2CrvStrategies.map(
-      (strategy) => strategy.address
+      (strategy: any) => strategy.address
     );
     // Checks if there are strategies to remove
     for (const chainStrategyAddress of chainStrategies) {
@@ -62,17 +57,16 @@ function run() {
         'is not on the local config file'
       );
       console.log(
-        `https://etherscan.io/address/${crvStrategyKeep3rJob2.address}#writeContract`
+        `https://etherscan.io/address/${crvStrategyKeep3rStealthJob2.address}#writeContract`
       );
       console.log(`removeStrategy(${chainStrategyAddress})`);
     }
 
     // Checks if local data matches chain data
     for (const strategy of crvStrategies) {
-      const requiredHarvest = await crvStrategyKeep3rJob2.requiredHarvest(
-        strategy.address
-      );
-      const requiredEarn = await crvStrategyKeep3rJob2.requiredEarn(
+      const requiredHarvest =
+        await crvStrategyKeep3rStealthJob2.requiredHarvest(strategy.address);
+      const requiredEarn = await crvStrategyKeep3rStealthJob2.requiredEarn(
         strategy.address
       );
       if (!strategy.requiredHarvestAmount.eq(requiredHarvest)) {
@@ -107,11 +101,11 @@ function run() {
     }
 
     const outdatedV1CrvStrategies = crvStrategies.filter(
-      (strategy) => strategy.update
+      (strategy: any) => strategy.update
     );
     console.log('updating', outdatedV1CrvStrategies.length, 'crvStrategies');
     console.log(
-      outdatedV1CrvStrategies.map((strategy) => strategy.name).join(', ')
+      outdatedV1CrvStrategies.map((strategy: any) => strategy.name).join(', ')
     );
 
     if (!(await confirm.run())) return;
@@ -119,7 +113,7 @@ function run() {
     // Update crv strategies on crv keep3r
     console.time('updateStrategies');
     for (const strategy of outdatedV1CrvStrategies) {
-      await crvStrategyKeep3rJob2.updateStrategy(
+      await crvStrategyKeep3rStealthJob2.updateStrategy(
         strategy.address,
         strategy.requiredHarvestAmount,
         bn

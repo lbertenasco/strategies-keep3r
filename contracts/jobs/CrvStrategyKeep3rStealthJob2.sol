@@ -16,7 +16,7 @@ import "../interfaces/yearn/IV1Controller.sol";
 import "../interfaces/yearn/IV1Vault.sol";
 import "../interfaces/yearn/IBaseStrategy.sol";
 import "../interfaces/crv/ICrvStrategy.sol";
-import "../interfaces/crv/ICrvClaimable.sol";
+import "../interfaces/crv/ICurveClaimableTokensHelper.sol";
 
 contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -38,6 +38,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
 
     // v2 specific
     address public override v2Keeper;
+    address public override curveClaimableTokensHelper;
 
     constructor(
         address _mechanicsRegistry,
@@ -50,12 +51,14 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
         bool _onlyEOA,
         uint256 _maxHarvestPeriod,
         uint256 _harvestCooldown,
-        address _v2Keeper
+        address _v2Keeper,
+        address _curveClaimableTokensHelper
     ) MachineryReady(_mechanicsRegistry) OnlyStealthRelayer(_stealthRelayer) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
         _setHarvestCooldown(_harvestCooldown);
         v2Keeper = _v2Keeper;
+        curveClaimableTokensHelper = _curveClaimableTokensHelper;
     }
 
     // Stealth Relayer Setters
@@ -207,18 +210,18 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
     }
 
     // Keeper view actions
-    function calculateHarvest(address _strategy) public override returns (uint256 _amount) {
+    function calculateHarvest(address _strategy) public view override returns (uint256 _amount) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::calculate-harvest:strategy-not-added");
         address _gauge = ICrvStrategy(_strategy).gauge();
         address _voter = ICrvStrategy(_strategy).voter();
-        return ICrvClaimable(_gauge).claimable_tokens(_voter);
+        return ICurveClaimableTokensHelper(curveClaimableTokensHelper).claimable_tokens(_gauge, _voter);
     }
 
-    function workable(address _strategy) external override notPaused returns (bool) {
+    function workable(address _strategy) external view override notPaused returns (bool) {
         return _workable(_strategy);
     }
 
-    function _workable(address _strategy) internal returns (bool) {
+    function _workable(address _strategy) internal view returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
         // ensures no other strategy has been harvested for at least the harvestCooldown
         if (block.timestamp < lastHarvest + harvestCooldown) return false;
