@@ -143,12 +143,12 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 5.8, // 5.8 days
     amount: e18.mul(250000),
   },
-  {
-    name: 'convex_musd',
-    address: '0x75be6ABC02a010559Ed5c7b0Eab94abD2B783b65',
-    maxReportDelay: 60 * 60 * 24 * 6.75, // 6.75 days
-    amount: e18.mul(250000),
-  },
+  // { // deprecated
+  //   name: 'convex_musd',
+  //   address: '0x75be6ABC02a010559Ed5c7b0Eab94abD2B783b65',
+  //   maxReportDelay: 60 * 60 * 24 * 6.75, // 6.75 days
+  //   amount: e18.mul(250000),
+  // },
   {
     name: 'convex_aave',
     address: '0xAC4AE0B06C913dF4608dB60E2571a8e91b74C619',
@@ -173,12 +173,12 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 3.75, // 3.75 days
     amount: e18.mul(250000),
   },
-  {
-    name: 'convex_busd',
-    address: '0xA44F947e51Ec6456A1d786F82ea5865F87Da9C30',
-    maxReportDelay: 60 * 60 * 24 * 6.94, // 6.94 days
-    amount: e18.mul(250000),
-  },
+  // { // deprecated
+  //   name: 'convex_busd',
+  //   address: '0xA44F947e51Ec6456A1d786F82ea5865F87Da9C30',
+  //   maxReportDelay: 60 * 60 * 24 * 6.94, // 6.94 days
+  //   amount: e18.mul(250000),
+  // },
   {
     name: 'convex_tusd',
     address: '0x270101459e9A38Db38Ba4Cb8718FfA31953A9Af3',
