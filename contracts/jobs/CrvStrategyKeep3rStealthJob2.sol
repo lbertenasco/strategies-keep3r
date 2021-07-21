@@ -213,7 +213,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
     function calculateHarvest(address _strategy) public view override returns (uint256 _amount) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::calculate-harvest:strategy-not-added");
         address _gauge = ICrvStrategy(_strategy).gauge();
-        address _voter = ICrvStrategy(_strategy).voter();
+        address _voter = strategyIsV1[_strategy] ? ICrvStrategy(ICrvStrategy(_strategy).proxy()).proxy() : ICrvStrategy(_strategy).voter();
         return ICurveClaimableTokensHelper(curveClaimableTokensHelper).claimable_tokens(_gauge, _voter);
     }
 
