@@ -46,7 +46,7 @@ const reset = async (forking?: { [key: string]: any }) => {
   });
 };
 
-export {
+export default {
   getBlockNumber,
   advanceTimeAndBlock,
   advanceToTimeAndBlock,

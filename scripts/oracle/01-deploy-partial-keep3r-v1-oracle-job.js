@@ -36,16 +36,17 @@ function promptAndSubmit() {
           const PartialKeep3rV1OracleJob = await ethers.getContractFactory(
             'PartialKeep3rV1OracleJob'
           );
-          const partialKeep3rV1OracleJob = await PartialKeep3rV1OracleJob.deploy(
-            mainnetContracts.keep3r.address,
-            ZERO_ADDRESS,
-            e18.mul(200), // 200 KP3R required
-            0,
-            0,
-            false, // only EOA disabled
-            mainnetContracts.oracle.oracleBondedKeeper,
-            { nonce: 887 }
-          );
+          const partialKeep3rV1OracleJob =
+            await PartialKeep3rV1OracleJob.deploy(
+              mainnetContracts.keep3r.address,
+              ZERO_ADDRESS,
+              e18.mul(200), // 200 KP3R required
+              0,
+              0,
+              false, // only EOA disabled
+              mainnetContracts.oracle.oracleBondedKeeper,
+              { nonce: 887 }
+            );
           console.timeEnd('PartialKeep3rV1OracleJob deployed');
           console.log(
             'PartialKeep3rV1OracleJob address:',

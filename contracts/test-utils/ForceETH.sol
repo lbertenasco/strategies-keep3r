@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 contract ForceETH {
-    constructor(address payable _to) public payable {
+    constructor(address payable _to) payable {
         selfdestruct(_to);
     }
 }

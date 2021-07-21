@@ -1,21 +1,20 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/EnumerableSet.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 
 import "../../interfaces/jobs/v2/IV2Keeper.sol";
 import "../../interfaces/yearn/IBaseStrategy.sol";
 
 contract V2Keeper is MachineryReady, IV2Keeper {
-    using SafeMath for uint256;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     EnumerableSet.AddressSet internal _validJobs;
 
-    constructor(address _mechanicsRegistry) public MachineryReady(_mechanicsRegistry) {}
+    // solhint-disable-next-line no-empty-blocks
+    constructor(address _mechanicsRegistry) MachineryReady(_mechanicsRegistry) {}
 
     // Setters
     function addJobs(address[] calldata _jobs) external override onlyGovernorOrMechanic {

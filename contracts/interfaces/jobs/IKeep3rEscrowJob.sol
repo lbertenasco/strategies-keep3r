@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 import "../keep3r/IKeep3rEscrow.sol";
 
 interface IKeep3rEscrowJob {
-    enum Actions {none, addLiquidityToJob, applyCreditToJob, removeLiquidityFromJob}
+    enum Actions {
+        none,
+        addLiquidityToJob,
+        applyCreditToJob,
+        removeLiquidityFromJob
+    }
 
     // Actions by Keeper
     event Worked();

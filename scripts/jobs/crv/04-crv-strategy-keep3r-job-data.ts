@@ -23,9 +23,8 @@ function promptAndSubmit(): Promise<void | Error> {
       const strategies = await crvStrategyKeep3rJob.callStatic.strategies();
 
       for (const strategy of strategies) {
-        const requiredHarvest = await crvStrategyKeep3rJob.callStatic.requiredHarvest(
-          strategy
-        );
+        const requiredHarvest =
+          await crvStrategyKeep3rJob.callStatic.requiredHarvest(strategy);
         const requiredEarn = await crvStrategyKeep3rJob.callStatic.requiredEarn(
           strategy
         );

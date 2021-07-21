@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 interface IBaseStrategy {
     function vault() external view returns (address _vault);
@@ -17,6 +17,9 @@ interface IBaseStrategy {
     function profitFactor() external view returns (uint256 _profitFactor);
 
     function maxReportDelay() external view returns (uint256 _maxReportDelay);
+
+    // custom view
+    function crv() external view returns (address _crv);
 
     // Setters
     function setStrategist(address _strategist) external;

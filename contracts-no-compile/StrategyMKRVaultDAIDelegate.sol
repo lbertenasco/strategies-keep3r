@@ -799,8 +799,9 @@ contract StrategyMKRVaultDAIDelegate {
     }
 
     function _withdrawDaiLeast(uint256 _amount) internal returns (uint256) {
-        uint256 _shares =
-            _amount.mul(1e18).div(yVault(yVaultDAI).getPricePerFullShare()).mul(withdrawalMax).div(withdrawalMax.sub(withdrawalFee));
+        uint256 _shares = _amount.mul(1e18).div(yVault(yVaultDAI).getPricePerFullShare()).mul(withdrawalMax).div(
+            withdrawalMax.sub(withdrawalFee)
+        );
 
         if (_shares > IERC20(yVaultDAI).balanceOf(address(this))) {
             _shares = IERC20(yVaultDAI).balanceOf(address(this));

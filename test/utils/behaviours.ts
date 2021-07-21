@@ -39,7 +39,7 @@ const deployShouldRevertWithZeroAddress = async ({
 }): Promise<void> => {
   const deployContractTx = await contract.getDeployTransaction(...args);
   const tx = contract.signer.sendTransaction(deployContractTx);
-  await checkTxRevertedWithZeroAddress(tx);
+  await checkTxRevertedWithZeroAddress(tx as any);
 };
 
 const txShouldRevertWithZeroAddress = async ({
@@ -88,7 +88,7 @@ const deployShouldSetVariablesAndEmitEvents = async ({
   ];
 }): Promise<void> => {
   const deployContractTx = await contract.getDeployTransaction(...args);
-  const tx = contract.signer.sendTransaction(deployContractTx);
+  const tx: any = contract.signer.sendTransaction(deployContractTx);
   const address = getStatic<(tx: TransactionResponse) => string>(
     contract.constructor,
     'getContractAddress'

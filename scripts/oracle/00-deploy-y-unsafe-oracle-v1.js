@@ -26,9 +26,10 @@ function promptAndSubmit() {
           const Keep3rV2OracleFactoryWrapper = await ethers.getContractFactory(
             'Keep3rV2OracleFactoryWrapper'
           );
-          const keep3rV2OracleFactoryWrapper = await Keep3rV2OracleFactoryWrapper.deploy(
-            mainnetContracts.oracle.yearnKeep3rV2OracleFactory
-          );
+          const keep3rV2OracleFactoryWrapper =
+            await Keep3rV2OracleFactoryWrapper.deploy(
+              mainnetContracts.oracle.yearnKeep3rV2OracleFactory
+            );
           const YUnsafeOracleV1 = await ethers.getContractFactory(
             'YUnsafeOracleV1'
           );

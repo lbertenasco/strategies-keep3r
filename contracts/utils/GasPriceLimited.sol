@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
 import "../interfaces/utils/IGasPriceLimited.sol";
 import "../interfaces/keep3r/IChainLinkFeed.sol";
@@ -10,7 +10,8 @@ abstract contract GasPriceLimited is IGasPriceLimited {
 
     uint256 public override maxGasPrice;
 
-    constructor() public {}
+    // solhint-disable-next-line no-empty-blocks
+    constructor() {}
 
     // MaxGasPrice
     function _setMaxGasPrice(uint256 _maxGasPrice) internal {

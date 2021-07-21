@@ -65,7 +65,7 @@ async function main() {
   const relayerTx = await stealthRelayer.populateTransaction.executeOnBlock(
     crvStrategyKeep3r.address,
     harvestTx.data,
-    blockNumber + 1,
+    blockNumber + 2,
     minerTip,
     {
       gasPrice: 0,
@@ -90,7 +90,7 @@ async function main() {
 
   const simulation = await flashbotsProvider.simulate(
     signedBundle,
-    blockNumber + 1
+    blockNumber + 2
   );
 
   console.log('simulation');

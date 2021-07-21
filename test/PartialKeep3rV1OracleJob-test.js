@@ -29,7 +29,8 @@ describe('PartialKeep3rV1OracleJob', function () {
       false,
       oracleBondedKeeper.address
     );
-    const oracleBondedKeeperAddress = await partialKeep3rV1OracleJob.oracleBondedKeeper();
+    const oracleBondedKeeperAddress =
+      await partialKeep3rV1OracleJob.oracleBondedKeeper();
     expect(oracleBondedKeeperAddress).to.eq(oracleBondedKeeper.address);
   });
 

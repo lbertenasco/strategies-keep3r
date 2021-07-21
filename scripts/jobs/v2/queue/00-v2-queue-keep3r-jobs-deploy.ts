@@ -14,9 +14,8 @@ const prompt = new Confirm(
 async function main() {
   await run('compile');
   const V2Keeper: ContractFactory = await ethers.getContractFactory('V2Keeper');
-  const HarvestV2QueueKeep3rJob: ContractFactory = await ethers.getContractFactory(
-    'HarvestV2QueueKeep3rJob'
-  );
+  const HarvestV2QueueKeep3rJob: ContractFactory =
+    await ethers.getContractFactory('HarvestV2QueueKeep3rJob');
   const TendV2QueueKeep3rJob: ContractFactory = await ethers.getContractFactory(
     'TendV2Keep3rJob' // 'TendV2QueueKeep3rJob'
   );

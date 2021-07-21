@@ -4,7 +4,7 @@
 
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 pragma experimental ABIEncoderV2;
 
 // Global Enums and Structs
@@ -813,7 +813,7 @@ abstract contract BaseStrategy {
         _;
     }
 
-    constructor(address _vault) public {
+    constructor(address _vault) {
         _initialize(_vault, msg.sender, msg.sender, msg.sender);
     }
 
@@ -834,11 +834,11 @@ abstract contract BaseStrategy {
 
         vault = VaultAPI(_vault);
         want = IERC20(vault.token());
-        want.safeApprove(_vault, uint256(-1)); // Give Vault unlimited access (might save gas)
+        want.safeApprove(_vault, type(uint256).max); // Give Vault unlimited access (might save gas)
         strategist = _strategist;
         rewards = _rewards;
         keeper = _keeper;
-        vault.approve(rewards, uint256(-1)); // Allow rewards to be pulled
+        vault.approve(rewards, type(uint256).max); // Allow rewards to be pulled
     }
 
     /**
@@ -885,7 +885,7 @@ abstract contract BaseStrategy {
         require(_rewards != address(0));
         vault.approve(rewards, 0);
         rewards = _rewards;
-        vault.approve(rewards, uint256(-1));
+        vault.approve(rewards, type(uint256).max);
         emit UpdatedRewards(_rewards);
     }
 
@@ -1332,7 +1332,7 @@ abstract contract BaseStrategy {
 // Part: iearn-finance/yearn-vaults@0.3.2/BaseStrategyInitializable
 
 abstract contract BaseStrategyInitializable is BaseStrategy {
-    constructor(address _vault) public BaseStrategy(_vault) {}
+    constructor(address _vault) BaseStrategy(_vault) {}
 
     function initialize(
         address _vault,
@@ -1374,7 +1374,7 @@ contract Strategy is BaseStrategyInitializable {
 
     event Cloned(address indexed clone);
 
-    constructor(address _vault) public BaseStrategyInitializable(_vault) {
+    constructor(address _vault) BaseStrategyInitializable(_vault) {
         debtThreshold = 100 * 1e18;
     }
 
@@ -1549,7 +1549,7 @@ contract Strategy is BaseStrategyInitializable {
 
     //Estimates debt limit decrease. It is not accurate and should only be used for very broad decision making
     function _estimateDebtLimitDecrease(uint256 change) internal view returns (uint256) {
-        uint256 lowestApr = uint256(-1);
+        uint256 lowestApr = type(uint256).max;
         uint256 aprChoice = 0;
 
         for (uint256 i = 0; i < lenders.length; i++) {
@@ -1595,7 +1595,7 @@ contract Strategy is BaseStrategyInitializable {
         // our simple algo
         // get the lowest apr strat
         // cycle through and see who could take its funds plus want for the highest apr
-        _lowestApr = uint256(-1);
+        _lowestApr = type(uint256).max;
         _lowest = 0;
         uint256 lowestNav = 0;
         for (uint256 i = 0; i < lenders.length; i++) {
@@ -1812,7 +1812,7 @@ contract Strategy is BaseStrategyInitializable {
         //most situations this will only run once. Only big withdrawals will be a gas guzzler
         uint256 j = 0;
         while (amountWithdrawn < _amount) {
-            uint256 lowestApr = uint256(-1);
+            uint256 lowestApr = type(uint256).max;
             uint256 lowest = 0;
             for (uint256 i = 0; i < lenders.length; i++) {
                 if (lenders[i].hasAssets()) {

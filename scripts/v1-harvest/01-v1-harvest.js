@@ -92,9 +92,10 @@ function promptAndSubmit() {
                 'ICrvClaimable',
                 vault.gauge
               );
-              vault.claimableTokens = await vault.gaugeContract.callStatic.claimable_tokens(
-                vault.voter
-              );
+              vault.claimableTokens =
+                await vault.gaugeContract.callStatic.claimable_tokens(
+                  vault.voter
+                );
               vault.checkHarvest = true;
               if (vault.claimableTokens > vault.decimals.mul(9_000)) {
                 console.log();
