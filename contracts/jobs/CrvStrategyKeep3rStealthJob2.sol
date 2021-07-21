@@ -16,9 +16,9 @@ import "../interfaces/yearn/IV1Controller.sol";
 import "../interfaces/yearn/IV1Vault.sol";
 import "../interfaces/yearn/IBaseStrategy.sol";
 import "../interfaces/crv/ICrvStrategy.sol";
-import "../interfaces/crv/ICurveClaimableTokensHelper.sol";
+import "../interfaces/crv/ICrvClaimable.sol";
 
-contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
+contract CrvStrategyKeep3rStealthJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant PRECISION = 1_000;
@@ -210,18 +210,18 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
     }
 
     // Keeper view actions
-    function calculateHarvest(address _strategy) public view override returns (uint256 _amount) {
+    function calculateHarvest(address _strategy) public override returns (uint256 _amount) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::calculate-harvest:strategy-not-added");
         address _gauge = ICrvStrategy(_strategy).gauge();
         address _voter = strategyIsV1[_strategy] ? ICrvStrategy(ICrvStrategy(_strategy).proxy()).proxy() : ICrvStrategy(_strategy).voter();
-        return ICurveClaimableTokensHelper(curveClaimableTokensHelper).claimable_tokens(_gauge, _voter);
+        return ICrvClaimable(_gauge).claimable_tokens(_voter);
     }
 
-    function workable(address _strategy) external view override notPaused returns (bool) {
+    function workable(address _strategy) external override notPaused returns (bool) {
         return _workable(_strategy);
     }
 
-    function _workable(address _strategy) internal view returns (bool) {
+    function _workable(address _strategy) internal returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
         // ensures no other strategy has been harvested for at least the harvestCooldown
         if (block.timestamp < lastHarvest + harvestCooldown) return false;

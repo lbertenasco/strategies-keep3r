@@ -44,38 +44,38 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 6.97, // 6.97 days
     amount: e18.mul(10),
   },
-  /* ETH */
-  {
-    name: 'convex_ankr',
-    address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
-    maxReportDelay: 60 * 60 * 24 * 6.84, // 6.84 days
-    amount: e18.mul(125),
-  },
-  {
-    name: 'convex_reth',
-    address: '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16',
-    maxReportDelay: 60 * 60 * 24 * 6.45, // 6.45 days
-    amount: e18.mul(125),
-  },
-  /* MISC */
-  {
-    name: 'convex_link',
-    address: '0xb7f013426d33fe27e4E8ABEE58500268554736bD',
-    maxReportDelay: 60 * 60 * 24 * 6.84, // 6.84 days
-    amount: e18.mul(12500),
-  },
-  {
-    name: 'convex_eurs',
-    address: '0xC45b3312c0DE684301a58A1eee558151BBE8f45c',
-    maxReportDelay: 60 * 60 * 24 * 4.1, // 4.1 days
-    amount: e18.mul(250000),
-  },
-  {
-    name: 'convex_tricrypto',
-    address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
-    maxReportDelay: 60 * 60 * 24 * 4.3, // 4.3 days
-    amount: e18.mul(250),
-  },
+  // /* ETH */ Moved to job
+  // {
+  //   name: 'convex_ankr',
+  //   address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
+  //   maxReportDelay: 60 * 60 * 24 * 6.84, // 6.84 days
+  //   amount: e18.mul(125),
+  // },
+  // {
+  //   name: 'convex_reth',
+  //   address: '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16',
+  //   maxReportDelay: 60 * 60 * 24 * 6.45, // 6.45 days
+  //   amount: e18.mul(125),
+  // },
+  // /* MISC */ Moved to job
+  // {
+  //   name: 'convex_link',
+  //   address: '0xb7f013426d33fe27e4E8ABEE58500268554736bD',
+  //   maxReportDelay: 60 * 60 * 24 * 6.84, // 6.84 days
+  //   amount: e18.mul(12500),
+  // },
+  // {
+  //   name: 'convex_eurs',
+  //   address: '0xC45b3312c0DE684301a58A1eee558151BBE8f45c',
+  //   maxReportDelay: 60 * 60 * 24 * 4.1, // 4.1 days
+  //   amount: e18.mul(250000),
+  // },
+  // {
+  //   name: 'convex_tricrypto',
+  //   address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
+  //   maxReportDelay: 60 * 60 * 24 * 4.3, // 4.3 days
+  //   amount: e18.mul(250),
+  // },
   /* STABLECOINS */
   {
     name: 'convex_usdp',

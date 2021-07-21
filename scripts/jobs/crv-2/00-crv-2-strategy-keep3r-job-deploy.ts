@@ -33,6 +33,7 @@ function promptAndSubmit(
 
           console.log(
             mechanicsContracts.registry,
+            contracts.stealthRelayer.mainnet,
             mainnetContracts.keep3r.address,
             ZERO_ADDRESS,
             e18.mul(50).toString(), // 50 KP3R required
@@ -47,6 +48,7 @@ function promptAndSubmit(
           const crvStrategyKeep3rStealthJob2 =
             await CrvStrategyKeep3rStealthJob2.deploy(
               mechanicsContracts.registry,
+              contracts.stealthRelayer.mainnet,
               mainnetContracts.keep3r.address,
               ZERO_ADDRESS,
               e18.mul(50), // 50 KP3R required

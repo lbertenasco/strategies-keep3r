@@ -3,16 +3,15 @@ import { ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../utils/web3-utils';
 import config from '../../.config.json';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
-import { Contract, ContractFactory } from 'ethers';
+import * as contracts from '../../utils/contracts';
 
 const mainnetContracts = config.contracts.mainnet;
 const mechanicsContracts = config.contracts.mainnet.mechanics;
-const genericV2Keep3rJobContracts = config.contracts.mainnet.genericV2Keep3rJob;
 
 const lowerCaseArray = (array: string[]) =>
   array.map((address: string) => address.toLowerCase());
 
-describe('CrvStrategyKeep3rJob2', () => {
+describe('CrvStrategyKeep3rStealthJob2', () => {
   let owner: SignerWithAddress;
 
   before('Setup accounts and contracts', async () => {
@@ -73,27 +72,29 @@ describe('CrvStrategyKeep3rJob2', () => {
       deployer
     );
 
-    const CrvStrategyKeep3rJob2 = await ethers.getContractFactory(
-      'CrvStrategyKeep3rJob2'
+    const CrvStrategyKeep3rStealthJob2 = await ethers.getContractFactory(
+      'CrvStrategyKeep3rStealthJob2'
     );
 
-    const crvStrategyKeep3rJob2 = (
-      await CrvStrategyKeep3rJob2.deploy(
-        mechanicsContracts.registry, // address _mechanicsRegistry,
-        config.contracts.mainnet.keep3r.address, // address _keep3r,
-        ZERO_ADDRESS, // address _bond,
-        e18.mul(50), // 50 KP3R required // uint256 _minBond,
-        0, // uint256 _earned,
-        0, // uint256 _age,
-        true, // bool _onlyEOA,
-        24 * 60 * 60, // 1 day maxHarvestPeriod, // uint256 _maxHarvestPeriod,
-        30 * 60, // 30 minutes harvestCooldown // uint256 _harvestCooldown,
-        v2Keeper.address // address _v2Keeper
+    const crvStrategyKeep3rStealthJob2 = (
+      await CrvStrategyKeep3rStealthJob2.deploy(
+        mechanicsContracts.registry,
+        contracts.stealthRelayer.mainnet,
+        mainnetContracts.keep3r.address,
+        ZERO_ADDRESS,
+        e18.mul(50), // 50 KP3R required
+        0,
+        0,
+        true,
+        2 * 24 * 60 * 60, // 2 days maxHarvestPeriod,
+        30 * 60, // 30 minutes harvestCooldown
+        v2Keeper.address,
+        contracts.curveClaimableTokensHelper.mainnet
       )
     ).connect(owner);
 
     // Add as valid job
-    await v2Keeper.addJob(crvStrategyKeep3rJob2.address);
+    await v2Keeper.addJob(crvStrategyKeep3rStealthJob2.address);
 
     // Add to keep3r
     const keep3r = await ethers.getContractAt(
@@ -101,8 +102,11 @@ describe('CrvStrategyKeep3rJob2', () => {
       config.contracts.mainnet.keep3r.address,
       keep3rGovernance
     );
-    await keep3r.addJob(crvStrategyKeep3rJob2.address);
-    await keep3r.addKPRCredit(crvStrategyKeep3rJob2.address, e18.mul(100));
+    await keep3r.addJob(crvStrategyKeep3rStealthJob2.address);
+    await keep3r.addKPRCredit(
+      crvStrategyKeep3rStealthJob2.address,
+      e18.mul(100)
+    );
 
     // Add strategies to job
     const strategies = [
@@ -135,39 +139,43 @@ describe('CrvStrategyKeep3rJob2', () => {
       );
       try {
         if (await strategyContract.controller())
-          await strategyContract.setStrategist(crvStrategyKeep3rJob2.address);
+          await strategyContract.setStrategist(
+            crvStrategyKeep3rStealthJob2.address
+          );
       } catch (error) {}
     }
 
     // set reward multiplier
-    await crvStrategyKeep3rJob2.setRewardMultiplier(800);
+    await crvStrategyKeep3rStealthJob2.setRewardMultiplier(800);
 
     for (const strategy of strategies) {
-      await crvStrategyKeep3rJob2.addStrategy(
+      await crvStrategyKeep3rStealthJob2.addStrategy(
         strategy.address,
         e18.mul(strategy.requiredAmount),
         e18.mul(strategy.requiredEarn)
       );
     }
 
-    const jobStrategies = await crvStrategyKeep3rJob2.strategies();
+    const jobStrategies = await crvStrategyKeep3rStealthJob2.strategies();
     expect(lowerCaseArray(jobStrategies)).to.be.deep.eq(
       lowerCaseArray(strategies.map((s) => s.address))
     );
 
-    let workable = await crvStrategyKeep3rJob2.callStatic.workable(
+    let workable = await crvStrategyKeep3rStealthJob2.callStatic.workable(
       strategies[0].address
     );
     console.log({ workable });
 
-    let workTx = await crvStrategyKeep3rJob2
+    let workTx = await crvStrategyKeep3rStealthJob2
       .connect(keeper)
       .work(strategies[0].address);
     let workTxData = await workTx.wait();
     console.log('gasUsed:', workTxData.cumulativeGasUsed.toNumber());
 
     expect(
-      await crvStrategyKeep3rJob2.callStatic.workable(strategies[0].address)
+      await crvStrategyKeep3rStealthJob2.callStatic.workable(
+        strategies[0].address
+      )
     ).to.be.false;
   });
 });
