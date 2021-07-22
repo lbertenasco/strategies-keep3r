@@ -1,7 +1,7 @@
 import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
 import { bnToDecimal } from '../../../utils/web3-utils';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 import { v2CrvStrategies } from '../../../utils/v2-crv-strategies';
 import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
 const mainnetContracts = config.contracts.mainnet;

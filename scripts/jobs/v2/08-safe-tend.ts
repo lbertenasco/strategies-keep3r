@@ -1,5 +1,5 @@
 import { run, ethers, network } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 import { gwei } from '../../../utils/web3-utils';
 import { advanceTimeAndBlock } from '../../../test/utils/evm';
 import * as taichi from '../../../utils/taichi';
