@@ -32,7 +32,6 @@
     "release": "standard-version",
     "test": "TEST=true hardhat compile && TEST=true mocha",
     "test:e2e": "yarn test ./test/e2e/**/*.spec.ts",
-    "test:integration": "yarn test ./test/integration/**/*.spec.ts",
     "test:gas": "REPORT_GAS=1 npx hardhat test",
     "test:unit": "yarn test 'test/unit/**/*.spec.ts'",
     "test:unit:gas": "REPORT_GAS=1 yarn test:unit",
