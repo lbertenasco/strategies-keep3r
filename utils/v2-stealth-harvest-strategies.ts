@@ -71,5 +71,36 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 1_000_000,
     address: '0x2886971eCAF2610236b4869f58cD42c115DFb47A',
   },
-  // add manual strategies here
+  /* ETH */
+  {
+    name: 'convex_ankr',
+    added: true,
+    address: '0xB194dCFF4E11d26919Ce3B3255F69aEca5951e88',
+    amount: 2_000_000,
+  },
+  {
+    name: 'convex_reth',
+    added: true,
+    address: '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16',
+    amount: 2_000_000,
+  },
+  /* MISC */
+  {
+    name: 'convex_link',
+    added: true,
+    address: '0xb7f013426d33fe27e4E8ABEE58500268554736bD',
+    amount: 2_000_000,
+  },
+  {
+    name: 'convex_eurs',
+    added: true,
+    address: '0xC45b3312c0DE684301a58A1eee558151BBE8f45c',
+    amount: 2_000_000,
+  },
+  {
+    name: 'convex_tricrypto',
+    added: true,
+    address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
+    amount: 2_000_000,
+  },
 ];

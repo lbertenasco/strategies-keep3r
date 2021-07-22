@@ -4,7 +4,9 @@ import * as contracts from '../../../utils/contracts';
 import { v2StealthStrategies } from '../../../utils/v2-stealth-harvest-strategies';
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm('Do you wish to deploy v2 keep3r jobs contracts?');
+const prompt = new Confirm({
+  message: 'Do you wish to deploy v2 keep3r jobs contracts?',
+});
 
 async function main() {
   await run('compile');

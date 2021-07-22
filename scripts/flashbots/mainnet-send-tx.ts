@@ -14,7 +14,8 @@ import { makeid } from '../../utils/hash';
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm({
-  message: 'Do you wish to stealth-mint though flashbots on mainnet?',
+  message:
+    'Do you wish to stealth work harvest job though flashbots on mainnet?',
 });
 
 async function main() {
@@ -63,7 +64,7 @@ function mainExecute(): Promise<void | Error> {
     );
 
     // build work tx
-    const strategy = '0x32b8C26d0439e1959CEa6262CBabC12320b384c4';
+    const strategy = '0xb7f013426d33fe27e4E8ABEE58500268554736bD';
     const workTx = await harvestV2Keep3rStealthJob.populateTransaction.work(
       strategy
     );
@@ -156,9 +157,9 @@ function mainExecute(): Promise<void | Error> {
 
     // NOTE: here you can rebalance payment using (results[0].gasPrice * gasUsed) + a % as miner bonus
     const fairPayment = gasPrice
-      .mul(100 + 10)
+      .mul(100 + 10) // + 10%
       .div(100)
-      .mul(simulation.totalGasUsed); // + 10%
+      .mul(simulation.totalGasUsed);
 
     const executeAndPayTxRepriced =
       await stealthRelayer.populateTransaction.executeAndPay(

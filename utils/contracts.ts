@@ -13,7 +13,16 @@ export const harvestV2Keep3rStealthJob = {
   goerli: '',
 };
 
+export const crvStrategyKeep3rStealthJob2 = {
+  mainnet: '',
+  goerli: '',
+};
+
 export const mechanicsRegistry = {
   mainnet: '0xE8d5A85758FE98F7Dce251CAd552691D49b499Bb',
   polygon: '0x7A99923aA2efa71178BB11294349EC1F6b23a814',
+};
+
+export const curveClaimableTokensHelper = {
+  mainnet: '0xEaD8d69dF1e75C81Ef63855a94309CC5374192bD',
 };
