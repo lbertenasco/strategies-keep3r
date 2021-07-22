@@ -230,6 +230,11 @@ export const manualHarvestStrategies = [
     address: '0x6341c289b2E0795A04223DF04B53A77970958723',
     maxReportDelay: 60 * 60 * 8, // 8 hours
   },
+  {
+    name: 'sam_unknown_4',
+    address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
+    maxReportDelay: 60 * 60 * 24, // 24 hours
+  },
   // orb unknown
   {
     name: 'orb_unknown_1',
