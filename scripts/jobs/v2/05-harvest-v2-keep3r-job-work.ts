@@ -1,5 +1,5 @@
 import { run, ethers } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 import { bn, e18, gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
 import { manualHarvestStrategies } from '../../../utils/v2-manual-harvest-strategies';

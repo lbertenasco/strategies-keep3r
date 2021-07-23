@@ -1,7 +1,7 @@
 import { ContractFactory } from 'ethers';
 import { run, ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../../utils/web3-utils';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 import * as contracts from '../../../utils/contracts';
 import * as yOracleContracts from '@lbertenasco/y-oracle/dist/utils/contracts';

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../utils/web3-utils';
-import config from '../../.config.json';
+import config from '../../contracts.json';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import * as contracts from '../../utils/contracts';
 
