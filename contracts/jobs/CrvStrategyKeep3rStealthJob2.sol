@@ -18,7 +18,7 @@ import "../interfaces/yearn/IBaseStrategy.sol";
 import "../interfaces/crv/ICrvStrategy.sol";
 import "../interfaces/crv/ICrvClaimable.sol";
 
-contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
+contract CrvStrategyKeep3rStealthJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, ICrvStrategyKeep3rJob, ICrvStrategyKeep3rJobV2 {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant PRECISION = 1_000;
@@ -210,7 +210,7 @@ contract CrvStrategyKeep3rJob2 is MachineryReady, OnlyStealthRelayer, Keep3r, IC
     function calculateHarvest(address _strategy) public override returns (uint256 _amount) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::calculate-harvest:strategy-not-added");
         address _gauge = ICrvStrategy(_strategy).gauge();
-        address _voter = ICrvStrategy(_strategy).voter();
+        address _voter = strategyIsV1[_strategy] ? ICrvStrategy(ICrvStrategy(_strategy).proxy()).proxy() : ICrvStrategy(_strategy).voter();
         return ICrvClaimable(_gauge).claimable_tokens(_voter);
     }
 

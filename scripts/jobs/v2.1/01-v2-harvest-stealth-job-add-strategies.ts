@@ -4,8 +4,10 @@ import * as contracts from '../../../utils/contracts';
 import { v2StealthStrategies } from '../../../utils/v2-stealth-harvest-strategies';
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm('Do you wish to deploy v2 keep3r jobs contracts?');
-
+const prompt = new Confirm({ message: 'correct address?' });
+const confirm = new Confirm({
+  message: 'Do you want to add strategies on v2 harvest stalth keep3r job?',
+});
 async function main() {
   await run('compile');
   await promptAndSubmit();
@@ -34,6 +36,7 @@ function promptAndSubmit(): Promise<void | Error> {
             }));
 
           console.log(strategiesToAdd);
+          if (!(await confirm.run())) return;
 
           await harvestV2Keep3rStealthJob.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,

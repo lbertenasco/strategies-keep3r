@@ -1,15 +1,10 @@
 const hre = require('hardhat');
 const ethers = hre.ethers;
-const {
-  bn,
-  e18,
-  e18ToDecimal,
-  ZERO_ADDRESS,
-} = require('../../../utils/web3-utils');
+const { bn } = require('../../../utils/web3-utils');
 const { v2CrvStrategies } = require('../../../utils/v2-crv-strategies');
 const { v1CrvStrategies } = require('../../../utils/v1-crv-strategies');
 const config = require('../../../.config.json');
-const jobs = config.contracts.mainnet.jobs;
+import * as contracts from '../../../utils/contracts';
 
 const { Confirm } = require('enquirer');
 const confirm = new Confirm(
@@ -40,16 +35,16 @@ function run() {
     }
     console.log('using address:', deployer._address);
 
-    const crvStrategyKeep3rJob2 = await ethers.getContractAt(
-      'CrvStrategyKeep3rJob2',
-      jobs.crvStrategyKeep3rJob2,
+    const crvStrategyKeep3rStealthJob2 = await ethers.getContractAt(
+      'CrvStrategyKeep3rStealthJob2',
+      contracts.crvStrategyKeep3rStealthJob2.mainnet,
       deployer
     );
 
     const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
 
     // Checks if local data matches chain data
-    const addedStrategies = await crvStrategyKeep3rJob2.strategies();
+    const addedStrategies = await crvStrategyKeep3rStealthJob2.strategies();
     for (const strategy of crvStrategies) {
       const added = addedStrategies.indexOf(strategy.address) != -1;
       if (added && strategy.added) continue;
@@ -72,7 +67,7 @@ function run() {
     if (!(await confirm.run())) return;
 
     console.time('addStrategies');
-    await crvStrategyKeep3rJob2.addStrategies(
+    await crvStrategyKeep3rStealthJob2.addStrategies(
       newV1CrvStrategies.map((strategy) => strategy.address),
       newV1CrvStrategies.map((strategy) => strategy.requiredHarvestAmount),
       newV1CrvStrategies.map((strategy) =>
