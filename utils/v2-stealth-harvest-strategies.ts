@@ -31,8 +31,8 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   },
   {
     name: 'StrategyMakerETHDAIDelegate',
-    added: false,
-    amount: 1_000_000,
+    added: true,
+    amount: 2_000_000,
     address: '0x1A5890d45090701A35D995Be3b63948A67460341',
   },
   {
@@ -101,6 +101,25 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     name: 'convex_tricrypto',
     added: true,
     address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
+    amount: 2_000_000,
+  },
+  // orb_unknown
+  {
+    name: 'orb_unknown_1',
+    added: true,
+    address: '0x04A508664B053E0A08d5386303E649925CBF763c',
+    amount: 2_000_000,
+  },
+  {
+    name: 'orb_unknown_2',
+    added: true,
+    address: '0x4730D10703155Ef4a448B17b0eaf3468fD4fb02d',
+    amount: 2_000_000,
+  },
+  {
+    name: 'orb_unknown_3',
+    added: true,
+    address: '0x9Ae0B9a67cF5D603847980D95Ad4D45b57Ff7783',
     amount: 2_000_000,
   },
 ];

@@ -63,6 +63,7 @@ function promptAndSubmit(): Promise<void | Error> {
       // '0x37770F958447fFa1571fc9624BFB3d673161f37F',
       // '0xd28b508EA08f14A473a5F332631eA1972cFd7cC0',
       '0x5148C3124B42e73CA4e15EEd1B304DB59E0F2AF7',
+      '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
     ];
 
     // custom maxReportDelay and amount:

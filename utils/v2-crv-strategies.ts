@@ -286,4 +286,14 @@ export const v2CrvStrategies = [
     requiredEarn: { amount: 10, decimals: 18 },
     profitFactor: 1,
   },
+  // unknown
+  {
+    name: 'unknown',
+    wantSymbol: 'unknown',
+    added: true,
+    address: '0x57D2E2eD281650A5d987E6ef87BC1BeD4fD0E959',
+    requiredHarvestAmount: e18.mul(10_000),
+    requiredEarn: { amount: 80_000, decimals: 18 },
+    profitFactor: 1,
+  },
 ];
