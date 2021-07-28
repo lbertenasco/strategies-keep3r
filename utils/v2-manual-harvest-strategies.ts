@@ -216,11 +216,6 @@ export const manualHarvestStrategies = [
   },
   // sam unknown
   {
-    name: 'sam_unknown_1',
-    address: '0x4d069f267DaAb537c4ff135556F711c0A6538496',
-    maxReportDelay: 60 * 60 * 8, // 8 hours
-  },
-  {
     name: 'sam_unknown_2',
     address: '0xE6c78b85f93c25B8EE7d963fD15d1d53a00F5908',
     maxReportDelay: 60 * 60 * 8, // 8 hours
