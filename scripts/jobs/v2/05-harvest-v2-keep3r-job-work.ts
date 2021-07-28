@@ -1,5 +1,6 @@
 import { run, ethers } from 'hardhat';
-import config from '../../../contracts.json';
+import config from '../../../.config.json';
+import { contracts } from '../../../contracts.json';
 import { bn, e18, gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
 import { manualHarvestStrategies } from '../../../utils/v2-manual-harvest-strategies';
@@ -27,12 +28,12 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('working v2 harvest strategies as:', signer.address);
     const v2Keeper = await ethers.getContractAt(
       'V2Keeper',
-      config.contracts.mainnet.proxyJobs.v2Keeper,
+      contracts.mainnet.proxyJobs.v2Keeper,
       signer
     );
     const harvestV2Keep3rJob = await ethers.getContractAt(
       'V2Keep3rJob',
-      config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
+      contracts.mainnet.oldJobs.harvestV2Keep3rJob
     );
     let strategiesAddresses: string[] =
       await harvestV2Keep3rJob.callStatic.strategies();
