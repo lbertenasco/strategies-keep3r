@@ -112,11 +112,13 @@ function promptAndSubmit(): Promise<void | Error> {
         );
         strategy.lastReport = params.lastReport;
         let debtRatio = params.debtRatio;
-        if(debtRatio == 0){
-          let totalAssets = strategy.vaultContract.callStatic.totalAssets();
-          let actualRatio = params.totalDebt / totalAssets * 10000;
-          if(actualRatio < 10){ // 0.1% in BPS
-            console.log('avoiding for zero debtRatio '+ strategy.address +' ...');
+        if (debtRatio.eq(0)) {
+          let totalAssets =
+            await strategy.vaultContract.callStatic.totalAssets();
+          let actualRatio = params.totalDebt.mul(10000).div(totalAssets);
+          if (actualRatio.lt(10)) {
+            // 0.1% in BPS
+            console.log('avoiding due to zero debtRatio...');
             continue; // Ignore strategies which have no debtRatio AND no actualRatio
           }
         }
