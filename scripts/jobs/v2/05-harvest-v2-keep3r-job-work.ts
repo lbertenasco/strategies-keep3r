@@ -108,6 +108,14 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy.address
         );
         strategy.lastReport = params.lastReport;
+        let debtRatio = params.debtRatio;
+        if(debtRatio == 0){
+          let totalAssets = strategy.vaultContract.callStatic.totalAssets();
+          let actualRatio = params.totalDebt / totalAssets * 10000;
+          if(actualRatio < 10){ // 0.1% in BPS
+            continue; // Ignore strategies which have no debtRatio AND no actualRatio
+          }
+        }
         const cooldownCompleted = strategy.lastReport.lt(
           now.sub(strategy.maxReportDelay)
         );
