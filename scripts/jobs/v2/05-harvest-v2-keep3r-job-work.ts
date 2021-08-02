@@ -113,6 +113,7 @@ function promptAndSubmit(): Promise<void | Error> {
           let totalAssets = strategy.vaultContract.callStatic.totalAssets();
           let actualRatio = params.totalDebt / totalAssets * 10000;
           if(actualRatio < 10){ // 0.1% in BPS
+            console.log('avoiding for zero debtRatio '+ strategy.address +' ...');
             continue; // Ignore strategies which have no debtRatio AND no actualRatio
           }
         }
