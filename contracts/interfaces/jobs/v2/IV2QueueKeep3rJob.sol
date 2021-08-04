@@ -3,7 +3,7 @@ pragma solidity >=0.6.8;
 import "../IKeep3rJob.sol";
 
 interface IV2QueueKeep3rJob is IKeep3rJob {
-    event Keep3rSet(address keep3r);
+    // event Keep3rSet(address keep3r);
 
     // Setters
     event StrategyAdded(address _strategy);
@@ -44,4 +44,6 @@ interface IV2QueueKeep3rJob is IKeep3rJob {
 
     // Mechanics keeper bypass
     function forceWork(address _strategy) external;
+
+    function forceWorkUnsafe(address _strategy) external;
 }

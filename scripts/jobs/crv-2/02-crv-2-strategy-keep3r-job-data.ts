@@ -1,9 +1,7 @@
-import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
-import { bnToDecimal } from '../../../utils/web3-utils';
-import config from '../../../.config.json';
 import { v2CrvStrategies } from '../../../utils/v2-crv-strategies';
-const mainnetContracts = config.contracts.mainnet;
+import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
+import * as contracts from '../../../utils/contracts';
 
 async function main() {
   await run('compile');
@@ -14,22 +12,25 @@ function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     console.log('');
     try {
-      // Setup CrvStrategyKeep3rJob2
-      const crvStrategyKeep3rJob2 = await ethers.getContractAt(
-        'CrvStrategyKeep3rJob2',
-        mainnetContracts.jobs.crvStrategyKeep3rJob2
+      // Setup CrvStrategyKeep3rStealthJob2
+      const crvStrategyKeep3rStealthJob2 = await ethers.getContractAt(
+        'CrvStrategyKeep3rStealthJob2',
+        contracts.crvStrategyKeep3rStealthJob2.mainnet
       );
 
-      const strategies = await crvStrategyKeep3rJob2.callStatic.strategies();
+      const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
+
+      const strategies =
+        await crvStrategyKeep3rStealthJob2.callStatic.strategies();
 
       for (const strategy of strategies) {
-        const requiredHarvest = await crvStrategyKeep3rJob2.callStatic.requiredHarvest(
-          strategy
-        );
-        const requiredEarn = await crvStrategyKeep3rJob2.callStatic.requiredEarn(
-          strategy
-        );
-        const strategyData = v2CrvStrategies.find(
+        const requiredHarvest =
+          await crvStrategyKeep3rStealthJob2.callStatic.requiredHarvest(
+            strategy
+          );
+        const requiredEarn =
+          await crvStrategyKeep3rStealthJob2.callStatic.requiredEarn(strategy);
+        const strategyData = crvStrategies.find(
           (strategyData: any) => strategyData.address == strategy
         );
         const strategyContract = await ethers.getContractAt(
@@ -56,7 +57,7 @@ function promptAndSubmit(): Promise<void | Error> {
       resolve();
     } catch (err) {
       reject(
-        `Error while checking workable strategies on CrvStrategyKeep3rJob2 contract: ${err.message}`
+        `Error while checking workable strategies on CrvStrategyKeep3rStealthJob2 contract: ${err.message}`
       );
     }
   });

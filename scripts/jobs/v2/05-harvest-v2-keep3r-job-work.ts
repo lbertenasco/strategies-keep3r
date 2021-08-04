@@ -1,7 +1,9 @@
 import { run, ethers } from 'hardhat';
 import config from '../../../.config.json';
-import { bn, gwei } from '../../../utils/web3-utils';
+import { contracts } from '../../../contracts.json';
+import { bn, e18, gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
+import { manualHarvestStrategies } from '../../../utils/v2-manual-harvest-strategies';
 const { Confirm } = require('enquirer');
 const sendTxPrompt = new Confirm({ message: 'Send tx?' });
 
@@ -12,10 +14,11 @@ async function main() {
 const vaultAPIVersions = {
   default: 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
   '0.3.0': 'contracts/interfaces/yearn/IVaultAPI.sol:VaultAPI',
-  '0.3.2': 'contracts/interfaces/yearn/IVaultAPI_0_3_2.sol:VaultAPI',
+  '0.3.2': 'contracts/interfaces/yearn/IVaultAPI_0_3_2_s.sol:VaultAPI',
 };
 
 function promptAndSubmit(): Promise<void | Error> {
+  let nonceIncreasedBy = bn.from(0);
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
     const provider = ethers.getDefaultProvider();
@@ -25,29 +28,72 @@ function promptAndSubmit(): Promise<void | Error> {
     console.log('working v2 harvest strategies as:', signer.address);
     const v2Keeper = await ethers.getContractAt(
       'V2Keeper',
-      config.contracts.mainnet.proxyJobs.v2Keeper,
+      contracts.mainnet.proxyJobs.v2Keeper,
       signer
     );
     const harvestV2Keep3rJob = await ethers.getContractAt(
-      'HarvestV2Keep3rJob',
-      config.contracts.mainnet.oldJobs.harvestV2Keep3rJob
+      'V2Keep3rJob',
+      contracts.mainnet.oldJobs.harvestV2Keep3rJob
     );
-    let strategiesAddresses = await harvestV2Keep3rJob.callStatic.strategies();
-    const strategies = strategiesAddresses.map((address: string) => ({
+    let strategiesAddresses: string[] =
+      await harvestV2Keep3rJob.callStatic.strategies();
+
+    // manually add extra strategies
+    strategiesAddresses = [
+      ...strategiesAddresses,
+      '0xe9bD008A97e362F7C501F6F5532A348d2e6B8131',
+    ];
+
+    const baseStrategies: any = strategiesAddresses.map((address: string) => ({
       address,
     }));
 
+    const strategiesToAvoid: any = [
+      // from vault DAI yVault 0x19D3364A399d251E894aC732651be8B0E4e85001
+      // from vault DAI yVault 0x19D3364A399d251E894aC732651be8B0E4e85001
+      '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
+      '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
+      '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca',
+      '0x7D960F3313f3cB1BBB6BF67419d303597F3E2Fa8',
+      '0x4d069f267DaAb537c4ff135556F711c0A6538496',
+      '0x3D6532c589A11117a4494d9725bb8518C731f1Be',
+      '0xB361a3E75Bc2Ae6c8A045b3A43E2B0c9aD890d48',
+      '0x57e848A6915455a7e77CF0D55A1474bEFd9C374d',
+      '0x30010039Ea4a0c4fa1Ac051E8aF948239678353d',
+      // from vault WETH yVault 0xa258C4606Ca8206D8aA700cE2143D7db854D168c
+      // '0xec2DB4A1Ad431CC3b102059FA91Ba643620F0826',
+      // '0xC5e385f7Dad49F230AbD53e21b06aA0fE8dA782D',
+      // '0x37770F958447fFa1571fc9624BFB3d673161f37F',
+      // '0xd28b508EA08f14A473a5F332631eA1972cFd7cC0',
+      '0x5148C3124B42e73CA4e15EEd1B304DB59E0F2AF7',
+    ];
+
+    // custom maxReportDelay and amount:
+    const strategies = [...baseStrategies, ...manualHarvestStrategies];
+
+    let harvestedCRV = false;
     try {
       const now = bn.from(Math.round(new Date().valueOf() / 1000));
 
       for (const strategy of strategies) {
-        console.log('strategy', strategy.address);
+        if (strategy.name)
+          console.log('strategy', strategy.name, strategy.address);
+        else console.log('strategy', strategy.address);
+        if (strategiesToAvoid.indexOf(strategy.address) != -1) {
+          console.log('avoiding...');
+          continue;
+        }
         strategy.contract = await ethers.getContractAt(
           'IBaseStrategy',
           strategy.address,
           signer
         );
-        strategy.maxReportDelay = await strategy.contract.callStatic.maxReportDelay();
+        try {
+          strategy.isCRV = !!(await strategy.contract.callStatic.crv());
+        } catch (error) {}
+        strategy.maxReportDelay = strategy.maxReportDelay
+          ? bn.from(Math.round(strategy.maxReportDelay))
+          : await strategy.contract.callStatic.maxReportDelay();
         strategy.vault = await strategy.contract.callStatic.vault();
         strategy.vaultContract = await ethers.getContractAt(
           vaultAPIVersions['default'],
@@ -65,7 +111,18 @@ function promptAndSubmit(): Promise<void | Error> {
           strategy.address
         );
         strategy.lastReport = params.lastReport;
-        const cooldown = strategy.lastReport.lt(
+        let debtRatio = params.debtRatio;
+        if (debtRatio.eq(0)) {
+          let totalAssets =
+            await strategy.vaultContract.callStatic.totalAssets();
+          let actualRatio = params.totalDebt.mul(10000).div(totalAssets);
+          if (actualRatio.lt(10)) {
+            // 0.1% in BPS
+            console.log('avoiding due to zero debtRatio...');
+            continue; // Ignore strategies which have no debtRatio AND no actualRatio
+          }
+        }
+        const cooldownCompleted = strategy.lastReport.lt(
           now.sub(strategy.maxReportDelay)
         );
         console.log(
@@ -74,7 +131,7 @@ function promptAndSubmit(): Promise<void | Error> {
         );
         console.log(
           'strategy over cooldown:',
-          cooldown,
+          cooldownCompleted,
           ', will work in:',
           strategy.lastReport
             .add(strategy.maxReportDelay)
@@ -83,10 +140,31 @@ function promptAndSubmit(): Promise<void | Error> {
             .toNumber(),
           'hours'
         );
-        if (!cooldown) continue;
+        if (!cooldownCompleted && !strategy.amount) continue;
+        if (!cooldownCompleted) {
+          console.log('checking creditAvailable:');
+          // vault.creditAvailable(strategy) >= amount -> do a harvest if true.
+          const creditAvailable =
+            await strategy.vaultContract.callStatic.creditAvailable(
+              strategy.address
+            );
+          // if creditAvailable is less than amount, do not harvest;
+          console.log(
+            'amount:',
+            strategy.amount.toString(),
+            'creditAvailable:',
+            creditAvailable.toString()
+          );
+          if (creditAvailable.lt(strategy.amount)) continue;
+        }
+
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
         await v2Keeper.callStatic.harvest(strategy.address);
+        if (strategy.isCRV && harvestedCRV) {
+          console.log('already harvested a CRV strat this cycle, skipping...');
+          continue;
+        }
         console.log('working...');
 
         // continue;
@@ -105,8 +183,11 @@ function promptAndSubmit(): Promise<void | Error> {
           reject(`gas price > ${maxGwei}gwei`);
         }
 
-        const nonce = ethers.BigNumber.from(await signer.getTransactionCount());
+        const nonce = ethers.BigNumber.from(
+          await signer.getTransactionCount()
+        ).add(nonceIncreasedBy);
         console.log('using account nonce:', nonce.toNumber());
+        nonceIncreasedBy = nonceIncreasedBy.add(1);
 
         const rawMessage = await v2Keeper.populateTransaction.harvest(
           strategy.address,
@@ -126,6 +207,7 @@ function promptAndSubmit(): Promise<void | Error> {
         // }
         const res = await taichi.sendPrivateTransaction(signedMessage);
         if (res.error) {
+          if (res.error == 'already known') continue;
           return reject(res.error.message);
         }
 
@@ -145,6 +227,7 @@ function promptAndSubmit(): Promise<void | Error> {
             console.log(query.obj);
           }
         }
+        if (strategy.isCRV) harvestedCRV = true;
       }
       console.log('waiting 10 minutes...');
     } catch (err) {

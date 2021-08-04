@@ -1,6 +1,6 @@
 import { run, ethers } from 'hardhat';
 import { JsonRpcSigner } from '@ethersproject/providers';
-import config from '../../.config.json';
+import config from '../../contracts.json';
 const mainnetContracts = config.contracts.mainnet;
 
 async function main() {

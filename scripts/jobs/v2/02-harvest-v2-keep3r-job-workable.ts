@@ -1,5 +1,5 @@
 import { run, ethers } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 const mainnetContracts = config.contracts.mainnet;
 
 async function main() {
@@ -24,9 +24,8 @@ function promptAndSubmit(): Promise<void | Error> {
       const strategies = await harvestV2Keep3rJob.callStatic.strategies();
       console.log('strategies:', strategies);
       for (const strategy of strategies) {
-        const workableStrategy = await harvestV2Keep3rJob.callStatic.workableStrategy(
-          strategy
-        );
+        const workableStrategy =
+          await harvestV2Keep3rJob.callStatic.workableStrategy(strategy);
         console.log(strategy, 'workable:', workableStrategy);
       }
       resolve();

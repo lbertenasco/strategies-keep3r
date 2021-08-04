@@ -1,7 +1,7 @@
 import { ContractFactory, Wallet } from 'ethers';
 import { run, ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../utils/web3-utils';
-import config from '../../.config.json';
+import config from '../../contracts.json';
 const escrowContracts = config.contracts.mainnet.escrow;
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 const genericV2Keep3rJobContracts = config.contracts.mainnet.genericV2Keep3rJob;
@@ -65,7 +65,7 @@ async function main() {
   const relayerTx = await stealthRelayer.populateTransaction.executeOnBlock(
     crvStrategyKeep3r.address,
     harvestTx.data,
-    blockNumber + 1,
+    blockNumber + 2,
     minerTip,
     {
       gasPrice: 0,
@@ -90,7 +90,7 @@ async function main() {
 
   const simulation = await flashbotsProvider.simulate(
     signedBundle,
-    blockNumber + 1
+    blockNumber + 2
   );
 
   console.log('simulation');

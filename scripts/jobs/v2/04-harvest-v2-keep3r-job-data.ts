@@ -1,5 +1,5 @@
 import { run, ethers } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 const mainnetContracts = config.contracts.mainnet;
 
 async function main() {
@@ -16,7 +16,7 @@ function promptAndSubmit(): Promise<void | Error> {
       // Setup HarvestV2Keep3rJob
       console.log('HarvestV2Keep3rJob:');
       const harvestV2Keep3rJob = await ethers.getContractAt(
-        'HarvestV2Keep3rJob',
+        'V2Keep3rJob',
         mainnetContracts.oldJobs.harvestV2Keep3rJob
       );
 

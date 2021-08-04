@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 import "../utils/GasPriceLimited.sol";
@@ -11,7 +10,7 @@ import "../interfaces/jobs/IVaultKeep3rJob.sol";
 import "../interfaces/yearn/IEarnableVault.sol";
 
 contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3rJob {
-    using SafeMath for uint256;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
@@ -32,7 +31,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
         bool _onlyEOA,
         uint256 _earnCooldown,
         uint256 _maxGasPrice
-    ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+    ) MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setEarnCooldown(_earnCooldown);
         _setMaxGasPrice(_maxGasPrice);
@@ -140,7 +139,7 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
 
     function _workable(address _vault) internal view returns (bool) {
         require(requiredEarn[_vault] > 0, "VaultKeep3rJob::workable:vault-not-added");
-        return (calculateEarn(_vault) >= requiredEarn[_vault] && block.timestamp > lastEarnAt[_vault].add(earnCooldown));
+        return (calculateEarn(_vault) >= requiredEarn[_vault] && block.timestamp > lastEarnAt[_vault] + earnCooldown);
     }
 
     // Keeper actions
@@ -156,14 +155,14 @@ contract VaultKeep3rJob is MachineryReady, Keep3r, GasPriceLimited, IVaultKeep3r
         emit Worked(_vault, msg.sender, _credits);
     }
 
-    function work(address _vault) external override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _vault) external override notPaused onlyKeeper(msg.sender) returns (uint256 _credits) {
         _credits = _work(_vault);
         _paysKeeperAmount(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
+        return (_getQuoteLimitFor(msg.sender, _initialGas) * rewardMultiplier) / PRECISION;
     }
 
     // Mechanics Setters

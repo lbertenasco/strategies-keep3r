@@ -1,5 +1,5 @@
 import { run, ethers } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 import { gwei } from '../../../utils/web3-utils';
 import * as taichi from '../../../utils/taichi';
 const { Confirm } = require('enquirer');

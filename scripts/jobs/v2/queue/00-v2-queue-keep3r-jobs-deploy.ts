@@ -1,7 +1,7 @@
 import { ContractFactory } from 'ethers';
 import { run, ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../../../utils/web3-utils';
-import config from '../../../../.config.json';
+import config from '../../../../contracts.json';
 const escrowContracts = config.contracts.mainnet.escrow;
 const mechanicsContracts = config.contracts.mainnet.mechanics;
 const genericV2Keep3rJobContracts = config.contracts.mainnet.genericV2Keep3rJob;
@@ -14,9 +14,8 @@ const prompt = new Confirm(
 async function main() {
   await run('compile');
   const V2Keeper: ContractFactory = await ethers.getContractFactory('V2Keeper');
-  const HarvestV2QueueKeep3rJob: ContractFactory = await ethers.getContractFactory(
-    'HarvestV2QueueKeep3rJob'
-  );
+  const HarvestV2QueueKeep3rJob: ContractFactory =
+    await ethers.getContractFactory('HarvestV2QueueKeep3rJob');
   const TendV2QueueKeep3rJob: ContractFactory = await ethers.getContractFactory(
     'TendV2Keep3rJob' // 'TendV2QueueKeep3rJob'
   );

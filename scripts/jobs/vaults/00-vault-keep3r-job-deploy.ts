@@ -1,7 +1,7 @@
 import { ContractFactory } from 'ethers';
 import { run, ethers } from 'hardhat';
 import { gwei, ZERO_ADDRESS } from '../../../utils/web3-utils';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 const mainnetContracts = config.contracts.mainnet;
 const mechanicsContracts = mainnetContracts.mechanics;
 

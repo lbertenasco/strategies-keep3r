@@ -1,5 +1,5 @@
 import { run, ethers, network } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 import { gwei } from '../../../utils/web3-utils';
 import { advanceTimeAndBlock } from '../../../test/utils/evm';
 import * as taichi from '../../../utils/taichi';
@@ -75,9 +75,8 @@ function promptAndSubmit(): Promise<void | Error> {
         strategy.keeperAccount
       );
       strategy.wantSymbol = await strategy.wantContract.callStatic.symbol();
-      strategy.wantBalancePre = await strategy.wantContract.callStatic.balanceOf(
-        strategy.address
-      );
+      strategy.wantBalancePre =
+        await strategy.wantContract.callStatic.balanceOf(strategy.address);
       strategy.decimals = await strategy.wantContract.callStatic.decimals();
       // init default
       strategy.vaultContract = await ethers.getContractAt(
@@ -86,7 +85,8 @@ function promptAndSubmit(): Promise<void | Error> {
         strategy.keeperAccount
       );
 
-      strategy.vaultTotalAssets = await strategy.vaultContract.callStatic.totalAssets();
+      strategy.vaultTotalAssets =
+        await strategy.vaultContract.callStatic.totalAssets();
       const workable = await strategy.contract.callStatic.tendTrigger(5000);
       console.log({
         strategy: strategy.address,

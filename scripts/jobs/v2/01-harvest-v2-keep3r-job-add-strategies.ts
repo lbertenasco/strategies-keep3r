@@ -1,5 +1,5 @@
 import { run, ethers } from 'hardhat';
-import config from '../../../.config.json';
+import config from '../../../contracts.json';
 const mainnetContracts = config.contracts.mainnet;
 
 const { Confirm } = require('enquirer');

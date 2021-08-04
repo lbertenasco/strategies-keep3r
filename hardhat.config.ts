@@ -25,7 +25,12 @@ module.exports = {
           mainnet: {
             url: process.env.MAINNET_HTTPS_URL,
             accounts: [process.env.MAINNET_PRIVATE_KEY],
-            gasPrice: 35000000000, // 35 gwei
+            gasPrice: 15000000000, // 15 gwei
+          },
+          polygonMainnet: {
+            url: 'https://rpc-mainnet.matic.quiknode.pro',
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+            gasPrice: 5000000000, // 5 gwei
           },
           staticMainnet: {
             url: process.env.MAINNET_HTTPS_URL,
@@ -37,6 +42,15 @@ module.exports = {
         },
   solidity: {
     compilers: [
+      {
+        version: '0.8.4',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
       {
         version: '0.6.12',
         settings: {

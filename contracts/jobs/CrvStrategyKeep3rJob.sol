@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.12;
+pragma solidity 0.8.4;
 
-import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@lbertenasco/contract-utils/contracts/abstract/MachineryReady.sol";
 import "@lbertenasco/contract-utils/contracts/keep3r/Keep3rAbstract.sol";
 
@@ -15,7 +14,7 @@ import "../interfaces/crv/ICrvStrategy.sol";
 import "../interfaces/crv/ICrvClaimable.sol";
 
 contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
-    using SafeMath for uint256;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant PRECISION = 1_000;
     uint256 public constant MAX_REWARD_MULTIPLIER = 1 * PRECISION; // 1x max reward multiplier
@@ -41,7 +40,7 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
         bool _onlyEOA,
         uint256 _maxHarvestPeriod,
         uint256 _harvestCooldown
-    ) public MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
+    ) MachineryReady(_mechanicsRegistry) Keep3r(_keep3r) {
         _setKeep3rRequirements(_bond, _minBond, _earned, _age, _onlyEOA);
         _setMaxHarvestPeriod(_maxHarvestPeriod);
         _setHarvestCooldown(_harvestCooldown);
@@ -198,9 +197,9 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
     function _workable(address _strategy) internal returns (bool) {
         require(requiredHarvest[_strategy] > 0, "CrvStrategyKeep3rJob::workable:strategy-not-added");
         // ensures no other strategy has been harvested for at least the harvestCooldown
-        if (block.timestamp < lastHarvest.add(harvestCooldown)) return false;
+        if (block.timestamp < lastHarvest + harvestCooldown) return false;
         // if strategy has exceeded maxHarvestPeriod, force workable true
-        if (block.timestamp > lastWorkAt[_strategy].add(maxHarvestPeriod)) return true;
+        if (block.timestamp > lastWorkAt[_strategy] + maxHarvestPeriod) return true;
         return calculateHarvest(_strategy) >= requiredHarvest[_strategy];
     }
 
@@ -225,14 +224,14 @@ contract CrvStrategyKeep3rJob is MachineryReady, Keep3r, ICrvStrategyKeep3rJob {
         emit Worked(_strategy, msg.sender, _credits);
     }
 
-    function work(address _strategy) external override notPaused onlyKeeper returns (uint256 _credits) {
+    function work(address _strategy) external override notPaused onlyKeeper(msg.sender) returns (uint256 _credits) {
         _credits = _work(_strategy);
         _paysKeeperAmount(msg.sender, _credits);
     }
 
     function _calculateCredits(uint256 _initialGas) internal view returns (uint256 _credits) {
         // Gets default credits from KP3R_Helper and applies job reward multiplier
-        return _getQuoteLimitFor(msg.sender, _initialGas).mul(rewardMultiplier).div(PRECISION);
+        return (_getQuoteLimitFor(msg.sender, _initialGas) * rewardMultiplier) / PRECISION;
     }
 
     // Mechanics keeper bypass
