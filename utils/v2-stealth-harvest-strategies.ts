@@ -11,30 +11,30 @@ export interface v2HarvestStealthStrategy {
 }
 
 export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
-  {
-    name: 'StrategystETHCurve',
-    added: false,
-    amount: 2_000_000,
-    address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
-  },
-  {
-    name: 'StrategyGenericLevCompFarm',
-    added: false,
-    amount: 2_000_000,
-    address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87',
-  },
+  // { // deprecated
+  //   name: 'StrategystETHCurve',
+  //   added: false,
+  //   amount: 2_000_000,
+  //   address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
+  // },
+  // { // deprecated
+  //   name: 'StrategyGenericLevCompFarm',
+  //   added: false,
+  //   amount: 2_000_000,
+  //   address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87',
+  // },
   {
     name: 'StrategyYearnVECRV',
     added: false,
     amount: 1_000_000,
     address: '0x2923a58c1831205C854DBEa001809B194FDb3Fa5',
   },
-  {
-    name: 'StrategyMakerETHDAIDelegate',
-    added: false,
-    amount: 1_000_000,
-    address: '0x1A5890d45090701A35D995Be3b63948A67460341',
-  },
+  // { // deprecated
+  //   name: 'StrategyMakerETHDAIDelegate',
+  //   added: false,
+  //   amount: 1_000_000,
+  //   address: '0x1A5890d45090701A35D995Be3b63948A67460341',
+  // },
   {
     name: 'StrategyLenderYieldOptimiser',
     added: true,
@@ -47,12 +47,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_000_000,
     address: '0xda988eBb26F505246C59Ba26514340B634F9a7a2',
   },
-  {
-    name: 'StrategyIdleidleDAIYield',
-    added: false,
-    amount: 3_000_000,
-    address: '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca',
-  },
+  // { // deprecated
+  //   name: 'StrategyIdleidleDAIYield',
+  //   added: false,
+  //   amount: 3_000_000,
+  //   address: '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca',
+  // },
   {
     name: 'StrategyIdleidleUSDCYield',
     added: false,
@@ -105,7 +105,7 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   },
   {
     name: 'StrategyKashiMultiPairLender',
-    added: true,
+    added: false,
     address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
     amount: 2_000_000,
   },

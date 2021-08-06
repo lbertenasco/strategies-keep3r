@@ -25,6 +25,27 @@ function promptAndSubmit(): Promise<void | Error> {
             contracts.harvestV2Keep3rStealthJob.mainnet
           );
 
+          const jobStrategies =
+            await harvestV2Keep3rStealthJob.callStatic.strategies();
+
+          const strategiesAdded = v2StealthStrategies
+            .filter((strategy) => strategy.added)
+            .map((strategy) => strategy.address);
+
+          for (const strategyAdded of strategiesAdded) {
+            if (jobStrategies.indexOf(strategyAdded) == -1)
+              console.log(
+                `strategy: ${strategyAdded} should be added: false, or removed from script`
+              );
+          }
+
+          for (const jobStrategy of jobStrategies) {
+            if (strategiesAdded.indexOf(jobStrategy) == -1)
+              console.log(
+                `strategy: ${jobStrategy} should not be on job, or is missing from config`
+              );
+          }
+
           const strategiesToAdd = v2StealthStrategies
             .filter((strategy) => !strategy.added)
             .map((strategy) => ({
@@ -35,9 +56,16 @@ function promptAndSubmit(): Promise<void | Error> {
               costPair: strategy.costPair ? strategy.costPair : ZERO_ADDRESS,
             }));
 
+          console.log('strategiesToAdd');
           console.log(strategiesToAdd);
           if (!(await confirm.run())) return;
 
+          await harvestV2Keep3rStealthJob.callStatic.addStrategies(
+            strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
+            strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
+            strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
+            strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
+          );
           await harvestV2Keep3rStealthJob.addStrategies(
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
             strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
