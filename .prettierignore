@@ -7,7 +7,7 @@
 .versionrc
 .env
 .env.example
-*.skip
+*.skip*
 
 # Hardhat
 artifacts
