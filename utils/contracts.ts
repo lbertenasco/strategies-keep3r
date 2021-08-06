@@ -14,7 +14,7 @@ export const harvestV2Keep3rStealthJob = {
 };
 
 export const crvStrategyKeep3rStealthJob2 = {
-  mainnet: '',
+  mainnet: '0x41edFD5575fa4590A20f669bBDa6C4Ae367cD0d8',
   goerli: '',
 };
 
