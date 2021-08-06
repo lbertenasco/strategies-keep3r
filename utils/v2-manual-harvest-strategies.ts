@@ -252,4 +252,11 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 150, // 150 hours
     amount: e18.mul(2500000),
   },
+  // poolpi's strats
+  {
+    name: 'Router_yvDAI_030_to_yvDAI_043',
+    address: '0x6D892A5585F45f3C45A238C717AA0a228aE69e2C',
+    maxReportDelay: 60 * 60 * 24 * 2, // 2 days
+    // amount: e18.mul(2500000),
+  },
 ];
