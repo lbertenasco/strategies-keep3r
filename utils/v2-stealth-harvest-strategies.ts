@@ -103,4 +103,10 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
     amount: 2_000_000,
   },
+  {
+    name: 'StrategyKashiMultiPairLender',
+    added: true,
+    address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
+    amount: 2_000_000,
+  },
 ];
