@@ -64,7 +64,7 @@ function mainExecute(): Promise<void | Error> {
     );
 
     // build work tx
-    const strategy = '0xb7f013426d33fe27e4E8ABEE58500268554736bD';
+    const strategy = '0x8E4AA2E00694Adaf37f0311651262671f4d7Ac16';
     const workTx = await harvestV2Keep3rStealthJob.populateTransaction.work(
       strategy
     );
@@ -79,7 +79,7 @@ function mainExecute(): Promise<void | Error> {
     const targetBlockNumber = blockNumber + 2;
 
     // NOTE: get this dynamically though estimated gas used + average fast gas price (check simulation)
-    const coinbasePayment = utils.parseEther('1').div(100);
+    // const coinbasePayment = utils.parseEther('1').div(100);
 
     const pendingBlock = await ethers.provider.send('eth_getBlockByNumber', [
       'latest',
@@ -101,27 +101,26 @@ function mainExecute(): Promise<void | Error> {
     if (gasPrice.gt(gwei.mul(maxGwei))) {
       reject(`gas price > ${maxGwei}gwei`);
     }
+    const fairGasPrice = gasPrice.mul(100 + 5).div(100);
+    console.log('fairGasPrice in gwei:', fairGasPrice.div(gwei).toNumber());
 
     // build stealth tx
     let nonce = ethers.BigNumber.from(await signer.getTransactionCount());
-    const executeAndPayTx =
-      await stealthRelayer.populateTransaction.executeAndPay(
-        harvestV2Keep3rStealthJob.address, // address _job,
-        workTx.data, // bytes memory _callData,
-        stealthHash, // bytes32 _stealthHash,
-        targetBlockNumber, // uint256 _blockNumber
-        coinbasePayment, // uint256 _payment
-        {
-          nonce,
-          gasPrice: 0,
-          gasLimit: blockGasLimit.sub(15_000),
-          value: coinbasePayment,
-        }
-      );
-    // console.log('executeAndPayTx');
-    // console.log(executeAndPayTx);
+    const executeTx = await stealthRelayer.populateTransaction.execute(
+      harvestV2Keep3rStealthJob.address, // address _job,
+      workTx.data, // bytes memory _callData,
+      stealthHash, // bytes32 _stealthHash,
+      targetBlockNumber, // uint256 _blockNumber
+      {
+        nonce,
+        gasPrice: fairGasPrice,
+        gasLimit: blockGasLimit.sub(5_000),
+      }
+    );
+    // console.log('executeTx');
+    // console.log(executeTx);
 
-    const signedTransaction = await signer.signTransaction(executeAndPayTx);
+    const signedTransaction = await signer.signTransaction(executeTx);
     // console.log('signedTransaction');
     // console.log(signedTransaction);
 
@@ -156,32 +155,27 @@ function mainExecute(): Promise<void | Error> {
     }
 
     // NOTE: here you can rebalance payment using (results[0].gasPrice * gasUsed) + a % as miner bonus
-    const fairPayment = gasPrice
-      .mul(100 + 10) // + 10%
-      .div(100)
-      .mul(simulation.totalGasUsed);
+    // const fairPayment = gasPrice
+    //   .mul(100 + 10) // + 10%
+    //   .div(100)
+    //   .mul(simulation.totalGasUsed);
 
-    const executeAndPayTxRepriced =
-      await stealthRelayer.populateTransaction.executeAndPay(
-        harvestV2Keep3rStealthJob.address, // address _job,
-        workTx.data, // bytes memory _callData,
-        stealthHash, // bytes32 _stealthHash,
-        targetBlockNumber, // uint256 _blockNumber
-        fairPayment, // uint256 _payment
-        {
-          nonce,
-          gasPrice: 0,
-          gasLimit: blockGasLimit.sub(15_000),
-          value: fairPayment,
-        }
-      );
+    const executeTxRepriced = await stealthRelayer.populateTransaction.execute(
+      harvestV2Keep3rStealthJob.address, // address _job,
+      workTx.data, // bytes memory _callData,
+      stealthHash, // bytes32 _stealthHash,
+      targetBlockNumber, // uint256 _blockNumber
+      {
+        nonce,
+        gasPrice: fairGasPrice,
+        gasLimit: blockGasLimit.sub(5_000),
+      }
+    );
 
     simulation = await flashbotsProvider.simulate(
       await flashbotsProvider.signBundle([
         {
-          signedTransaction: await signer.signTransaction(
-            executeAndPayTxRepriced
-          ),
+          signedTransaction: await signer.signTransaction(executeTxRepriced),
         },
       ]),
       targetBlockNumber
@@ -193,9 +187,7 @@ function mainExecute(): Promise<void | Error> {
       await flashbotsProvider.sendBundle(
         [
           {
-            signedTransaction: await signer.signTransaction(
-              executeAndPayTxRepriced
-            ),
+            signedTransaction: await signer.signTransaction(executeTxRepriced),
           },
         ],
         targetBlockNumber
