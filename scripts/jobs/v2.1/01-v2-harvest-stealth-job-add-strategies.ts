@@ -1,7 +1,9 @@
 import { run, ethers, network } from 'hardhat';
 import { e18, ZERO_ADDRESS } from '../../../utils/web3-utils';
 import * as contracts from '../../../utils/contracts';
+import * as accounts from '../../../utils/accounts';
 import { v2StealthStrategies } from '../../../utils/v2-stealth-harvest-strategies';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm({ message: 'correct address?' });
@@ -16,13 +18,28 @@ async function main() {
 function promptAndSubmit(): Promise<void | Error> {
   return new Promise(async (resolve, reject) => {
     const [owner] = await ethers.getSigners();
-    console.log('using address:', owner.address);
+    let signer = owner;
+    if (owner.address != accounts.yKeeper) {
+      console.log('on fork mode, impersonating yKeeper');
+      await network.provider.request({
+        method: 'hardhat_impersonateAccount',
+        params: [accounts.yKeeper],
+      });
+      const yKeeper: any = ethers.provider.getUncheckedSigner(
+        accounts.yKeeper
+      ) as any as SignerWithAddress;
+      yKeeper.address = yKeeper._address;
+      signer = yKeeper;
+    }
+
+    console.log('using address:', signer.address);
     prompt.run().then(async (answer: any) => {
       if (answer) {
         try {
           const harvestV2Keep3rStealthJob = await ethers.getContractAt(
             'HarvestV2Keep3rStealthJob',
-            contracts.harvestV2Keep3rStealthJob.mainnet
+            contracts.harvestV2Keep3rStealthJob.mainnet,
+            signer
           );
 
           const jobStrategies =
