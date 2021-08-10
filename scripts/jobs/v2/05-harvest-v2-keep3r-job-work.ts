@@ -160,7 +160,16 @@ function promptAndSubmit(): Promise<void | Error> {
 
         const workable = await strategy.contract.harvestTrigger(1_000_000);
         console.log('workabe:', workable);
-        await v2Keeper.callStatic.harvest(strategy.address);
+
+        const gasLimit = await provider.estimateGas(
+          await v2Keeper.populateTransaction.harvest(strategy.address)
+        );
+        console.log('gasLimit', gasLimit.toNumber());
+
+        await v2Keeper.callStatic.harvest(strategy.address, {
+          gasLimit: gasLimit.mul(11).div(10),
+        });
+
         if (strategy.isCRV && harvestedCRV) {
           console.log('already harvested a CRV strat this cycle, skipping...');
           continue;
@@ -194,7 +203,7 @@ function promptAndSubmit(): Promise<void | Error> {
           {
             gasPrice,
             nonce,
-            gasLimit: 3000000,
+            gasLimit: gasLimit.mul(11).div(10), // 10% buffer
           }
         );
         console.log(rawMessage);

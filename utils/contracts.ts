@@ -23,6 +23,11 @@ export const mechanicsRegistry = {
   polygon: '0x7A99923aA2efa71178BB11294349EC1F6b23a814',
 };
 
+export const v2Keeper = {
+  mainnet: '0x736D7e3c5a6CB2CE3B764300140ABF476F6CFCCF',
+  polygon: '',
+};
+
 export const curveClaimableTokensHelper = {
   mainnet: '0xEaD8d69dF1e75C81Ef63855a94309CC5374192bD',
 };
