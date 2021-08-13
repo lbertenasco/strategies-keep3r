@@ -238,7 +238,7 @@ export const manualHarvestStrategies = [
   {
     name: 'sam_unknown_5',
     address: '0xDD387F2fe0D9B1E5768fc941e7E48AA8BfAf5e41',
-    maxReportDelay: 60 * 60 * 48, // 48 hours
+    maxReportDelay: 60 * 60 * 80, // 80 hours
   },
   {
     name: 'ssc_steth',
