@@ -5,7 +5,7 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_hcrv',
     address: '0x7Ed0d52C5944C7BF92feDC87FEC49D474ee133ce',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
+    maxReportDelay: 60 * 60 * 24 * 4, // 4 days
     amount: e18.mul(5),
   },
   {
