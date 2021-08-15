@@ -210,6 +210,12 @@ export const manualHarvestStrategies = [
     amount: e18.mul(300),
   },
   {
+    name: 'convex_3crypto',
+    address: '0x2055CFD5CDbc90c60A202A1AC3DDfB71AeC1cE98',
+    maxReportDelay: 60 * 60 * 24, // 24 hours
+    amount: e18.mul(500),
+  },
+  {
     name: 'idle_rai_yield',
     address: '0x5d411d2cde10e138d68517c42be2808c90c22026',
     amount: e18.mul(1000000),
