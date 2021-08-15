@@ -173,7 +173,8 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
     amount: e18.mul(200000),
   },
-  { // deprecated
+  {
+    // deprecated
     name: 'convex_busd',
     address: '0xA44F947e51Ec6456A1d786F82ea5865F87Da9C30',
     maxReportDelay: 60 * 60 * 24 * 6.94, // 6.94 days
