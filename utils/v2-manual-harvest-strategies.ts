@@ -256,13 +256,6 @@ export const manualHarvestStrategies = [
     address: '0xCdC3d3A18c9d83Ee6E10E91B48b1fcb5268C97B5',
     maxReportDelay: 60 * 60 * 24 * 3, // 3 days
   },
-  // dudesahn Iron Bank Curve
-  {
-    name: 'dude_unknown_1',
-    address: '0x6D892A5585F45f3C45A238C717AA0a228aE69e2C',
-    maxReportDelay: 60 * 60 * 150, // 150 hours
-    amount: e18.mul(2500000),
-  },
   // poolpi's strats
   {
     name: 'Router_yvDAI_030_to_yvDAI_043',
