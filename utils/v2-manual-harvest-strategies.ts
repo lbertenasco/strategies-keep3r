@@ -29,7 +29,7 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_sbtc',
     address: '0x7aB4DB515bf258A88Bb14f3685769a0f70B8778f',
-    maxReportDelay: 60 * 60 * 24 * 6, // 6 days
+    maxReportDelay: 60 * 60 * 24 * 6.73, // 6.73 days
     amount: e18.mul(5),
   },
   {
@@ -39,9 +39,9 @@ export const manualHarvestStrategies = [
     amount: e18.mul(5),
   },
   {
-    name: 'convex_rbtc',
+    name: 'convex_renbtc',
     address: '0x7799F476522Ebe259fc525C1A21E84f7Dd551955',
-    maxReportDelay: 60 * 60 * 24 * 6, // 6 days
+    maxReportDelay: 60 * 60 * 24 * 6.93, // 6.93 days
     amount: e18.mul(5),
   },
   // /* ETH */ Moved to job
