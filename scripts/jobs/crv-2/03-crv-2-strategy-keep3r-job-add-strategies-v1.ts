@@ -17,7 +17,7 @@ async function main() {
 }
 
 function run() {
-  return new Promise(async (resolve) => {
+  return new Promise<void>(async (resolve) => {
     // Setup deployer
     const [owner] = await ethers.getSigners();
     let deployer;

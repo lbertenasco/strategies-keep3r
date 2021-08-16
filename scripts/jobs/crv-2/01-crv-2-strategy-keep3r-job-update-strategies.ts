@@ -35,15 +35,14 @@ function run(): Promise<void | Error> {
     }
     console.log('using address:', deployer._address);
 
-    const crvStrategyKeep3rStealthJob2 = await ethers.getContractAt(
+    const crvStrategyKeep3rJob2 = await ethers.getContractAt(
       'CrvStrategyKeep3rStealthJob2',
-      contracts.crvStrategyKeep3rStealthJob2.mainnet,
+      contracts.crvStrategyKeep3rJob2.mainnet,
       deployer
     );
 
     const crvStrategies: any = [...v2CrvStrategies, ...v1CrvStrategies];
-    const chainStrategies =
-      await crvStrategyKeep3rStealthJob2.callStatic.strategies();
+    const chainStrategies = await crvStrategyKeep3rJob2.callStatic.strategies();
     const strategyAddressess = v2CrvStrategies.map(
       (strategy: any) => strategy.address
     );
@@ -57,16 +56,17 @@ function run(): Promise<void | Error> {
         'is not on the local config file'
       );
       console.log(
-        `https://etherscan.io/address/${crvStrategyKeep3rStealthJob2.address}#writeContract`
+        `https://etherscan.io/address/${crvStrategyKeep3rJob2.address}#writeContract`
       );
       console.log(`removeStrategy(${chainStrategyAddress})`);
     }
 
     // Checks if local data matches chain data
     for (const strategy of crvStrategies) {
-      const requiredHarvest =
-        await crvStrategyKeep3rStealthJob2.requiredHarvest(strategy.address);
-      const requiredEarn = await crvStrategyKeep3rStealthJob2.requiredEarn(
+      const requiredHarvest = await crvStrategyKeep3rJob2.requiredHarvest(
+        strategy.address
+      );
+      const requiredEarn = await crvStrategyKeep3rJob2.requiredEarn(
         strategy.address
       );
       if (!strategy.requiredHarvestAmount.eq(requiredHarvest)) {
@@ -113,7 +113,7 @@ function run(): Promise<void | Error> {
     // Update crv strategies on crv keep3r
     console.time('updateStrategies');
     for (const strategy of outdatedV1CrvStrategies) {
-      await crvStrategyKeep3rStealthJob2.updateStrategy(
+      await crvStrategyKeep3rJob2.updateStrategy(
         strategy.address,
         strategy.requiredHarvestAmount,
         bn

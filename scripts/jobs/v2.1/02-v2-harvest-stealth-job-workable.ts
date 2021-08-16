@@ -5,7 +5,7 @@ import { v2StealthStrategies } from '../../../utils/v2-stealth-harvest-strategie
 
 const { Confirm } = require('enquirer');
 const prompt = new Confirm({
-  message: 'Do you wish to deploy v2 keep3r jobs contracts?',
+  message: 'Do you wish to know which v2 stealth strategies are workable?',
 });
 
 async function main() {
