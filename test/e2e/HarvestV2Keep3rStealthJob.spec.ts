@@ -107,13 +107,6 @@ describe('HarvestV2Keep3rStealthJob', () => {
 
     // Add strategies to job
     const strategies = [
-      // {
-      //   name: 'orb_unknown',
-      //   address: '0x8c44Cc5c0f5CD2f7f17B9Aca85d456df25a61Ae8',
-      //   requiredAmount: 1_000,
-      //   costToken: ZERO_ADDRESS,
-      //   costPair: ZERO_ADDRESS,
-      // },
       {
         name: 'test',
         address: '0xF2E9e8eae24deA1a5d40F3a105677AF1797A47D3',
