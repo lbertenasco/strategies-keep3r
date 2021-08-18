@@ -247,16 +247,6 @@ export const manualHarvestStrategies = [
     address: '0xDD387F2fe0D9B1E5768fc941e7E48AA8BfAf5e41',
     maxReportDelay: 60 * 60 * 80, // 80 hours
   },
-  {
-    name: 'ssc_steth',
-    address: '0x8c44Cc5c0f5CD2f7f17B9Aca85d456df25a61Ae8',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
-  },
-  {
-    name: 'ssc_seth',
-    address: '0xCdC3d3A18c9d83Ee6E10E91B48b1fcb5268C97B5',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
-  },
   // poolpi's strats
   {
     name: 'Router_yvDAI_030_to_yvDAI_043',

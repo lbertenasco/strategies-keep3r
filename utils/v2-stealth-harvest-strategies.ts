@@ -42,18 +42,6 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
   },
   {
-    name: 'StrategyeCurveWETHSingleSided',
-    added: false,
-    amount: 2_000_000,
-    address: '0xda988eBb26F505246C59Ba26514340B634F9a7a2',
-  },
-  // { // deprecated
-  //   name: 'StrategyIdleidleDAIYield',
-  //   added: false,
-  //   amount: 3_000_000,
-  //   address: '0x9f51F4df0b275dfB1F74f6Db86219bAe622B36ca',
-  // },
-  {
     name: 'StrategyIdleidleUSDCYield',
     added: false,
     amount: 2_800_000,
@@ -65,12 +53,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_800_000,
     address: '0x01b54c320d6B3057377cbc71d953d1BBa84df44e',
   },
-  {
-    name: 'StrategysteCurveWETHSingleSided',
-    added: false,
-    amount: 1_000_000,
-    address: '0x2886971eCAF2610236b4869f58cD42c115DFb47A',
-  },
+  // {
+  //   name: 'StrategysteCurveWETHSingleSided',
+  //   added: false,
+  //   amount: 1_000_000,
+  //   address: '0x2886971eCAF2610236b4869f58cD42c115DFb47A',
+  // },
   /* ETH */
   {
     name: 'convex_ankr',
