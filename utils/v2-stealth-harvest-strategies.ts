@@ -53,12 +53,6 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_800_000,
     address: '0x01b54c320d6B3057377cbc71d953d1BBa84df44e',
   },
-  // {
-  //   name: 'StrategysteCurveWETHSingleSided',
-  //   added: false,
-  //   amount: 1_000_000,
-  //   address: '0x2886971eCAF2610236b4869f58cD42c115DFb47A',
-  // },
   /* ETH */
   {
     name: 'convex_ankr',
