@@ -49,10 +49,21 @@ function promptAndSubmit(): Promise<void | Error> {
             .filter((strategy) => strategy.added)
             .map((strategy) => strategy.address);
 
+          const strategiesNotYetAdded = v2StealthStrategies
+            .filter((strategy) => !strategy.added)
+            .map((strategy) => strategy.address);
+
           for (const strategyAdded of strategiesAdded) {
             if (jobStrategies.indexOf(strategyAdded) == -1)
               console.log(
-                `strategy: ${strategyAdded} should be added: false, or removed from script`
+                `strategy: ${strategyAdded} should be added: false, or removed from config`
+              );
+          }
+
+          for (const strategyNotYetAdded of strategiesNotYetAdded) {
+            if (jobStrategies.indexOf(strategyNotYetAdded) != -1)
+              console.log(
+                `strategy: ${strategyNotYetAdded} should be added: true, or removed from job and config`
               );
           }
 

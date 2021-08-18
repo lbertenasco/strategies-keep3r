@@ -11,45 +11,21 @@ export interface v2HarvestStealthStrategy {
 }
 
 export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
-  // { // deprecated
-  //   name: 'StrategystETHCurve',
-  //   added: false,
-  //   amount: 2_000_000,
-  //   address: '0x979843B8eEa56E0bEA971445200e0eC3398cdB87',
-  // },
-  // { // deprecated
-  //   name: 'StrategyGenericLevCompFarm',
-  //   added: false,
-  //   amount: 2_000_000,
-  //   address: '0x4D7d4485fD600c61d840ccbeC328BfD76A050F87',
-  // },
   {
     name: 'StrategyYearnVECRV',
-    added: false,
+    added: true,
     amount: 1_000_000,
     address: '0x2923a58c1831205C854DBEa001809B194FDb3Fa5',
   },
-  // { // deprecated
-  //   name: 'StrategyMakerETHDAIDelegate',
-  //   added: false,
-  //   amount: 1_000_000,
-  //   address: '0x1A5890d45090701A35D995Be3b63948A67460341',
-  // },
-  {
-    name: 'StrategyLenderYieldOptimiser',
-    added: true,
-    amount: 2_000_000,
-    address: '0x32b8C26d0439e1959CEa6262CBabC12320b384c4',
-  },
   {
     name: 'StrategyIdleidleUSDCYield',
-    added: false,
+    added: true,
     amount: 2_800_000,
     address: '0x2E1ad896D3082C52A5AE7Af307131DE7a37a46a0',
   },
   {
     name: 'StrategyIdleidleUSDTYield',
-    added: false,
+    added: true,
     amount: 2_800_000,
     address: '0x01b54c320d6B3057377cbc71d953d1BBa84df44e',
   },
@@ -80,14 +56,8 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_000_000,
   },
   {
-    name: 'convex_tricrypto',
-    added: true,
-    address: '0xCc39eC658Eedb7e44f5aeD9B5192219982D2c9e5',
-    amount: 2_000_000,
-  },
-  {
     name: 'StrategyKashiMultiPairLender',
-    added: false,
+    added: true,
     address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
     amount: 2_000_000,
   },
