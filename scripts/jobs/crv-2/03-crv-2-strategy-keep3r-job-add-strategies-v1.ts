@@ -35,16 +35,16 @@ function run() {
     }
     console.log('using address:', deployer._address);
 
-    const crvStrategyKeep3rStealthJob2 = await ethers.getContractAt(
+    const crvStrategyKeep3rJob2 = await ethers.getContractAt(
       'CrvStrategyKeep3rStealthJob2',
-      contracts.crvStrategyKeep3rStealthJob2.mainnet,
+      contracts.crvStrategyKeep3rJob2.mainnet,
       deployer
     );
 
     const crvStrategies = [...v2CrvStrategies, ...v1CrvStrategies];
 
     // Checks if local data matches chain data
-    const addedStrategies = await crvStrategyKeep3rStealthJob2.strategies();
+    const addedStrategies = await crvStrategyKeep3rJob2.strategies();
     for (const strategy of crvStrategies) {
       const added = addedStrategies.indexOf(strategy.address) != -1;
       if (added && strategy.added) continue;
@@ -67,7 +67,7 @@ function run() {
     if (!(await confirm.run())) return;
 
     console.time('addStrategies');
-    await crvStrategyKeep3rStealthJob2.addStrategies(
+    await crvStrategyKeep3rJob2.addStrategies(
       newV1CrvStrategies.map((strategy) => strategy.address),
       newV1CrvStrategies.map((strategy) => strategy.requiredHarvestAmount),
       newV1CrvStrategies.map((strategy) =>
