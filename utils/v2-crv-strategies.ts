@@ -131,7 +131,6 @@ export const v2CrvStrategies = [
   //     profitFactor: 1,
   //   },
   {
-    // 100% in convex, deprecated for now
     name: 'LUSD',
     wantSymbol: 'LUSD3CRV-f',
     added: true,
@@ -141,7 +140,6 @@ export const v2CrvStrategies = [
     profitFactor: 1,
   },
   {
-    // 100% in convex, deprecated for now
     name: 'FRAX',
     wantSymbol: 'FRAX3CRV-f',
     added: true,
