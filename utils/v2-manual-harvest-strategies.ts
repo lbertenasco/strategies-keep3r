@@ -80,14 +80,14 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_usdp',
     address: '0xfb0702469A1a0440E87C06605461E8660FD0F43d',
-    maxReportDelay: 60 * 60 * 24 * 5, // 5 days
+    maxReportDelay: 60 * 60 * 24 * 6, // 6 days
     amount: e18.mul(200000),
   },
   {
     name: 'convex_usdn',
     address: '0x8e87e65Cb28c069550012f92d5470dB6EB6897c0',
-    maxReportDelay: 60 * 60 * 20, // 20 hours
-    amount: e18.mul(200000),
+    maxReportDelay: 60 * 60 * 8, // 8 hours
+    amount: e18.mul(2000000),
   },
   {
     name: 'convex_comp',
@@ -158,20 +158,20 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_saave',
     address: '0xF5636591256195414f25d19034B70A4742Fc2A2e',
-    maxReportDelay: 60 * 60 * 24 * 6.1, // 6.1 days
-    amount: e18.mul(200000),
+    maxReportDelay: 60 * 60 * 24 * 5, // 5 days
+    amount: e18.mul(300000),
   },
   {
     name: 'convex_lusd',
     address: '0x789685963DF287337759A9FaB65d8c645a3B4cba',
-    maxReportDelay: 60 * 60 * 24 * 1, // 1 day
-    amount: e18.mul(200000),
+    maxReportDelay: 60 * 60 * 24 * 1.2, // 1.2 day
+    amount: e18.mul(300000),
   },
   {
     name: 'convex_frax',
     address: '0x8c312B63Bc4000f61E1C4df4868A3A1f09b31A73',
-    maxReportDelay: 60 * 60 * 24 * 3, // 3 days
-    amount: e18.mul(200000),
+    maxReportDelay: 60 * 60 * 24 * 2, // 2 days
+    amount: e18.mul(500000),
   },
   {
     // deprecated
@@ -195,7 +195,13 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_ironbank',
     address: '0xf0aAba6bb8E6bAE83Ea984BC4b7dcf0fF54a8FEF',
-    maxReportDelay: 60 * 60 * 18, // 18 hours
+    maxReportDelay: 60 * 60 * 14, // 14 hours
+    amount: e18.mul(1500000),
+  },
+  {
+    name: 'curve_ironbank',
+    address: '0xf0aAba6bb8E6bAE83Ea984BC4b7dcf0fF54a8FEF',
+    maxReportDelay: 60 * 60 * 22, // 22 hours
     amount: e18.mul(1500000),
   },
   {
@@ -207,13 +213,13 @@ export const manualHarvestStrategies = [
   {
     name: 'convex_steth',
     address: '0x6C0496fC55Eb4089f1Cf91A4344a2D56fAcE51e3',
-    maxReportDelay: 60 * 60 * 18, // 18 hours
+    maxReportDelay: 60 * 60 * 8, // 8 hours
     amount: e18.mul(300),
   },
   {
     name: 'convex_3crypto',
     address: '0x2055CFD5CDbc90c60A202A1AC3DDfB71AeC1cE98',
-    maxReportDelay: 60 * 60 * 24, // 24 hours
+    maxReportDelay: 60 * 60 * 40, // 40 hours
     amount: e18.mul(500),
   },
   {
