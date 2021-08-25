@@ -1,11 +1,11 @@
 import { e18 } from './web3-utils';
 
 export const manualHarvestStrategies = [
-  {
-    name: 'idle_rai_yield',
-    address: '0x5d411d2cde10e138d68517c42be2808c90c22026',
-    amount: e18.mul(1000000),
-  },
+  // { // deprecated due to illiquid swap
+  //   name: 'idle_rai_yield',
+  //   address: '0x5D411D2cde10e138d68517c42bE2808C90c22026',
+  //   amount: e18.mul(1000000),
+  // },
   // sam unknown
   {
     name: 'sam_unknown_1',
@@ -44,5 +44,4 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 24 * 2, // 2 days
     // amount: e18.mul(2500000),
   },
-  
 ];
