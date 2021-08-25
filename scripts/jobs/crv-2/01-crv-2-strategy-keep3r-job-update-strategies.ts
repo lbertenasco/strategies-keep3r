@@ -10,6 +10,9 @@ const { Confirm } = require('enquirer');
 const confirm = new Confirm(
   'Do you want to modify strategies on crv keep3r job?'
 );
+const confirmAddStrategies = new Confirm(
+  'Do you want to add strategies on crv keep3r job?'
+);
 
 async function main() {
   await hre.run('compile');
@@ -61,6 +64,22 @@ function run(): Promise<void | Error> {
       console.log(`removeStrategy(${chainStrategyAddress})`);
     }
 
+    const strategiesToAdd = [];
+    for (const configStrategyAddress of strategyAddressess) {
+      if (chainStrategies.indexOf(configStrategyAddress) == -1) {
+        console.log(configStrategyAddress, 'is on config but not on job');
+        strategiesToAdd.push(configStrategyAddress);
+      }
+    }
+
+    if (strategiesToAdd.length > 0) {
+      // TODO add missing strats and exit
+      if (!(await confirmAddStrategies.run())) return;
+      for (const strategyToAdd of strategiesToAdd) {
+      }
+      return resolve();
+    }
+
     // Checks if local data matches chain data
     for (const strategy of crvStrategies) {
       const requiredHarvest = await crvStrategyKeep3rJob2.requiredHarvest(
@@ -108,11 +127,20 @@ function run(): Promise<void | Error> {
       outdatedV1CrvStrategies.map((strategy: any) => strategy.name).join(', ')
     );
 
-    if (!(await confirm.run())) return;
+    if (!(await confirm.run())) return resolve();
 
     // Update crv strategies on crv keep3r
     console.time('updateStrategies');
     for (const strategy of outdatedV1CrvStrategies) {
+      console.log(strategy.address);
+      await crvStrategyKeep3rJob2.callStatic.updateStrategy(
+        strategy.address,
+        strategy.requiredHarvestAmount,
+        bn
+          .from(10)
+          .pow(strategy.requiredEarn.decimals)
+          .mul(strategy.requiredEarn.amount)
+      );
       await crvStrategyKeep3rJob2.updateStrategy(
         strategy.address,
         strategy.requiredHarvestAmount,

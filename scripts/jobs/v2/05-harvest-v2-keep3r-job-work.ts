@@ -236,6 +236,10 @@ function promptAndSubmit(): Promise<void | Error> {
             console.log(query.obj);
           }
         }
+
+        // TODO remove this
+        return resolve(); // only allow 1 harvest every 10 minutes
+
         if (strategy.isCRV) harvestedCRV = true;
       }
       console.log('waiting 10 minutes...');
