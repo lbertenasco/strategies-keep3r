@@ -23,9 +23,9 @@ export const manualHarvestStrategies = [
     maxReportDelay: 60 * 60 * 8, // 8 hours
   },
   {
-    name: 'sam_unknown_4',
+    name: 'Lev Comp WETH',
     address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
-    maxReportDelay: 60 * 60 * 24, // 24 hours
+    maxReportDelay: 60 * 60 * 24 * 4, // 4 days
   },
   {
     name: 'sam_unknown_5',
