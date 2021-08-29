@@ -29,9 +29,13 @@ function promptAndSubmit(): Promise<void | Error> {
             await harvestV2Keep3rStealthJob.callStatic.strategies();
           console.log('strategies:', strategies);
           for (const strategy of strategies) {
-            const workableStrategy =
-              await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
-            console.log(strategy, 'workable:', workableStrategy);
+            try {
+              const workableStrategy =
+                await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
+              console.log(strategy, 'workable:', workableStrategy);
+            } catch (error) {
+              console.log(error);
+            }
           }
 
           resolve();
