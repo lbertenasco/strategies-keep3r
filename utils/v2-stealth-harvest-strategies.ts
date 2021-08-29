@@ -183,6 +183,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_000_000,
   },
   {
+    name: 'convex_rsv',
+    added: false,
+    address: '0xA7A5BFf106d5E7aA601F6D540c5034Ca2a13787B',
+    amount: 2_000_000,
+  },
+  {
     name: 'convex_tusd',
     added: true,
     address: '0x270101459e9A38Db38Ba4Cb8718FfA31953A9Af3',
@@ -201,11 +207,23 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_000_000,
   },
   {
-    name: 'curve_ironbank',
-    added: true,
-    address: '0x6D892A5585F45f3C45A238C717AA0a228aE69e2C',
+    name: 'convex_husd',
+    added: false,
+    address: '0xdC929e76081a78e5c32552C2e79D29ECab3F6755',
     amount: 2_000_000,
   },
+  {
+    name: 'convex_musd',
+    added: false,
+    address: '0x75be6ABC02a010559Ed5c7b0Eab94abD2B783b65',
+    amount: 2_000_000,
+  },
+  //   { // deprecated for now
+  //     name: 'curve_ironbank',
+  //     added: true,
+  //     address: '0x6D892A5585F45f3C45A238C717AA0a228aE69e2C',
+  //     amount: 2_000_000,
+  //   },
   /* MISC */
   {
     name: 'convex_link',
@@ -223,6 +241,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     name: 'convex_3crypto',
     added: true,
     address: '0x2055CFD5CDbc90c60A202A1AC3DDfB71AeC1cE98',
+    amount: 2_000_000,
+  },
+  {
+    name: 'curve_triCrypto',
+    added: false,
+    address: '0x4ce03bCFC3122eB0F724b94913629c6062949947',
     amount: 2_000_000,
   },
   {
