@@ -183,6 +183,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_000_000,
   },
   {
+    name: 'convex_rsv',
+    added: false,
+    address: '0xA7A5BFf106d5E7aA601F6D540c5034Ca2a13787B',
+    amount: 2_000_000,
+  },
+  {
     name: 'convex_tusd',
     added: true,
     address: '0x270101459e9A38Db38Ba4Cb8718FfA31953A9Af3',
