@@ -17,9 +17,9 @@ import {
 import { resolve } from 'dns';
 
 const { Confirm } = require('enquirer');
-const prompt = new Confirm({
-  message: 'Do you wish to force work v2 stealth strategies?',
-});
+// const prompt = new Confirm({
+//   message: 'Do you wish to force work v2 stealth strategies?',
+// });
 let blockProtection: Contract;
 
 async function main() {
@@ -45,81 +45,79 @@ function promptAndSubmit(): Promise<void | Error> {
     }
 
     console.log('using address:', signer.address);
-    prompt.run().then(async (answer: any) => {
-      if (answer) {
+    // prompt.run().then(async (answer: any) => {
+    //   if (answer) {
+    try {
+      // const mechanicsRegistry = await ethers.getContractAt(
+      //   'MechanicsRegistry',
+      //   contracts.mechanicsRegistry.mainnet,
+      //   signer
+      // );
+
+      // const BlockProtection: ContractFactory = await ethers.getContractFactory(
+      //   'BlockProtection'
+      // );
+
+      // blockProtection = await BlockProtection.deploy(mechanicsRegistry.address);
+
+      // await mechanicsRegistry.addMechanic(blockProtection.address);
+
+      blockProtection = await ethers.getContractAt(
+        'BlockProtection',
+        contracts.blockProtection.mainnet,
+        signer
+      );
+
+      const harvestV2Keep3rStealthJob = await ethers.getContractAt(
+        'HarvestV2Keep3rStealthJob',
+        contracts.harvestV2Keep3rStealthJob.mainnet,
+        signer
+      );
+
+      const strategies =
+        await harvestV2Keep3rStealthJob.callStatic.strategies();
+      // const strategies = ['0xeC088B98e71Ba5FFAf520c2f6A6F0153f1bf494B'];
+
+      console.log('strategies:', strategies);
+      for (const strategy of strategies) {
         try {
-          // const mechanicsRegistry = await ethers.getContractAt(
-          //   'MechanicsRegistry',
-          //   contracts.mechanicsRegistry.mainnet,
-          //   signer
-          // );
+          const workableStrategy =
+            await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
+          console.log(strategy, 'workable:', workableStrategy);
 
-          // const BlockProtection: ContractFactory = await ethers.getContractFactory(
-          //   'BlockProtection'
-          // );
+          if (!workableStrategy) continue;
+          const workTx =
+            await harvestV2Keep3rStealthJob.populateTransaction.forceWorkUnsafe(
+              strategy
+            );
 
-          // blockProtection = await BlockProtection.deploy(mechanicsRegistry.address);
+          // const blockNumber = await ethers.provider.getBlockNumber();
+          // await blockProtection.connect(signer).callWithBlockProtection(workTx.to, workTx.data, blockNumber + 1);
 
-          // await mechanicsRegistry.addMechanic(blockProtection.address);
+          const error = await flashBotsSendTx(workTx);
 
-          blockProtection = await ethers.getContractAt(
-            'BlockProtection',
-            contracts.blockProtection.mainnet,
-            signer
-          );
-
-          const harvestV2Keep3rStealthJob = await ethers.getContractAt(
-            'HarvestV2Keep3rStealthJob',
-            contracts.harvestV2Keep3rStealthJob.mainnet,
-            signer
-          );
-
-          const strategies =
-            await harvestV2Keep3rStealthJob.callStatic.strategies();
-          // const strategies = ['0xeC088B98e71Ba5FFAf520c2f6A6F0153f1bf494B'];
-
-          console.log('strategies:', strategies);
-          for (const strategy of strategies) {
-            try {
-              const workableStrategy =
-                await harvestV2Keep3rStealthJob.callStatic.workable(strategy);
-              console.log(strategy, 'workable:', workableStrategy);
-
-              if (!workableStrategy) continue;
-              const workTx =
-                await harvestV2Keep3rStealthJob.populateTransaction.forceWorkUnsafe(
-                  strategy
-                );
-
-              // const blockNumber = await ethers.provider.getBlockNumber();
-              // await blockProtection.connect(signer).callWithBlockProtection(workTx.to, workTx.data, blockNumber + 1);
-
-              const error = await flashBotsSendTx(workTx);
-
-              if (error) {
-                console.log('error:');
-                console.log(error);
-                return;
-              }
-
-              console.log('done!');
-              return resolve();
-            } catch (error) {
-              console.log(error);
-            }
+          if (error) {
+            console.log('error:');
+            console.log(error);
+            return;
           }
 
-          resolve();
-        } catch (err) {
-          reject(
-            `Error while force work v2 stealth strategies: ${err.message}`
-          );
+          console.log('done!');
+          return resolve();
+        } catch (error) {
+          console.log(error);
         }
-      } else {
-        console.error('Aborted!');
-        resolve();
       }
-    });
+
+      resolve();
+    } catch (err) {
+      reject(`Error while force work v2 stealth strategies: ${err.message}`);
+    }
+    // } else {
+    //   console.error('Aborted!');
+    //   resolve();
+    // }
+    // });
   });
 }
 
