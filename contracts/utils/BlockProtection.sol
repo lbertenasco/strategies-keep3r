@@ -20,12 +20,16 @@ contract BlockProtection is MachineryReady, IBlockProtection {
 
     constructor(address _mechanicsRegistry) MachineryReady(_mechanicsRegistry) {}
 
+    modifier blockNumberProtection(uint256 _blockNumber) {
+        if (_blockNumber != block.number) revert InvalidBlock();
+        _;
+    }
+
     function callWithBlockProtection(
         address _to,
         bytes memory _data,
         uint256 _blockNumber
-    ) external payable override onlyMechanic() returns (bytes memory _returnData) {
-        if (_blockNumber != block.number) revert InvalidBlock();
+    ) external payable override blockNumberProtection(_blockNumber) onlyMechanic() returns (bytes memory _returnData) {
         return _to.functionCallWithValue(_data, msg.value);
     }
 }
