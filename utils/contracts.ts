@@ -36,3 +36,7 @@ export const v2Keeper = {
 export const curveClaimableTokensHelper = {
   mainnet: '0xEaD8d69dF1e75C81Ef63855a94309CC5374192bD',
 };
+
+export const blockProtection = {
+  mainnet: '0xCC268041259904bB6ae2c84F9Db2D976BCEB43E5',
+};

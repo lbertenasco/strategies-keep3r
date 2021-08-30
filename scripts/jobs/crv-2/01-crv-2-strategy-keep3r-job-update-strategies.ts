@@ -4,6 +4,7 @@ const ethers = hre.ethers;
 import { v2CrvStrategies } from '../../../utils/v2-crv-strategies';
 import { v1CrvStrategies } from '../../../utils/v1-crv-strategies';
 import config from '../../../.config.json';
+import * as accounts from '../../../utils/accounts';
 import * as contracts from '../../../utils/contracts';
 
 const { Confirm } = require('enquirer');
@@ -24,17 +25,15 @@ function run(): Promise<void | Error> {
     // Setup deployer
     const [owner] = await ethers.getSigners();
     let deployer: any;
-    if (owner.address == config.accounts.mainnet.deployer) {
+    if (owner.address == accounts.yKeeper) {
       deployer = owner;
       deployer._address = owner.address;
     } else {
       await hre.network.provider.request({
         method: 'hardhat_impersonateAccount',
-        params: [config.accounts.mainnet.deployer],
+        params: [accounts.yKeeper],
       });
-      deployer = (owner as any).provider.getUncheckedSigner(
-        config.accounts.mainnet.deployer
-      );
+      deployer = (owner as any).provider.getUncheckedSigner(accounts.yKeeper);
     }
     console.log('using address:', deployer._address);
 
