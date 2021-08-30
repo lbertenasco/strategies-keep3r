@@ -212,6 +212,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0x75be6ABC02a010559Ed5c7b0Eab94abD2B783b65',
     amount: 2_000_000,
   },
+  {
+    name: 'convex_compound',
+    added: false,
+    address: '0x2b0b941d98848d6c9C729d944E3B1BD9C00A5529',
+    amount: 2_000_000,
+  },
   //   { // deprecated for now
   //     name: 'curve_ironbank',
   //     added: true,
