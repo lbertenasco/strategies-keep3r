@@ -98,10 +98,7 @@ function promptAndSubmit(): Promise<void | Error> {
             strategiesToAdd.map((strategy) => strategy.address), // address _strategy,
             strategiesToAdd.map((strategy) => strategy.amount), // uint256 _requiredAmount,
             strategiesToAdd.map((strategy) => strategy.costToken), // address _costToken,
-            strategiesToAdd.map((strategy) => strategy.costPair), // address _costPair
-            {
-              nonce: 53,
-            }
+            strategiesToAdd.map((strategy) => strategy.costPair) // address _costPair
           );
 
           resolve();
