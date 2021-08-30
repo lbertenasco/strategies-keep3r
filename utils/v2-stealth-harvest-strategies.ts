@@ -255,4 +255,40 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
     amount: 2_000_000,
   },
+  {
+    name: 'weth_lev_comp',
+    added: false,
+    address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
+    amount: 2_000_000,
+  },
+  {
+    name: 'dai_lev_comp',
+    added: false,
+    address: '0x6341c289b2E0795A04223DF04B53A77970958723',
+    amount: 2_000_000,
+  },
+  {
+    name: 'usdc_lev_comp',
+    added: false,
+    address: '0xE6c78b85f93c25B8EE7d963fD15d1d53a00F5908',
+    amount: 2_000_000,
+  },
+  {
+    name: 'wbtc_lev_comp',
+    added: false,
+    address: '0x4F3c19878da5366fd85648Ef8692D96067dEE16D',
+    amount: 2_000_000,
+  },
+  {
+    name: 'dai_router',
+    added: false,
+    address: '0x3D6532c589A11117a4494d9725bb8518C731f1Be',
+    amount: 2_000_000,
+  },
+  {
+    name: 'weth_router',
+    added: false,
+    address: '0xE5f7f2E59B259E11EcF2Ff76fDf5dC7438363A3f',
+    amount: 2_000_000,
+  },
 ];
