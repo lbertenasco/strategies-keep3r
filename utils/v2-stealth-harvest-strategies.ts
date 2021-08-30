@@ -12,12 +12,6 @@ export interface v2HarvestStealthStrategy {
 
 export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   {
-    name: 'StrategyYearnVECRV',
-    added: true,
-    amount: 1_000_000,
-    address: '0x2923a58c1831205C854DBEa001809B194FDb3Fa5',
-  },
-  {
     name: 'StrategyIdleidleUSDCYield',
     added: true,
     amount: 2_800_000,
