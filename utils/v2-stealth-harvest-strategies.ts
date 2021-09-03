@@ -293,7 +293,7 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   },
   {
     name: 'StrategyKashiMultiPairLender - TUSD',
-    added: true,
+    added: false,
     address: '0x564bf2844654f149821697cC56572eE4384c05f7',
     amount: 2_000_000,
   },
