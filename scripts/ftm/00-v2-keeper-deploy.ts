@@ -29,7 +29,6 @@ function promptAndSubmit() {
         'V2Keeper'
       );
       const v2Keeper = await V2Keeper.deploy(contracts.mechanicsRegistry.ftm);
-      console.timeEnd('V2Keeper deployed');
       console.log('V2Keeper address:', v2Keeper.address);
       console.log(
         'PLEASE: change .contracts.ts v2Keeper.ftm address to:',

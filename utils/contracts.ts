@@ -42,3 +42,15 @@ export const curveClaimableTokensHelper = {
 export const blockProtection = {
   mainnet: '0xCC268041259904bB6ae2c84F9Db2D976BCEB43E5',
 };
+
+export const vaultsRegistry = {
+  mainnet: '0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804',
+  polygon: '',
+  ftm: '0x41679043846d1B16b44FBf6E7FE531390e5bf092',
+};
+
+export const vaultsRegistryHelper = {
+  mainnet: '',
+  polygon: '',
+  ftm: '0x3030c9462BD9AFeCE7536B66cc75071dE687Af4A',
+};

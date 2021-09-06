@@ -14,10 +14,12 @@ function promptAndSubmit() {
     try {
       // Setup deployer
       const [owner] = await ethers.getSigners();
+      console.log('using', owner.address);
       let deployer;
       if (owner.address == accounts.yKeeper) {
         deployer = owner;
       } else {
+        console.log('impersonating', accounts.yKeeper);
         await hre.network.provider.request({
           method: 'hardhat_impersonateAccount',
           params: [accounts.yKeeper],
@@ -25,33 +27,20 @@ function promptAndSubmit() {
         deployer = (owner.provider as any).getUncheckedSigner(accounts.yKeeper);
       }
 
-      const v2Keeper = await ethers.getContractAt(
-        'V2Keeper',
-        contracts.v2Keeper.ftm,
-        deployer
+      const VaultsRegistryHelper: ContractFactory =
+        await ethers.getContractFactory('VaultsRegistryHelper');
+      console.log(contracts.vaultsRegistry.ftm);
+      const vaultsRegistryHelper = await VaultsRegistryHelper.deploy(
+        contracts.vaultsRegistry.ftm
       );
-
-      /**
-      def all_vaults():
-          regist = registry()
-          vaults = []
-          for i in range(0, regist.numTokens()):
-              for j in range(0,20):
-                  vault = regist.vaults(regist.tokens(i), j)
-                  if vault == '0x0000000000000000000000000000000000000000':
-                      break
-                  #vault = regist.latestVault(regist.tokens(i))
-                  vaults.append(assess_vault_version(vault))
-          return vaults
-
-      def all_strats(vault):
-          strategies = []
-          for i in range(20):
-              s = vault.withdrawalQueue(i)
-              if s == ZERO_ADDRESS:
-                  return strategies
-              strategies.append(Contract(s))
-       */
+      console.log(
+        'VaultsRegistryHelper address:',
+        vaultsRegistryHelper.address
+      );
+      console.log(
+        'PLEASE: change .contracts.ts vaultsRegistryHelper.ftm address to:',
+        vaultsRegistryHelper.address
+      );
 
       resolve();
     } catch (err) {

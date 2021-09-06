@@ -12,6 +12,12 @@ interface IV2Registry {
 
     function getVaults() external view returns (address[] memory);
 
+    function numTokens() external view returns (uint256 _numTokens);
+
+    function tokens(uint256 _index) external view returns (address _token);
+
+    function vaults(address _token, uint256 _index) external view returns (address _vault);
+
     function getVaultInfo(address _vault)
         external
         view
