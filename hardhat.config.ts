@@ -27,9 +27,14 @@ module.exports = {
             accounts: [process.env.MAINNET_PRIVATE_KEY],
             gasPrice: 65000000000, // 65 gwei
           },
+          ftm: {
+            url: 'https://rpc.ftm.tools',
+            accounts: [process.env.FTM_PRIVATE_KEY],
+            // gasPrice: 65000000000, // 65 gwei
+          },
           polygonMainnet: {
             url: 'https://rpc-mainnet.matic.quiknode.pro',
-            accounts: [process.env.MAINNET_PRIVATE_KEY],
+            accounts: [process.env.POLYGON_PRIVATE_KEY],
             gasPrice: 5000000000, // 5 gwei
           },
           staticMainnet: {
