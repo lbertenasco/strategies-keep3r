@@ -255,12 +255,12 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
     amount: 2_000_000,
   },
-  {
-    name: 'weth_lev_comp',
-    added: true,
-    address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
-    amount: 2_000_000,
-  },
+  // {
+  //   name: 'weth_lev_comp',
+  //   added: true,
+  //   address: '0x83B6211379c26E0bA8d01b9EcD4eE1aE915630aa',
+  //   amount: 2_000_000,
+  // },
   {
     name: 'dai_lev_comp',
     added: true,
