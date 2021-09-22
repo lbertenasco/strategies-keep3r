@@ -250,6 +250,18 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     amount: 2_000_000,
   },
   {
+    name: 'convex_eurt',
+    added: false,
+    address: '0x5E10E27DEae12877e23A68cC0d6F1b134b4d517A',
+    amount: 2_000_000,
+  },
+  {
+    name: 'convex_mim',
+    added: false,
+    address: '0x6570B0a1593a59CcB378fb0b01A753875FCa99c4',
+    amount: 2_000_000,
+  },
+  {
     name: 'StrategyKashiMultiPairLender',
     added: true,
     address: '0xC8f17f8E15900b6D6079680b15Da3cE5263f62AA',
