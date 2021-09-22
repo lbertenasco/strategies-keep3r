@@ -297,4 +297,16 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
     address: '0x564bf2844654f149821697cC56572eE4384c05f7',
     amount: 2_000_000,
   },
+  {
+    name: 'Gen Lender USDT',
+    added: false,
+    address: '0x2f87c5e8396F0C41b86aad4F3C8358aB21681952',
+    amount: 2_000_000,
+  },
+  {
+    name: 'GenericAave - USDT plugin',
+    added: false,
+    address: '0x41b51b0b9ECDD0ee54D82798e83Fd3B9562A7A3c',
+    amount: 2_000_000,
+  },
 ];
