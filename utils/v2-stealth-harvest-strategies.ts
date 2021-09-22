@@ -300,7 +300,7 @@ export const v2StealthStrategies: v2HarvestStealthStrategy[] = [
   {
     name: 'Gen Lender USDT',
     added: false,
-    address: '0x2f8503BC62EDc228bFdFDAA72722f2d9b7e61914',
+    address: '0x2f87c5e8396F0C41b86aad4F3C8358aB21681952',
     amount: 2_000_000,
   },
   {
