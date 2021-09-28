@@ -1,3 +1,5 @@
+Archived and moved to https://github.com/yearn/strategies-keep3r
+
 # Strategies Keep3r
 
 ## Wishlist
